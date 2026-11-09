@@ -10,7 +10,7 @@ import { SnapshotStore, type Polity, type Snapshot } from './snapshots';
 import { paintPaper } from './paper';
 import { assignColors, CINNABAR, PIGMENTS } from './palette';
 import { warmWashTiles } from './wash';
-import { drawBase, drawHover, drawPolities, drawWater, type Quality } from './render';
+import { drawBase, drawHover, drawPolities, drawWater, type PolityStyle, type Quality } from './render';
 import { drawLabels, drawRiverLabels, layoutLabels, LABEL_FONT } from './labels';
 import { Layer, composeLayer } from './layer';
 
@@ -32,6 +32,8 @@ export interface EngineEvents {
 
 export type FxPainter = (ctx: CanvasRenderingContext2D, view: View, now: number) => boolean;
 
+type LayerJob = [Layer, (ctx: CanvasRenderingContext2D) => void];
+
 export interface Padding {
   left: number;
   right: number;
@@ -52,7 +54,7 @@ export class MapEngine {
   private fx = document.createElement('canvas');
   private base: Basemap | null = null;
   private baseLayer = new Layer();
-  private waterLayer = new Layer();
+  private waterLayer = new Layer(false);
   private polLayers: [Layer, Layer] = [new Layer(), new Layer()];
   private labLayers: [Layer, Layer] = [new Layer(), new Layer()];
   private current: Snapshot | null = null;
@@ -120,6 +122,7 @@ export class MapEngine {
     this.destroyed = true;
     cancelAnimationFrame(this.raf);
     this.resizeObserver.disconnect();
+    this.store.destroy();
     this.container.replaceChildren();
   }
 
@@ -177,7 +180,7 @@ export class MapEngine {
   // 切换年份：若生效的切片变化则加载并淡入
   async setYear(year: number, immediate = false) {
     this.year = year;
-    if (!this.store.index) return;
+    if (!this.store.index || this.destroyed) return;
     const meta = this.store.metaFor(year);
     this.store.prefetch(this.store.nextMeta(meta));
     if (this.current?.meta.year === meta.year) {
@@ -201,8 +204,8 @@ export class MapEngine {
     this.fadeStart = performance.now();
     this.polLayers.reverse();
     this.labLayers.reverse();
-    this.polLayers[1].invalidate();
-    this.labLayers[1].invalidate();
+    this.polLayers[1].reset();
+    this.labLayers[1].reset();
     this.events.onSnapshot?.(meta);
     this.snapshotListeners.forEach((l) => l(meta));
     this.kick();
@@ -313,7 +316,9 @@ export class MapEngine {
       next = { k, x: width / 2 - center[0] * k, y: (top + height - bottom) / 2 - center[1] * k };
     }
     this.view = { ...prev, width, height, dpr, ...next };
+    // 显式给出视口范围：默认的 extent 每次变换都读 clientWidth，飞行中逐帧触发强制同步布局
     this.zoomer
+      .extent([[0, 0], [width, height]])
       .scaleExtent([fit.k * 0.8, fit.k * 30])
       .translateExtent([[-BASE_W * 0.3, -BASE_H * 0.4], [BASE_W * 1.3, BASE_H * 1.4]]);
     select(this.fx).call(this.zoomer.transform, zoomIdentity.translate(next.x, next.y).scale(next.k));
@@ -334,6 +339,10 @@ export class MapEngine {
       (name) => this.policy.preferredColor(name, y),
     );
     snap.polities.forEach((p, i) => (p.color = colors[i]));
+  }
+
+  private polityStyle(snap: Snapshot): PolityStyle {
+    return { colors: snap.polities.map((p) => p.color), highlight: this.highlightSet(snap), highlightColor: this.policy.highlightColor };
   }
 
   private highlightSet(snap: Snapshot): Map<number, 1 | 2> | null {
@@ -379,42 +388,36 @@ export class MapEngine {
     if (animating || this.interacting) this.kick();
   };
 
-  // 缓存失效或缩放差异过大时重绘图层；交互中只在缩放比偏离 1.6 倍以上时快速重绘
+  // 缓存失效或偏离视图过多时重绘图层（交互中只在缩放比偏离 1.6 倍或露边较多时快速重绘）。
+  // 每帧至多重绘一层、最急者优先，把开销摊到多帧，避免飞行中所有图层挤在同一帧重绘
   private renderLayers(quality: Quality) {
     const base = this.base!;
     const v = this.view;
-    let fullBudget = 1;
-    const needs = (l: Layer) => {
-      if (!l.needsRender(v, this.interacting, quality)) return false;
-      if (quality === 'fast' || !l.view) return true;
-      const sameView = l.view.k === v.k && l.view.x === v.x && l.view.y === v.y && l.view.width === v.width;
-      if (!sameView) return true;
-      if (fullBudget <= 0) {
-        this.kick();
-        return false;
-      }
-      fullBudget--;
-      return true;
-    };
-    if (needs(this.baseLayer)) this.baseLayer.render(v, quality, (ctx) => drawBase(ctx, v, base, quality));
-    if (needs(this.waterLayer)) this.waterLayer.render(v, quality, (ctx) => drawWater(ctx, v, base));
-    const pairs: [Snapshot | null, Layer, Layer][] = [
-      [this.current, this.polLayers[1], this.labLayers[1]],
-      [this.previous, this.polLayers[0], this.labLayers[0]],
+    const snapJobs = (snap: Snapshot | null, pl: Layer, ll: Layer): LayerJob[] =>
+      snap
+        ? [
+            [pl, (ctx) => drawPolities(ctx, v, base, snap, this.polityStyle(snap), quality)],
+            [
+              ll,
+              (ctx) => {
+                const specs = layoutLabels(snap, v, (n) => this.policy.nameOf(n, snap.meta.year, this.year), this.highlightSet(snap));
+                drawRiverLabels(ctx, base.riverLabels, v);
+                drawLabels(ctx, specs, v.dpr, quality === 'full');
+              },
+            ],
+          ]
+        : [];
+    const jobs: LayerJob[] = [
+      ...snapJobs(this.current, this.polLayers[1], this.labLayers[1]),
+      [this.waterLayer, (ctx) => drawWater(ctx, v, base)],
+      [this.baseLayer, (ctx) => drawBase(ctx, v, base, quality)],
+      ...snapJobs(this.previous, this.polLayers[0], this.labLayers[0]),
     ];
-    for (const [snap, pl, ll] of pairs) {
-      if (!snap) continue;
-      const highlight = this.highlightSet(snap);
-      const style = { colors: snap.polities.map((p) => p.color), highlight, highlightColor: this.policy.highlightColor };
-      if (needs(pl)) pl.render(v, quality, (ctx) => drawPolities(ctx, v, base, snap, style, quality));
-      if (needs(ll)) {
-        ll.render(v, quality, (ctx) => {
-          const specs = layoutLabels(snap, v, (n) => this.policy.nameOf(n, snap.meta.year, this.year), highlight);
-          drawRiverLabels(ctx, base.riverLabels, v);
-          drawLabels(ctx, specs, v.dpr);
-        });
-      }
-    }
+    const due = jobs.filter(([l]) => l.needsRender(v, this.interacting, quality));
+    if (!due.length) return;
+    const [layer, draw] = due.reduce((a, b) => (b[0].staleness(v) > a[0].staleness(v) ? b : a));
+    layer.render(v, quality, draw);
+    if (due.length > 1) this.kick();
   }
 
   private compose(fade: number) {

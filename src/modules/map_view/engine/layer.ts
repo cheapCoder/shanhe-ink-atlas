@@ -8,8 +8,17 @@ export class Layer {
   quality: Quality | null = null;
   private valid = false;
 
+  // qualityAware：绘制结果是否随质量档变化；不变的图层在交互结束后无需为提升质量而重绘
+  constructor(private qualityAware = true) {}
+
   invalidate() {
     this.valid = false;
+  }
+
+  // 丢弃缓存内容：换切片后旧位图属于别的年代，重绘前不能拿来顶替
+  reset() {
+    this.valid = false;
+    this.view = null;
   }
 
   needsRender(v: View, interacting: boolean, quality: Quality): boolean {
@@ -21,7 +30,14 @@ export class Layer {
       if (r > 1.6 || r < 0.62) return true;
       return uncovered(c, v) > 0.18;
     }
-    return c.k !== v.k || c.x !== v.x || c.y !== v.y || this.quality !== quality;
+    return c.k !== v.k || c.x !== v.x || c.y !== v.y || (this.qualityAware && this.quality !== quality);
+  }
+
+  // 缓存偏离当前视图的程度，用于排定重绘先后：失效者最急，其次看缩放偏差与未覆盖面积
+  staleness(v: View): number {
+    const c = this.view;
+    if (!this.valid || !c || c.width !== v.width || c.height !== v.height || c.dpr !== v.dpr) return Infinity;
+    return Math.abs(Math.log(v.k / c.k)) + uncovered(c, v);
   }
 
   render(v: View, quality: Quality, draw: (ctx: CanvasRenderingContext2D) => void) {

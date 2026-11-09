@@ -1,9 +1,10 @@
-// 底图：陆地（裁剪与海岸线）、湖泊、河流，均预投影为基准平面上的 Path2D
+// 底图：陆地（裁剪与海岸线）、湖泊、河流，均预投影到基准平面并按缩放分级简化
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry, LineString, MultiLineString, MultiPolygon, Polygon } from 'geojson';
 import { geoArea } from 'd3-geo';
 import { BASE_H, BASE_W, project, toPath2D } from './projection';
+import { LodPath } from './lod';
 
 export interface RiverLabel {
   name: string;
@@ -26,10 +27,10 @@ interface ChinaSeaData {
 }
 
 export interface Basemap {
-  land: Path2D;
-  rippleLand: Path2D;
-  lakes: Path2D;
-  riversByRank: Path2D[];
+  land: LodPath;
+  rippleLand: LodPath;
+  lakes: LodPath;
+  riversByRank: LodPath[];
   riverLabels: RiverLabel[];
   landTexture: HTMLCanvasElement | null;
   chinaSea: ChinaSea | null;
@@ -71,7 +72,7 @@ function riverLabel(f: Feature<Geometry, { n?: string; r: number }>): RiverLabel
 }
 
 // 水纹只描面积较大的陆块，避免小岛周围的同心圈过于繁密
-function largeLand(land: FeatureCollection<Geometry, GeoJsonProperties>): Path2D {
+function largeLand(land: FeatureCollection<Geometry, GeoJsonProperties>): LodPath {
   const minSteradian = 2500 / (6371 * 6371);
   const polygons: Polygon['coordinates'][] = [];
   for (const f of land.features) {
@@ -79,17 +80,18 @@ function largeLand(land: FeatureCollection<Geometry, GeoJsonProperties>): Path2D
     const parts = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
     for (const p of parts) if (geoArea({ type: 'Polygon', coordinates: p }) > minSteradian) polygons.push(p);
   }
-  return toPath2D({ type: 'MultiPolygon', coordinates: polygons });
+  return new LodPath({ type: 'MultiPolygon', coordinates: polygons });
 }
 
 // 陆地淡彩与山体墨色只在加载时合成一次，之后每帧只需一次贴图
-function composeLand(land: Path2D, relief: HTMLImageElement | null): HTMLCanvasElement {
+function composeLand(lod: LodPath, relief: HTMLImageElement | null): HTMLCanvasElement {
   const width = window.innerWidth > 1000 ? 4096 : 2048;
   const c = document.createElement('canvas');
   c.width = width;
   c.height = Math.round((width * BASE_H) / BASE_W);
   const ctx = c.getContext('2d')!;
   const s = width / BASE_W;
+  const land = lod.whole(s);
   ctx.setTransform(s, 0, 0, s, 0, 0);
   ctx.fillStyle = 'rgba(222, 204, 168, 0.34)';
   ctx.fill(land);
@@ -124,21 +126,20 @@ export async function loadBasemap(): Promise<Basemap> {
     loadImage(url('base/relief.webp')),
     loadChinaSea(),
   ]);
-  const riversByRank = Array.from({ length: 7 }, () => new Path2D());
+  const byRank = Array.from({ length: 7 }, () => [] as Feature<Geometry, { n?: string; r: number }>[]);
   const labels = new Map<string, RiverLabel>();
   for (const f of rivers.features) {
-    const rank = Math.min(6, Math.max(0, Math.round(f.properties.r)));
-    riversByRank[rank].addPath(toPath2D(f));
+    byRank[Math.min(6, Math.max(0, Math.round(f.properties.r)))].push(f);
     const label = riverLabel(f);
     const prev = label && labels.get(label.name);
     if (label && (!prev || prev.rank > label.rank)) labels.set(label.name, label);
   }
-  const landPath = toPath2D(land);
+  const landPath = new LodPath(land);
   return {
     land: landPath,
     rippleLand: largeLand(land),
-    lakes: toPath2D(lakes),
-    riversByRank,
+    lakes: new LodPath(lakes),
+    riversByRank: byRank.map((features) => new LodPath({ type: 'FeatureCollection', features })),
     riverLabels: [...labels.values()],
     landTexture: composeLand(landPath, relief),
     chinaSea,
