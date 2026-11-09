@@ -1,0 +1,198 @@
+/* 水墨精灵：笔墨基元 */
+.ink-sprite {
+  overflow: visible;
+  animation: ink-in 1.1s var(--ease-ink) both;
+}
+
+@keyframes ink-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.ink-sprite .ink-fill { fill: var(--ink-0); }
+.ink-sprite .ink-fill.soft { opacity: 0.55; }
+.ink-sprite .ink-stroke { fill: none; stroke: var(--ink-0); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ink-sprite .ink-stroke.thin { stroke-width: 1.5; }
+.ink-sprite .ink-stroke.hair { stroke-width: 0.8; }
+.ink-sprite .ink-stroke.paper { stroke: var(--paper-light); opacity: 0.7; }
+.ink-sprite .ink-stroke.leg { stroke-width: 3.2; }
+.ink-sprite .ink-stroke.torso { stroke-width: 4.6; }
+.ink-sprite .ink-stroke.pole { stroke-width: 3; }
+.ink-sprite .ink-stroke.wave { stroke-width: 1.6; opacity: 0.65; }
+.ink-sprite .ink-stroke.faint { opacity: 0.32; }
+.ink-sprite .ink-stroke.dotted { stroke-width: 1.4; stroke-dasharray: 1 5; opacity: 0.55; }
+.ink-sprite .ink-wash { fill: rgba(20, 18, 15, 0.14); filter: url(#ink-wash); }
+.ink-sprite .ink-wash-fill { fill: rgba(30, 27, 23, 0.34); }
+.ink-sprite .ink-wash-fill.dark { fill: rgba(30, 27, 23, 0.52); }
+.ink-sprite .ink-wash-fill.light { fill: rgba(30, 27, 23, 0.13); }
+.ink-sprite .cinnabar-fill { fill: var(--cinnabar); }
+.ink-sprite .cinnabar-fill.rough { filter: url(#seal-rough); }
+.ink-sprite .cinnabar-stroke { fill: none; stroke: var(--cinnabar); stroke-width: 2.2; stroke-linecap: round; }
+.ink-sprite .ochre-fill { fill: rgba(168, 116, 63, 0.55); }
+.ink-sprite .paper-fill { fill: var(--paper-light); }
+.ink-sprite .gold-fill { fill: rgba(196, 150, 62, 0.45); }
+.ink-sprite .flame-fill { fill: rgba(30, 27, 23, 0.78); }
+.ink-sprite .sail { fill: rgba(168, 116, 63, 0.4); stroke: var(--ink-0); stroke-width: 1.5; stroke-linejoin: round; }
+.ink-sprite .robe { fill: rgba(30, 27, 23, 0.62); stroke: var(--ink-0); stroke-width: 1.4; }
+.ink-sprite .scroll-paper { fill: #f6ecd6; stroke: rgba(120, 88, 46, 0.5); stroke-width: 0.8; }
+.ink-sprite .rod { fill: #3e2918; }
+.ink-sprite .stone-fill { fill: #3f4a44; }
+.ink-sprite .seal-inner { fill: none; stroke: rgba(248, 239, 226, 0.8); stroke-width: 1.2; }
+.ink-sprite .seal-text { font-family: var(--font-brush); font-size: 15px; fill: #f8efe2; text-anchor: middle; }
+.ink-sprite .sun-halo { fill: rgba(178, 58, 43, 0.12); }
+.ink-sprite .leaf { fill: rgba(80, 110, 70, 0.78); stroke: var(--ink-0); stroke-width: 0.6; transform-box: fill-box; transform-origin: center; animation: leaf 0.5s ease-out both; }
+.ink-sprite .calli { stroke-width: 3; stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw 0.8s ease-out forwards; }
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes appear { to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes leaf { from { transform: scale(0); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* 帆船 */
+.spr-ship__boat { transform-box: fill-box; transform-origin: 50% 100%; animation: bob 3.2s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-2.5px) rotate(1.5deg); } }
+.spr-ship__waves { animation: wave-drift 2.4s linear infinite; }
+@keyframes wave-drift { to { transform: translateX(-20px); } }
+
+/* 奔马 */
+.spr-horse__body { animation: gallop 0.4s ease-in-out infinite alternate; }
+@keyframes gallop { to { transform: translateY(-2.5px); } }
+.spr-horse__legs-a, .spr-camel__legs-a, .spr-walker__feet-a { animation: frame-a 0.4s steps(1) infinite; }
+.spr-horse__legs-b, .spr-camel__legs-b, .spr-walker__feet-b { animation: frame-b 0.4s steps(1) infinite; }
+@keyframes frame-a { 0% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes frame-b { 0% { opacity: 0; } 50% { opacity: 1; } }
+.spr-horse__dust circle { fill: rgba(30, 27, 23, 0.25); transform-box: fill-box; transform-origin: center; animation: dust 1s ease-out infinite; }
+.spr-horse__dust circle:nth-child(2) { animation-delay: 0.3s; }
+.spr-horse__dust circle:nth-child(3) { animation-delay: 0.6s; }
+@keyframes dust { from { transform: translate(0, 0) scale(0.6); opacity: 0.7; } to { transform: translate(-14px, -6px) scale(1.6); opacity: 0; } }
+
+/* 驼队与行者 */
+.spr-camel__body { animation: camel-bob 1.2s ease-in-out infinite; }
+.spr-camel__legs-a, .spr-camel__legs-b { animation-duration: 1.2s; }
+@keyframes camel-bob { 50% { transform: translateY(-1.8px) rotate(-0.6deg); } }
+.spr-walker__body { animation: camel-bob 0.9s ease-in-out infinite; }
+.spr-walker__feet-a, .spr-walker__feet-b { animation-duration: 0.9s; }
+.spr-walker__staff { transform-origin: 47px 52px; animation: staff 0.9s ease-in-out infinite alternate; }
+@keyframes staff { to { transform: rotate(5deg); } }
+.spr-walker__steps ellipse { fill: rgba(30, 27, 23, 0.35); opacity: 0; animation: step 2.7s ease-out infinite; }
+.spr-walker__steps ellipse:nth-child(2) { animation-delay: 0.9s; }
+.spr-walker__steps ellipse:nth-child(3) { animation-delay: 1.8s; }
+@keyframes step { 10% { opacity: 1; } 70% { opacity: 0.4; } 100% { opacity: 0; } }
+
+/* 火箭 */
+.spr-rocket__ship { animation: rocket-rise 3s ease-in-out infinite alternate; }
+@keyframes rocket-rise { to { transform: translateY(-7px); } }
+.spr-rocket__flame { transform-box: fill-box; transform-origin: 50% 0; animation: flicker 0.15s ease-in-out infinite alternate; }
+@keyframes flicker { to { transform: scaleY(0.78); opacity: 0.85; } }
+.spr-rocket__smoke circle,
+.spr-steam__puffs circle,
+.spr-cannon__smoke circle,
+.spr-volcano__plume circle {
+  fill: rgba(30, 27, 23, 0.26);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.spr-rocket__smoke circle { animation: billow 2.2s ease-out infinite; }
+.spr-rocket__smoke circle:nth-child(2) { animation-delay: 0.7s; }
+.spr-rocket__smoke circle:nth-child(3) { animation-delay: 1.4s; }
+@keyframes billow { from { transform: scale(0.6); opacity: 0.8; } to { transform: scale(1.6); opacity: 0; } }
+
+/* 交锋 */
+.spr-battle__a { transform-origin: 20px 88px; animation: swing-a 2.4s ease-in-out infinite; }
+.spr-battle__b { transform-origin: 100px 88px; animation: swing-b 2.4s ease-in-out infinite; }
+@keyframes swing-a { 0%, 100% { transform: rotate(-34deg); } 40% { transform: rotate(0); } 46% { transform: rotate(-5deg); } 52% { transform: rotate(0); } }
+@keyframes swing-b { 0%, 100% { transform: rotate(34deg); } 40% { transform: rotate(0); } 46% { transform: rotate(5deg); } 52% { transform: rotate(0); } }
+.spr-battle__burst { transform-origin: 60px 54px; animation: burst 2.4s ease-out infinite; }
+@keyframes burst { 0%, 38% { opacity: 0; transform: scale(0.4); } 44% { opacity: 1; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(1.25); } }
+
+/* 火炮 */
+.spr-cannon__barrel { animation: recoil 2.2s ease-out infinite; }
+@keyframes recoil { 0%, 100% { transform: none; } 12% { transform: translate(-3px, 1.2px); } 30% { transform: none; } }
+.spr-cannon__flash { transform-origin: 104px 54px; animation: flash 2.2s ease-out infinite; }
+@keyframes flash { 0%, 8% { opacity: 0; transform: scale(0.3); } 12% { opacity: 1; transform: scale(1); } 26%, 100% { opacity: 0; transform: scale(1.3); } }
+.spr-cannon__smoke circle { animation: cannon-smoke 2.2s ease-out infinite; }
+@keyframes cannon-smoke { 0%, 10% { opacity: 0; transform: scale(0.4); } 16% { opacity: 0.85; } 100% { opacity: 0; transform: translate(8px, -12px) scale(2.2); } }
+
+/* 烈焰 */
+.spr-fire__smoke path { animation: rise 2.4s ease-out infinite; }
+.spr-fire__smoke path:nth-child(2) { animation-delay: 1.2s; }
+@keyframes rise { from { transform: translateY(6px); opacity: 0; } 30% { opacity: 0.7; } to { transform: translateY(-10px); opacity: 0; } }
+
+/* 蘑菇云 */
+.spr-mushroom__cloud { transform-origin: 60px 96px; animation: mushroom 6s ease-out infinite; }
+@keyframes mushroom { 0% { transform: scale(0.25); opacity: 0; } 10% { opacity: 1; } 45%, 85% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.04); opacity: 0; } }
+.spr-mushroom__ring { fill: none; stroke: rgba(30, 27, 23, 0.5); stroke-width: 1.2; transform-origin: 60px 96px; animation: ring 6s ease-out infinite; }
+@keyframes ring { 0% { transform: scale(0.2); opacity: 0.8; } 30% { transform: scale(2.4); opacity: 0; } 100% { opacity: 0; } }
+
+/* 瘟疫 */
+.spr-plague__blot { fill: rgba(20, 18, 15, 0.45); filter: url(#ink-bleed); transform-box: fill-box; transform-origin: center; animation: blot 3.6s ease-out infinite; }
+@keyframes blot { 0% { transform: scale(0); opacity: 0.9; } 70% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 0; } }
+.spr-plague__crows { animation: crows 6s linear infinite; }
+@keyframes crows { from { transform: translateX(-20px); } to { transform: translateX(110px); } }
+
+/* 火山 */
+.spr-volcano__plume circle { animation: plume 3s ease-out infinite; }
+.spr-volcano__plume circle:nth-child(2) { animation-delay: 1s; }
+.spr-volcano__plume circle:nth-child(3) { animation-delay: 2s; }
+@keyframes plume { from { transform: translate(0, 0) scale(0.6); opacity: 0.9; } to { transform: translate(-6px, -34px) scale(2.6); opacity: 0; } }
+.spr-volcano__lava { stroke-dasharray: 60; stroke-dashoffset: 60; animation: lava 2.4s ease-in infinite; }
+@keyframes lava { 70%, 100% { stroke-dashoffset: 0; } }
+
+/* 卷轴与印刷 */
+.spr-scroll__seal { opacity: 0; animation: appear 0.4s 2.7s forwards; }
+.spr-printing__platen { animation: press 2.4s ease-in-out infinite; }
+@keyframes press { 0%, 100% { transform: translateY(0); } 40%, 50% { transform: translateY(24px); } }
+.spr-printing__lines { animation: printed 2.4s infinite; }
+@keyframes printed { 0%, 45% { opacity: 0; } 55%, 100% { opacity: 1; } }
+
+/* 宝塔、金字塔 */
+.spr-temple__halo { fill: rgba(168, 116, 63, 0.16); transform-origin: 60px 60px; animation: halo 4s ease-in-out infinite; }
+@keyframes halo { 50% { transform: scale(1.08); opacity: 0.6; } }
+.spr-temple__smoke path { animation: rise 3s ease-out infinite; }
+.spr-temple__smoke path:nth-child(2) { animation-delay: 1.5s; }
+.spr-pyramid__sun { animation: sunrise 5s ease-out infinite alternate; }
+@keyframes sunrise { from { transform: translateY(10px); opacity: 0.6; } to { transform: translateY(-4px); opacity: 1; } }
+
+/* 长城 */
+.spr-wall .wall-body { stroke-width: 5; stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 2.2s ease-out forwards; }
+.spr-wall .wall-merlons { stroke-width: 2.6; stroke-dasharray: 1.4 1.8; opacity: 0; animation: appear 0.6s 1.9s forwards; }
+.spr-wall__tower { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: tower 0.5s ease-out forwards; }
+@keyframes tower { from { opacity: 0; transform: scaleY(0.2); } to { opacity: 1; transform: none; } }
+
+/* 橄榄冠 */
+.spr-wreath { transform-origin: 60px 92px; animation: sway 4s 1s ease-in-out infinite alternate; }
+@keyframes sway { to { transform: rotate(2deg); } }
+
+/* 印章 */
+.spr-seal__stone { animation: stamp 3s ease-in-out infinite; }
+@keyframes stamp { 0% { transform: translateY(-30px); opacity: 0; } 15% { opacity: 1; } 38% { transform: translateY(48px); } 44% { transform: translateY(49px) scaleY(0.95); } 60% { transform: translateY(-4px); } 100% { transform: translateY(-30px); opacity: 0; } }
+.spr-seal__imprint { animation: imprint 3s ease-in-out infinite; }
+@keyframes imprint { 0%, 40% { opacity: 0; } 46%, 92% { opacity: 1; } 100% { opacity: 0; } }
+.spr-seal__dots { animation: imprint 3s ease-out infinite; }
+
+/* 王冠 */
+.spr-crown__rays { transform-origin: 60px 66px; animation: halo 3.2s ease-in-out infinite; }
+.spr-crown__body { animation: crown-in 1.2s var(--ease-ink) both, crown-float 3s 1.2s ease-in-out infinite alternate; }
+@keyframes crown-in { from { transform: translateY(-14px); opacity: 0; } }
+@keyframes crown-float { to { transform: translateY(-2px); } }
+.spr-crown__gem { animation: twinkle 1.8s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: 0.45; } }
+
+/* 蒸汽机车 */
+.spr-steam__loco { animation: gallop 0.3s ease-in-out infinite alternate; }
+.spr-steam__wheel { animation: spin 1.2s linear infinite; }
+.spr-steam__puffs circle { animation: puff 2.4s ease-out infinite; }
+.spr-steam__puffs circle:nth-child(2) { animation-delay: 0.8s; }
+.spr-steam__puffs circle:nth-child(3) { animation-delay: 1.6s; }
+@keyframes puff { from { transform: translate(0, 10px) scale(0.5); opacity: 0.9; } to { transform: translate(-16px, -14px) scale(1.8); opacity: 0; } }
+
+/* 原子 */
+.spr-atom { transform-origin: 60px 60px; animation: spin 18s linear infinite; }

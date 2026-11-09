@@ -1,0 +1,203 @@
+/* 题签、纪年与模式切换 */
+.title-seal {
+  position: absolute;
+  top: 22px;
+  left: 26px;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: start;
+  gap: 4px 10px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.title-seal__name {
+  grid-row: span 2;
+  margin: 0;
+  writing-mode: vertical-rl;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.05;
+  letter-spacing: 0.12em;
+  color: var(--ink-0);
+  text-shadow: 0 0 1px rgba(20, 18, 15, 0.35);
+}
+
+.title-seal__stamp {
+  width: 34px;
+  height: 34px;
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.05em;
+}
+
+.title-seal__sub {
+  margin: 4px 0 0;
+  writing-mode: vertical-rl;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--ink-3);
+}
+
+.year-banner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* 纸色晕底：压住横幅下方的地图大字，免得与年号、朝代相互叠印 */
+.year-banner::before {
+  content: '';
+  position: absolute;
+  inset: -22px -90px -16px;
+  z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--paper) 86%, transparent) 55%, transparent);
+}
+
+.year-banner__main {
+  text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  color: var(--ink-0);
+}
+
+.year-banner__era,
+.year-banner__unit {
+  font-family: var(--font-brush);
+  font-size: 22px;
+  color: var(--ink-2);
+}
+
+.year-banner__num {
+  font-size: 46px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  min-width: 2.2ch;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.year-banner__meta {
+  text-shadow: 0 0 4px var(--paper), 0 0 8px var(--paper), 0 0 12px var(--paper);
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+
+.year-banner__dynasty {
+  color: var(--cinnabar-deep);
+}
+
+.year-banner__snap {
+  color: var(--ink-4);
+}
+
+.mode-tabs {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+}
+
+.mode-tabs__tab {
+  position: relative;
+  padding: 6px 12px 10px;
+  font-family: var(--font-brush);
+  font-size: 22px;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  transition: color 0.3s var(--ease-ink);
+}
+
+.mode-tabs__tab::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 10%;
+  bottom: 3px;
+  height: 6px;
+  background: var(--ink-1);
+  border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0.85;
+  filter: url(#ink-brush);
+  transition: transform 0.45s var(--ease-ink);
+}
+
+.mode-tabs__tab:hover {
+  color: var(--ink-1);
+}
+
+.mode-tabs__tab.is-active {
+  color: var(--ink-0);
+}
+
+.mode-tabs__tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.mode-tabs__notes {
+  width: 30px;
+  height: 30px;
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+@media (max-width: 760px) {
+  .title-seal {
+    top: 12px;
+    left: 14px;
+  }
+
+  .title-seal__name {
+    font-size: 30px;
+  }
+
+  .title-seal__sub {
+    display: none;
+  }
+
+  .year-banner {
+    top: 64px;
+  }
+
+  .year-banner__num {
+    font-size: 34px;
+  }
+
+  .year-banner__meta {
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  .mode-tabs {
+    top: 10px;
+    right: 10px;
+    gap: 0;
+  }
+
+  .mode-tabs__tab {
+    padding: 4px 7px 8px;
+    font-size: 18px;
+  }
+}

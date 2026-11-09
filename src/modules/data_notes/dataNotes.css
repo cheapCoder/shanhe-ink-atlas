@@ -1,0 +1,122 @@
+/* 数据说明 */
+.notes {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(40, 32, 22, 0.32);
+  backdrop-filter: blur(2px);
+  animation: notes-in 0.4s var(--ease-ink) both;
+}
+
+@keyframes notes-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.notes__sheet {
+  width: min(980px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 28px 32px 34px;
+  background-color: var(--paper-light);
+  box-shadow: 0 0 0 10px #d8c6a2, 0 0 0 11px rgba(120, 88, 46, 0.4), 0 24px 60px rgba(40, 28, 14, 0.35);
+}
+
+.notes__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notes__disclaimer {
+  margin: 12px 0 4px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--cinnabar-deep);
+  background: rgba(178, 58, 43, 0.06);
+  border-left: 3px solid var(--cinnabar);
+}
+
+.notes__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 28px;
+}
+
+.notes__source {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.notes__source a {
+  font-weight: 600;
+  color: var(--indigo);
+}
+
+.notes__source p {
+  margin: 4px 0 0;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.notes__license {
+  margin-left: 8px;
+  padding: 0 6px;
+  font-size: 11px;
+  color: var(--ink-3);
+  border: 1px solid rgba(70, 58, 44, 0.3);
+  border-radius: 8px;
+}
+
+.notes__count {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.notes__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.notes__table th,
+.notes__table td {
+  padding: 7px 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(70, 58, 44, 0.14);
+}
+
+.notes__table th {
+  font-weight: 600;
+  color: var(--ink-1);
+  border-bottom-color: rgba(70, 58, 44, 0.35);
+}
+
+.notes__table td {
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.notes__table td:first-child,
+.notes__table td:nth-child(2) {
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .notes__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes__table th:nth-child(4),
+  .notes__table td:nth-child(4) {
+    display: none;
+  }
+}

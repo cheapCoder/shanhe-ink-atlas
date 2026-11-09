@@ -1,0 +1,125 @@
+/* 山河墨史 · 视觉系统：宣纸、墨分五色、朱砂、石青石绿等中国传统色 */
+:root {
+  --paper: #f4ecdb;
+  --paper-light: #f7f1e4;
+  --paper-deep: #e5d9c0;
+  --paper-edge: #d2c09c;
+  --ink-0: #151412;
+  --ink-1: #2b2925;
+  --ink-2: #4a4640;
+  --ink-3: #78736a;
+  --ink-4: #a7a194;
+  --ink-5: #cdc5b3;
+  --cinnabar: #b23a2b;
+  --cinnabar-deep: #8c2a1e;
+  --cinnabar-soft: rgba(178, 58, 43, 0.12);
+  --ochre: #a8743f;
+  --indigo: #3e5c76;
+  --malachite: #5f8a72;
+  --gold: #a88a52;
+  --font-brush: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', 'Kaiti SC', serif;
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-latin: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+  --shadow-paper: 0 10px 30px rgba(60, 42, 20, 0.18), 0 2px 6px rgba(60, 42, 20, 0.12);
+  --ease-ink: cubic-bezier(0.22, 0.61, 0.36, 1);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink-1);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--indigo);
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(178, 58, 43, 0.2);
+}
+
+/* 细墨线滚动条 */
+.ink-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-4) transparent;
+}
+
+.ink-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ink-scroll::-webkit-scrollbar-thumb {
+  background: var(--ink-4);
+  border-radius: 3px;
+}
+
+/* 朱砂印章：白文方印 */
+.seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cinnabar);
+  color: #f8efe2;
+  font-family: var(--font-brush);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1.5px rgba(248, 239, 226, 0.55), inset 0 0 6px rgba(80, 10, 0, 0.45);
+  filter: url(#seal-rough);
+}
+
+.brush-title {
+  font-family: var(--font-brush);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ink-0);
+}
+
+.latin {
+  font-family: var(--font-latin);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

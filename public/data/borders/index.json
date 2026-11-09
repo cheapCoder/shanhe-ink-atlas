@@ -1,0 +1,407 @@
+{
+ "source": {
+  "name": "historical-basemaps",
+  "author": "André Ourednik",
+  "url": "https://github.com/aourednik/historical-basemaps",
+  "license": "GPL-3.0"
+ },
+ "simplify": "5000 m",
+ "snapshots": [
+  {
+   "year": -123000,
+   "file": "-123000.json",
+   "count": 3,
+   "synthetic": false
+  },
+  {
+   "year": -10000,
+   "file": "-10000.json",
+   "count": 13,
+   "synthetic": false
+  },
+  {
+   "year": -8000,
+   "file": "-8000.json",
+   "count": 14,
+   "synthetic": false
+  },
+  {
+   "year": -5000,
+   "file": "-5000.json",
+   "count": 28,
+   "synthetic": false
+  },
+  {
+   "year": -4000,
+   "file": "-4000.json",
+   "count": 23,
+   "synthetic": false
+  },
+  {
+   "year": -3000,
+   "file": "-3000.json",
+   "count": 25,
+   "synthetic": false
+  },
+  {
+   "year": -2000,
+   "file": "-2000.json",
+   "count": 45,
+   "synthetic": false
+  },
+  {
+   "year": -1500,
+   "file": "-1500.json",
+   "count": 68,
+   "synthetic": false
+  },
+  {
+   "year": -1000,
+   "file": "-1000.json",
+   "count": 69,
+   "synthetic": false
+  },
+  {
+   "year": -700,
+   "file": "-700.json",
+   "count": 73,
+   "synthetic": false
+  },
+  {
+   "year": -500,
+   "file": "-500.json",
+   "count": 74,
+   "synthetic": false
+  },
+  {
+   "year": -400,
+   "file": "-400.json",
+   "count": 76,
+   "synthetic": false
+  },
+  {
+   "year": -323,
+   "file": "-323.json",
+   "count": 68,
+   "synthetic": false
+  },
+  {
+   "year": -300,
+   "file": "-300.json",
+   "count": 73,
+   "synthetic": false
+  },
+  {
+   "year": -221,
+   "file": "-221.json",
+   "count": 71,
+   "synthetic": true,
+   "base": -300,
+   "note": "公元前 221 年秦灭六国。秦朝疆域近似取西汉初年汉、南越、闽越范围之并（秦亡后南越、闽越方才自立），其余地区沿用公元前 300 年数据。",
+   "source": "https://zh.wikipedia.org/wiki/%E7%A7%A6%E6%9C%9D"
+  },
+  {
+   "year": -200,
+   "file": "-200.json",
+   "count": 86,
+   "synthetic": false
+  },
+  {
+   "year": -100,
+   "file": "-100.json",
+   "count": 84,
+   "synthetic": false
+  },
+  {
+   "year": -1,
+   "file": "-1.json",
+   "count": 79,
+   "synthetic": false
+  },
+  {
+   "year": 100,
+   "file": "100.json",
+   "count": 83,
+   "synthetic": false
+  },
+  {
+   "year": 200,
+   "file": "200.json",
+   "count": 69,
+   "synthetic": false
+  },
+  {
+   "year": 300,
+   "file": "300.json",
+   "count": 71,
+   "synthetic": false
+  },
+  {
+   "year": 400,
+   "file": "400.json",
+   "count": 79,
+   "synthetic": false
+  },
+  {
+   "year": 500,
+   "file": "500.json",
+   "count": 87,
+   "synthetic": false
+  },
+  {
+   "year": 600,
+   "file": "600.json",
+   "count": 83,
+   "synthetic": false
+  },
+  {
+   "year": 700,
+   "file": "700.json",
+   "count": 126,
+   "synthetic": false
+  },
+  {
+   "year": 800,
+   "file": "800.json",
+   "count": 117,
+   "synthetic": false
+  },
+  {
+   "year": 900,
+   "file": "900.json",
+   "count": 134,
+   "synthetic": false
+  },
+  {
+   "year": 1000,
+   "file": "1000.json",
+   "count": 129,
+   "synthetic": false
+  },
+  {
+   "year": 1100,
+   "file": "1100.json",
+   "count": 139,
+   "synthetic": false
+  },
+  {
+   "year": 1142,
+   "file": "1142.json",
+   "count": 140,
+   "synthetic": true,
+   "base": 1100,
+   "note": "1127 年靖康之变后宋室南渡，1142 年绍兴和议确定宋金以淮河—大散关为界；西辽已于 1124—1132 年间立国。东亚范围沿用校勘后的 1200 年，其余地区沿用 1100 年。",
+   "source": "https://zh.wikipedia.org/wiki/%E7%BB%8D%E5%85%B4%E5%92%8C%E8%AE%AE"
+  },
+  {
+   "year": 1200,
+   "file": "1200.json",
+   "count": 128,
+   "synthetic": false
+  },
+  {
+   "year": 1206,
+   "file": "1206.json",
+   "count": 128,
+   "synthetic": true,
+   "base": 1200,
+   "note": "1206 年铁木真在斡难河源称成吉思汗，建立大蒙古国；疆域沿用 1200 年蒙古诸部范围。",
+   "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E8%92%99%E5%8F%A4%E5%9B%BD"
+  },
+  {
+   "year": 1234,
+   "file": "1234.json",
+   "count": 124,
+   "synthetic": true,
+   "base": 1206,
+   "note": "大蒙古国先后灭西辽（1218）、花剌子模（1221）、西夏（1227），1234 年联宋灭金。范围取 1206 年各政权多边形之并。",
+   "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E9%87%91%E6%88%98%E4%BA%89"
+  },
+  {
+   "year": 1279,
+   "file": "1279.json",
+   "count": 113,
+   "synthetic": false
+  },
+  {
+   "year": 1300,
+   "file": "1300.json",
+   "count": 113,
+   "synthetic": false
+  },
+  {
+   "year": 1368,
+   "file": "1368.json",
+   "count": 116,
+   "synthetic": true,
+   "base": 1300,
+   "note": "1368 年明军攻占大都，元廷北迁。明朝范围近似取 1400 年（明初至 1387 年方陆续统一四川、云南、辽东）；朝鲜半岛此时仍为高丽。",
+   "source": "https://zh.wikipedia.org/wiki/%E6%98%8E%E6%9C%9D"
+  },
+  {
+   "year": 1400,
+   "file": "1400.json",
+   "count": 118,
+   "synthetic": false
+  },
+  {
+   "year": 1492,
+   "file": "1492.json",
+   "count": 1298,
+   "synthetic": false
+  },
+  {
+   "year": 1500,
+   "file": "1500.json",
+   "count": 139,
+   "synthetic": false
+  },
+  {
+   "year": 1530,
+   "file": "1530.json",
+   "count": 271,
+   "synthetic": false
+  },
+  {
+   "year": 1600,
+   "file": "1600.json",
+   "count": 639,
+   "synthetic": false
+  },
+  {
+   "year": 1644,
+   "file": "1644.json",
+   "count": 637,
+   "synthetic": true,
+   "base": 1600,
+   "note": "1644 年李自成攻入北京、明崇祯帝自缢，清军随即入关；东亚范围沿用 1650 年（清与南明并立），其余地区沿用 1600 年。",
+   "source": "https://zh.wikipedia.org/wiki/%E7%94%B2%E7%94%B3%E4%B9%8B%E5%8F%98"
+  },
+  {
+   "year": 1650,
+   "file": "1650.json",
+   "count": 592,
+   "synthetic": false
+  },
+  {
+   "year": 1700,
+   "file": "1700.json",
+   "count": 582,
+   "synthetic": false
+  },
+  {
+   "year": 1715,
+   "file": "1715.json",
+   "count": 599,
+   "synthetic": false
+  },
+  {
+   "year": 1783,
+   "file": "1783.json",
+   "count": 548,
+   "synthetic": false
+  },
+  {
+   "year": 1800,
+   "file": "1800.json",
+   "count": 546,
+   "synthetic": false
+  },
+  {
+   "year": 1815,
+   "file": "1815.json",
+   "count": 312,
+   "synthetic": false
+  },
+  {
+   "year": 1878,
+   "file": "1878.json",
+   "count": 171,
+   "synthetic": false
+  },
+  {
+   "year": 1880,
+   "file": "1880.json",
+   "count": 168,
+   "synthetic": false
+  },
+  {
+   "year": 1900,
+   "file": "1900.json",
+   "count": 165,
+   "synthetic": false
+  },
+  {
+   "year": 1912,
+   "file": "1912.json",
+   "count": 164,
+   "synthetic": true,
+   "base": 1900,
+   "note": "1912 年 1 月 1 日中华民国成立，2 月 12 日清帝退位；日本已于 1910 年吞并朝鲜。东亚范围沿用 1914 年，其余地区沿用 1900 年。",
+   "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+  },
+  {
+   "year": 1914,
+   "file": "1914.json",
+   "count": 139,
+   "synthetic": false
+  },
+  {
+   "year": 1920,
+   "file": "1920.json",
+   "count": 159,
+   "synthetic": false
+  },
+  {
+   "year": 1930,
+   "file": "1930.json",
+   "count": 158,
+   "synthetic": false
+  },
+  {
+   "year": 1938,
+   "file": "1938.json",
+   "count": 163,
+   "synthetic": false
+  },
+  {
+   "year": 1945,
+   "file": "1945.json",
+   "count": 179,
+   "synthetic": false
+  },
+  {
+   "year": 1949,
+   "file": "1949.json",
+   "count": 179,
+   "synthetic": true,
+   "base": 1945,
+   "note": "1949 年 10 月 1 日中华人民共和国成立；朝鲜半岛已于 1948 年分立两国。东亚范围沿用 1960 年，其余地区沿用 1945 年。",
+   "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD%E5%BC%80%E5%9B%BD%E5%A4%A7%E5%85%B8"
+  },
+  {
+   "year": 1960,
+   "file": "1960.json",
+   "count": 155,
+   "synthetic": false
+  },
+  {
+   "year": 1994,
+   "file": "1994.json",
+   "count": 192,
+   "synthetic": false
+  },
+  {
+   "year": 2000,
+   "file": "2000.json",
+   "count": 192,
+   "synthetic": false
+  },
+  {
+   "year": 2010,
+   "file": "2010.json",
+   "count": 192,
+   "synthetic": false
+  }
+ ]
+}

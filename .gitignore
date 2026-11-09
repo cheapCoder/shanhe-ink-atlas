@@ -1,0 +1,7 @@
+node_modules
+dist
+data_raw
+*.log
+.DS_Store
+scripts/_*.mjs
+.playwright-cli

@@ -1,0 +1,177 @@
+/* 疆域模式：国家列表、面积图与时期表 */
+.country-list__title {
+  margin-top: 0;
+}
+
+.country-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.country-list__item {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border-bottom: 1px dashed rgba(70, 58, 44, 0.16);
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.country-list__item i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: 0.75;
+}
+
+.country-list__name {
+  font-family: var(--font-brush);
+  font-size: 19px;
+  color: var(--ink-1);
+}
+
+.country-list__span {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.country-list__item:hover {
+  background: rgba(178, 58, 43, 0.05);
+}
+
+.country-list__item.is-active {
+  background: rgba(178, 58, 43, 0.1);
+  box-shadow: inset 3px 0 0 var(--cinnabar);
+}
+
+.country-card__note {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.country-card__unit {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.area-chart {
+  position: relative;
+}
+
+.area-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+}
+
+.area-chart__grid {
+  stroke: rgba(70, 58, 44, 0.14);
+  stroke-width: 1;
+}
+
+.area-chart__cross {
+  stroke: rgba(30, 26, 22, 0.5);
+  stroke-width: 1;
+}
+
+.area-chart__tick {
+  font-family: var(--font-latin);
+  font-size: 11px;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.area-chart__peak {
+  font-size: 11px;
+  fill: var(--ink-2);
+}
+
+.area-chart__tip {
+  position: absolute;
+  top: -6px;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--ink-3);
+  background: rgba(251, 247, 238, 0.97);
+  border: 1px solid rgba(70, 58, 44, 0.22);
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(60, 42, 20, 0.15);
+  pointer-events: none;
+}
+
+.area-chart__tip b {
+  font-size: 13.5px;
+  color: var(--ink-0);
+}
+
+.country-card__now {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.country-card__now b {
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--ink-0);
+}
+
+.country-card__now-seal {
+  padding: 2px 5px;
+  font-size: 13px;
+}
+
+.country-card__play {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.country-card__periods {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.country-card__periods button {
+  display: grid;
+  grid-template-columns: 78px 1fr auto;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 4px;
+  font-size: 13px;
+  text-align: left;
+  color: var(--ink-2);
+  border-bottom: 1px dashed rgba(70, 58, 44, 0.14);
+}
+
+.country-card__periods .latin {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.country-card__area {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+.country-card__periods li.is-current button {
+  color: var(--ink-0);
+  background: rgba(178, 58, 43, 0.08);
+  box-shadow: inset 3px 0 0 var(--cinnabar);
+}

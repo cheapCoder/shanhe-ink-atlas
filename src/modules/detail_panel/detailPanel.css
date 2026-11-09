@@ -1,0 +1,207 @@
+/* 大事与人物详情 */
+.event-card__hero {
+  display: flex;
+  justify-content: center;
+  margin: -6px -6px 6px;
+  padding: 6px 0 2px;
+  background: radial-gradient(ellipse at 50% 60%, rgba(150, 116, 66, 0.12), transparent 70%);
+}
+
+.event-card__head,
+.figure-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.event-card__cat {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin-top: 4px;
+  font-size: 19px;
+}
+
+.event-card__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.event-card__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.event-card__nav .ink-button {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.event-card__nav .ink-button:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.figure-card__portrait {
+  flex: none;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-deep);
+  box-shadow: 0 0 0 3px var(--paper-light), 0 0 0 4.5px rgba(30, 26, 22, 0.75), 0 6px 14px rgba(60, 42, 20, 0.2);
+}
+
+.figure-card__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  filter: sepia(0.2) saturate(0.85);
+}
+
+.figure-card__head .panel-title {
+  margin-top: 14px;
+}
+
+.figure-card__credit {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+.figure-card__play {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+.figure-card__route {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+}
+
+.figure-card__route::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  bottom: 8px;
+  width: 1.5px;
+  background: rgba(30, 26, 22, 0.3);
+}
+
+.figure-card__route li {
+  position: relative;
+}
+
+.figure-card__route li::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--paper-light);
+  box-shadow: 0 0 0 1.5px var(--ink-2);
+}
+
+.figure-card__route li.is-past::before {
+  background: var(--ink-2);
+}
+
+.figure-card__route li.is-current::before {
+  background: var(--cinnabar);
+  box-shadow: 0 0 0 1.5px var(--cinnabar), 0 0 0 5px rgba(178, 58, 43, 0.15);
+}
+
+.figure-card__route button {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 1px 8px;
+  width: 100%;
+  padding: 7px 6px;
+  text-align: left;
+  border-radius: 2px;
+}
+
+.figure-card__route button:hover {
+  background: rgba(178, 58, 43, 0.05);
+}
+
+.figure-card__route li.is-current button {
+  background: rgba(178, 58, 43, 0.08);
+}
+
+.figure-card__year {
+  grid-row: span 2;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+.figure-card__place {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-1);
+}
+
+.figure-card__note {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.detail-hint {
+  margin: 40% 6px 0;
+  font-family: var(--font-brush);
+  font-size: 20px;
+  line-height: 1.9;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.tour-hold {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.tour-hold__bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--cinnabar);
+  transform-origin: left center;
+  animation: hold-drain linear forwards;
+}
+
+@keyframes hold-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+    opacity: 0.4;
+  }
+}
+
+.tour-hold .ink-button {
+  height: 30px;
+  font-size: 15px;
+}

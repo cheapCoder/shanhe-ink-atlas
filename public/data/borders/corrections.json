@@ -1,0 +1,858 @@
+[
+ {
+  "year": 300,
+  "op": "rename",
+  "target": "Parthian Empire",
+  "result": "Sasanian Empire",
+  "note": "萨珊王朝于 224 年推翻安息，公元 300 年波斯为萨珊王朝统治。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%90%A8%E7%8F%8A%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 400,
+  "op": "rename",
+  "target": "Persia",
+  "result": "Sasanian Empire",
+  "note": "公元 400 年波斯为萨珊王朝统治。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%90%A8%E7%8F%8A%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 500,
+  "op": "rename",
+  "target": "Jin Empire",
+  "result": "Southern Qi",
+  "note": "东晋已于 420 年灭亡，公元 500 年江南为南齐（479–502）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8D%97%E9%BD%90"
+ },
+ {
+  "year": 700,
+  "op": "rename",
+  "target": "Sui Empire",
+  "result": "Tang Empire",
+  "note": "隋于 618 年灭亡，公元 700 年为唐（武周，690–705）。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%AD%A6%E5%91%A8"
+ },
+ {
+  "year": 1000,
+  "op": "rename",
+  "target": "Nan Chao",
+  "result": "Dali Kingdom",
+  "note": "南诏于 902 年灭亡，937 年起云南为大理国。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E7%90%86%E5%9B%BD"
+ },
+ {
+  "year": 1100,
+  "op": "rename",
+  "target": "Nan Chao",
+  "result": "Dali Kingdom",
+  "note": "同上，1100 年云南为大理国。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E7%90%86%E5%9B%BD"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Nan Chao",
+  "result": "Dali Kingdom",
+  "note": "同上，1200 年云南为大理国。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E7%90%86%E5%9B%BD"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Mongol Empire",
+  "result": "Mongol tribes",
+  "note": "大蒙古国于 1206 年建立，1200 年蒙古高原尚为诸部并立。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E8%92%99%E5%8F%A4%E5%9B%BD"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Liao",
+  "result": "Jin (Jurchen)",
+  "note": "辽已于 1125 年为金所灭，1200 年东北与华北属金。",
+  "source": "https://zh.wikipedia.org/wiki/%E9%87%91%E6%9C%9D"
+ },
+ {
+  "year": 1200,
+  "op": "splitByLine",
+  "target": "Song Empire",
+  "result": "Jin (Jurchen) / Southern Song",
+  "note": "原数据 1200 年宋的范围仍及华北。按 1142 年绍兴和议“东以淮水中流为界，西以大散关为界”拆分：线北并入金，线南为南宋（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%BB%8D%E5%85%B4%E5%92%8C%E8%AE%AE"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Fatimid Caliphate",
+  "result": "Ayyubid Sultanate",
+  "note": "法蒂玛王朝已于 1171 年为萨拉丁所灭，1200 年埃及为阿尤布王朝。",
+  "source": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%B0%A4%E5%B8%83%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 1200,
+  "op": "merge",
+  "target": "Buwayhid Emirates",
+  "result": "Khwarazmian dynasty",
+  "note": "布韦希王朝已于 1062 年灭亡；1194 年花剌子模击灭塞尔柱残余后据有伊朗大部（西部边界示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%8A%B1%E5%89%8C%E5%AD%90%E6%A8%A1%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Ghaznavid Emirate",
+  "result": "Ghurid dynasty",
+  "note": "伽色尼王朝已于 1186 年为古尔王朝所灭。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%A4%E5%B0%94%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 1200,
+  "op": "rename",
+  "target": "Imperial Japan (Fujiwara)",
+  "result": "Kamakura Shogunate",
+  "note": "1185 年起日本进入镰仓幕府时代。",
+  "source": "https://zh.wikipedia.org/wiki/%E9%95%B0%E4%BB%93%E5%B9%95%E5%BA%9C"
+ },
+ {
+  "year": 1279,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Great Khanate",
+  "note": "元朝设宣政院管辖吐蕃地区，西藏属元朝版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%AE%A3%E6%94%BF%E9%99%A2"
+ },
+ {
+  "year": 1279,
+  "op": "borrow",
+  "target": 1200,
+  "result": "Goryeo",
+  "note": "高丽为元朝藩属：元设征东行省而以高丽国王兼领，高丽仍保有王室与国号。原数据把朝鲜半岛并入元朝，此处借用 1200 年高丽范围单列。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%BE%81%E4%B8%9C%E8%A1%8C%E7%9C%81"
+ },
+ {
+  "year": 1300,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Great Khanate",
+  "note": "元朝设宣政院管辖吐蕃地区，西藏属元朝版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%AE%A3%E6%94%BF%E9%99%A2"
+ },
+ {
+  "year": 1300,
+  "op": "borrow",
+  "target": 1200,
+  "result": "Goryeo",
+  "note": "高丽为元朝藩属：元设征东行省而以高丽国王兼领，高丽仍保有王室与国号。原数据把朝鲜半岛并入元朝，此处借用 1200 年高丽范围单列。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%BE%81%E4%B8%9C%E8%A1%8C%E7%9C%81"
+ },
+ {
+  "year": 1400,
+  "op": "rename",
+  "target": "Shogun Japan (Kamakura)",
+  "result": "Muromachi Shogunate",
+  "note": "镰仓幕府于 1333 年灭亡，1400 年为室町幕府。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%AE%A4%E7%94%BA%E5%B9%95%E5%BA%9C"
+ },
+ {
+  "year": 1400,
+  "op": "rename",
+  "target": "Chagatai Khanate",
+  "result": "Moghulistan",
+  "note": "1400 年察合台汗国西部已归帖木儿，东部为东察合台汗国（蒙兀儿斯坦）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%9C%E5%AF%9F%E5%90%88%E5%8F%B0%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1400,
+  "op": "borrow",
+  "target": 1492,
+  "result": "Ming Empire",
+  "note": "原数据 1400 年仍为元朝（大汗国）全境。明朝已于 1368 年建立，此处借用 1492 年明朝范围（与原元朝范围求交）作为近似。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%98%8E%E6%9C%9D"
+ },
+ {
+  "year": 1400,
+  "op": "borrow",
+  "target": 1492,
+  "result": "Joseon",
+  "note": "1392 年李成桂建立朝鲜王朝，此处借用 1492 年朝鲜范围。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%9C%9D%E9%B2%9C%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 1400,
+  "op": "splitByLine",
+  "target": "Great Khanate",
+  "result": "Jurchen tribes / Great Khanate",
+  "note": "扣除明、朝鲜后的原元朝范围中，大兴安岭以东为女真诸部（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A5%B3%E7%9C%9F"
+ },
+ {
+  "year": 1400,
+  "op": "splitByLine",
+  "target": "Great Khanate",
+  "result": "Oirats / Northern Yuan",
+  "note": "其余漠南漠北为北元，阿尔泰山以西为瓦剌（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%85%83"
+ },
+ {
+  "year": 1400,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Ming Empire",
+  "note": "明朝设乌思藏、朵甘二都指挥使司（羁縻性质），册封法王等僧俗首领；依《中国历史地图集》惯例并入明朝显示（史学界对明廷实际管辖程度看法不一）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E6%80%9D%E8%97%8F%E9%83%BD%E6%8C%87%E6%8C%A5%E4%BD%BF%E5%8F%B8"
+ },
+ {
+  "year": 1492,
+  "op": "splitByLine",
+  "target": "Chagatai Khanate",
+  "result": "Jurchen tribes / Chagatai Khanate",
+  "note": "原数据把蒙古高原与东北一并标为察合台汗国。大兴安岭以东为女真诸部（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A5%B3%E7%9C%9F"
+ },
+ {
+  "year": 1492,
+  "op": "splitByLine",
+  "target": "Chagatai Khanate",
+  "result": "Northern Yuan / Moghulistan",
+  "note": "阿尔泰山—哈密以东为北元（达延汗时期），以西为东察合台汗国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%85%83"
+ },
+ {
+  "year": 1492,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Ming Empire",
+  "note": "明朝设乌思藏、朵甘二都指挥使司（羁縻性质），册封法王等僧俗首领；依《中国历史地图集》惯例并入明朝显示（史学界对明廷实际管辖程度看法不一）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E6%80%9D%E8%97%8F%E9%83%BD%E6%8C%87%E6%8C%A5%E4%BD%BF%E5%8F%B8"
+ },
+ {
+  "year": 1492,
+  "op": "claimLand",
+  "target": "海南岛",
+  "result": "Ming Empire",
+  "note": "海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%90%BC%E5%B7%9E%E5%BA%9C"
+ },
+ {
+  "year": 1500,
+  "op": "splitByLine",
+  "target": "Chagatai Khanate",
+  "result": "Jurchen tribes / Chagatai Khanate",
+  "note": "同 1492 年：大兴安岭以东为女真诸部（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A5%B3%E7%9C%9F"
+ },
+ {
+  "year": 1500,
+  "op": "splitByLine",
+  "target": "Chagatai Khanate",
+  "result": "Northern Yuan / Moghulistan",
+  "note": "同 1492 年：以东为北元，以西为东察合台汗国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%85%83"
+ },
+ {
+  "year": 1500,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Ming Chinese Empire",
+  "note": "明朝设乌思藏、朵甘二都指挥使司（羁縻性质），册封法王等僧俗首领；依《中国历史地图集》惯例并入明朝显示（史学界对明廷实际管辖程度看法不一）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E6%80%9D%E8%97%8F%E9%83%BD%E6%8C%87%E6%8C%A5%E4%BD%BF%E5%8F%B8"
+ },
+ {
+  "year": 1500,
+  "op": "claimLand",
+  "target": "海南岛",
+  "result": "Ming Chinese Empire",
+  "note": "海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%90%BC%E5%B7%9E%E5%BA%9C"
+ },
+ {
+  "year": 1530,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Ming Chinese Empire",
+  "note": "明朝设乌思藏、朵甘二都指挥使司（羁縻性质），册封法王等僧俗首领；依《中国历史地图集》惯例并入明朝显示（史学界对明廷实际管辖程度看法不一）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E6%80%9D%E8%97%8F%E9%83%BD%E6%8C%87%E6%8C%A5%E4%BD%BF%E5%8F%B8"
+ },
+ {
+  "year": 1530,
+  "op": "rename",
+  "target": "Bukara Khanate",
+  "result": "Yarkent Khanate",
+  "note": "1514 年赛义德汗建立叶尔羌汗国，据有塔里木盆地；原数据把这一范围误标为布哈拉汗国。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B6%E5%B0%94%E7%BE%8C%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1530,
+  "op": "rename",
+  "target": "central Asian khanates",
+  "result": "Siberians",
+  "note": "原数据把北冰洋沿岸的一块标为“中亚诸汗国”，实为西伯利亚诸部。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%BF%84%E5%9B%BD%E5%BE%81%E6%9C%8D%E8%A5%BF%E4%BC%AF%E5%88%A9%E4%BA%9A"
+ },
+ {
+  "year": 1530,
+  "op": "borrow",
+  "target": 1500,
+  "result": "Northern Yuan",
+  "note": "原数据 1530 年蒙古高原空缺；此时为达延汗统一漠南漠北后的北元，借用 1500 年范围补足。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%85%83"
+ },
+ {
+  "year": 1530,
+  "op": "borrow",
+  "target": 1500,
+  "result": "Oirat Confederation",
+  "note": "同上，阿尔泰山一带为瓦剌，借用 1500 年范围补足。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%93%A6%E5%89%8C"
+ },
+ {
+  "year": 1530,
+  "op": "borrow",
+  "target": 1500,
+  "result": "Moghulistan",
+  "note": "原数据 1530 年吐鲁番、哈密一带空缺；此地为察合台后裔的吐鲁番汗国所据，借用 1500 年东察合台汗国范围补足。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B6%E5%B0%94%E7%BE%8C%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1530,
+  "op": "borrow",
+  "target": 1500,
+  "result": "Siberians",
+  "note": "原数据 1530 年西伯利亚大部空缺，借用 1500 年西伯利亚诸部范围补足。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%BF%84%E5%9B%BD%E5%BE%81%E6%9C%8D%E8%A5%BF%E4%BC%AF%E5%88%A9%E4%BA%9A"
+ },
+ {
+  "year": 1530,
+  "op": "borrow",
+  "target": 1500,
+  "result": "Korea",
+  "note": "原数据 1530 年朝鲜王朝缺汉城以南，借用 1500 年范围补足。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%9C%9D%E9%B2%9C%E7%8E%8B%E6%9C%9D"
+ },
+ {
+  "year": 1530,
+  "op": "claimLand",
+  "target": "海南岛",
+  "result": "Ming Chinese Empire",
+  "note": "海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%90%BC%E5%B7%9E%E5%BA%9C"
+ },
+ {
+  "year": 1600,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Ming Chinese Empire",
+  "note": "明朝设乌思藏、朵甘二都指挥使司（羁縻性质），册封法王等僧俗首领；依《中国历史地图集》惯例并入明朝显示（史学界对明廷实际管辖程度看法不一）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E6%80%9D%E8%97%8F%E9%83%BD%E6%8C%87%E6%8C%A5%E4%BD%BF%E5%8F%B8"
+ },
+ {
+  "year": 1600,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Siberians / central Asian khanates",
+  "note": "原数据把蒙古高原、新疆与西伯利亚合标为一块“中亚诸汗国”。萨彦岭—贝加尔湖—黑龙江一线以北为西伯利亚诸部，俄国此时方越过乌拉尔山（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%BF%84%E5%9B%BD%E5%BE%81%E6%9C%8D%E8%A5%BF%E4%BC%AF%E5%88%A9%E4%BA%9A"
+ },
+ {
+  "year": 1600,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Northern Yuan / central Asian khanates",
+  "note": "阿尔泰山以东的漠南漠北为北元（察哈尔、土默特、喀尔喀诸部，界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%85%83"
+ },
+ {
+  "year": 1600,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Oirats / Yarkent Khanate",
+  "note": "天山以北为瓦剌（卫拉特诸部），以南的塔里木盆地与吐鲁番为叶尔羌汗国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B6%E5%B0%94%E7%BE%8C%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1600,
+  "op": "claimLand",
+  "target": "海南岛",
+  "result": "Ming Chinese Empire",
+  "note": "海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%90%BC%E5%B7%9E%E5%BA%9C"
+ },
+ {
+  "year": 1650,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Manchu Empire",
+  "note": "1642 年五世达赖喇嘛与固始汗遣使盛京通好，1653 年清廷册封五世达赖喇嘛，1727 年设驻藏大臣；依通行惯例并入清朝显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E5%8E%86%E5%8F%B2"
+ },
+ {
+  "year": 1650,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Siberians / central Asian khanates",
+  "note": "原数据把蒙古高原、新疆与贝加尔湖一带合标为“中亚诸汗国”。贝加尔湖与外贝加尔俄国尚未设堡（尼布楚 1658 年、伊尔库茨克 1661 年），为布里亚特等西伯利亚诸部（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%BF%84%E5%9B%BD%E5%BE%81%E6%9C%8D%E8%A5%BF%E4%BC%AF%E5%88%A9%E4%BA%9A"
+ },
+ {
+  "year": 1650,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Khalkha / central Asian khanates",
+  "note": "1635 年漠南蒙古归附后金（清），漠北为喀尔喀三部（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%96%80%E5%B0%94%E5%96%80%E8%92%99%E5%8F%A4"
+ },
+ {
+  "year": 1650,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Dzungar Khanate / Yarkent Khanate",
+  "note": "天山以北为准噶尔汗国（17 世纪 30 年代立国），以南为叶尔羌汗国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%87%86%E5%99%B6%E5%B0%94%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1700,
+  "op": "merge",
+  "target": "Post-Ming Warlords",
+  "result": "Manchu Empire",
+  "note": "三藩之乱于 1681 年平定，1683 年清收台湾，1700 年华南、西南均属清。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%89%E8%97%A9%E4%B9%8B%E4%B9%B1"
+ },
+ {
+  "year": 1700,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Manchu Empire",
+  "note": "1642 年五世达赖喇嘛与固始汗遣使盛京通好，1653 年清廷册封五世达赖喇嘛，1727 年设驻藏大臣；依通行惯例并入清朝显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E5%8E%86%E5%8F%B2"
+ },
+ {
+  "year": 1700,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Tsardom of Muscovy / central Asian khanates",
+  "note": "1689 年《尼布楚条约》划定中俄东段边界，外贝加尔属俄国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%B0%BC%E5%B8%83%E6%A5%9A%E6%9D%A1%E7%BA%A6"
+ },
+ {
+  "year": 1700,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Manchu Empire / central Asian khanates",
+  "note": "1691 年喀尔喀蒙古在多伦会盟归附清朝，1696 年清军于昭莫多大败噶尔丹，漠北属清（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%96%80%E5%B0%94%E5%96%80%E8%92%99%E5%8F%A4"
+ },
+ {
+  "year": 1700,
+  "op": "rename",
+  "target": "central Asian khanates",
+  "result": "Dzungar Khanate",
+  "note": "其余新疆与阿尔泰山以西为准噶尔汗国，1680 年已吞并叶尔羌汗国。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%87%86%E5%99%B6%E5%B0%94%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1700,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Manchu Empire",
+  "note": "1683 年清军收复台湾，次年设台湾府隶福建省；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1715,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Manchu Empire",
+  "note": "1642 年五世达赖喇嘛与固始汗遣使盛京通好，1653 年清廷册封五世达赖喇嘛，1727 年设驻藏大臣；依通行惯例并入清朝显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E5%8E%86%E5%8F%B2"
+ },
+ {
+  "year": 1715,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Manchu Empire / Dzungar Khanate",
+  "note": "1715 年清与准噶尔沿阿尔泰山对峙：以东喀尔喀属清，以西为准噶尔汗国（界线示意）。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%87%86%E5%99%B6%E5%B0%94%E6%B1%97%E5%9B%BD"
+ },
+ {
+  "year": 1715,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Manchu Empire",
+  "note": "1683 年清军收复台湾，次年设台湾府隶福建省；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1783,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Qing Empire / central Asian khanates",
+  "note": "1759 年清朝平定大小和卓之乱，统一天山南路；原数据仍把喀什噶尔一带划在“中亚诸汗国”。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E5%B0%8F%E5%92%8C%E5%8D%93%E4%B9%8B%E4%B9%B1"
+ },
+ {
+  "year": 1783,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Qing Empire",
+  "note": "1683 年清军收复台湾，次年设台湾府隶福建省；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1783,
+  "op": "claimLand",
+  "target": "海南岛",
+  "result": "Qing Empire",
+  "note": "海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%90%BC%E5%B7%9E%E5%BA%9C"
+ },
+ {
+  "year": 1800,
+  "op": "splitByLine",
+  "target": "central Asian khanates",
+  "result": "Qing Empire / central Asian khanates",
+  "note": "1759 年清朝平定大小和卓之乱，统一天山南路；原数据仍把喀什噶尔一带划在“中亚诸汗国”。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E5%B0%8F%E5%92%8C%E5%8D%93%E4%B9%8B%E4%B9%B1"
+ },
+ {
+  "year": 1800,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Qing Empire",
+  "note": "1683 年清军收复台湾，次年设台湾府隶福建省；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1815,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Manchu Empire",
+  "note": "1683 年清军收复台湾，次年设台湾府隶福建省；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1878,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "Manchu Empire",
+  "note": "清于 1684 年设台湾府，1885 年建台湾省，原数据将台湾单列。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1880,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "Manchu Empire",
+  "note": "清于 1684 年设台湾府，1885 年建台湾省，原数据将台湾单列。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1900,
+  "op": "claimLand",
+  "target": "台湾岛",
+  "result": "Imperial Japan",
+  "note": "1895 年《马关条约》清廷割让台湾、澎湖，此后至 1945 年为日本占据；原数据缺台湾岛。",
+  "source": "https://zh.wikipedia.org/wiki/%E9%A9%AC%E5%85%B3%E6%9D%A1%E7%BA%A6"
+ },
+ {
+  "year": 1914,
+  "op": "rename",
+  "target": "Manchu Empire",
+  "result": "Republic of China",
+  "note": "清朝于 1912 年结束，1914 年为中华民国北洋政府时期。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1914,
+  "op": "merge",
+  "target": "Xinjiang",
+  "result": "Republic of China",
+  "note": "新疆为中华民国一省，杨增新、金树仁、盛世才等相继主政。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD)"
+ },
+ {
+  "year": 1914,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Republic of China",
+  "note": "民国时期西藏地方与中央关系一度疏离，但中华民国设蒙藏委员会主管藏事，1940 年在拉萨设驻藏办事处，国际上亦无国家承认西藏独立；西藏属中国版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
+ },
+ {
+  "year": 1914,
+  "op": "merge",
+  "target": "Mongolia",
+  "result": "Republic of China",
+  "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1920,
+  "op": "rename",
+  "target": "USSR",
+  "result": "Soviet Russia",
+  "note": "苏联于 1922 年 12 月成立，1920 年为苏维埃俄国。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%BF%84%E7%BD%97%E6%96%AF%E8%8B%8F%E7%BB%B4%E5%9F%83%E8%81%94%E9%82%A6%E7%A4%BE%E4%BC%9A%E4%B8%BB%E4%B9%89%E5%85%B1%E5%92%8C%E5%9B%BD"
+ },
+ {
+  "year": 1920,
+  "op": "rename",
+  "target": "Chinese Warlords",
+  "result": "Republic of China",
+  "note": "北洋政府与国民政府时期虽有地方军阀割据，国家名义上为中华民国。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1920,
+  "op": "merge",
+  "target": "Xinjiang",
+  "result": "Republic of China",
+  "note": "新疆为中华民国一省，杨增新、金树仁、盛世才等相继主政。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD)"
+ },
+ {
+  "year": 1920,
+  "op": "merge",
+  "target": "Manchuria",
+  "result": "Republic of China",
+  "note": "东北为奉系主政，1928 年东北易帜归附国民政府。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%9C%E5%8C%97%E6%98%93%E5%B8%9C"
+ },
+ {
+  "year": 1920,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Republic of China",
+  "note": "民国时期西藏地方与中央关系一度疏离，但中华民国设蒙藏委员会主管藏事，1940 年在拉萨设驻藏办事处，国际上亦无国家承认西藏独立；西藏属中国版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
+ },
+ {
+  "year": 1920,
+  "op": "merge",
+  "target": "Mongolia",
+  "result": "Republic of China",
+  "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1930,
+  "op": "rename",
+  "target": "White Russia",
+  "result": "USSR",
+  "note": "原数据把 1930 年的苏联主体误标为“白俄罗斯”。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%8B%8F%E8%81%94"
+ },
+ {
+  "year": 1930,
+  "op": "merge",
+  "target": "Far Eastern SSR",
+  "result": "USSR",
+  "note": "远东共和国已于 1922 年并入苏俄。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%BF%9C%E4%B8%9C%E5%85%B1%E5%92%8C%E5%9B%BD"
+ },
+ {
+  "year": 1930,
+  "op": "rename",
+  "target": "Chinese Warlords",
+  "result": "Republic of China",
+  "note": "北洋政府与国民政府时期虽有地方军阀割据，国家名义上为中华民国。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1930,
+  "op": "merge",
+  "target": "Xinjiang",
+  "result": "Republic of China",
+  "note": "新疆为中华民国一省，杨增新、金树仁、盛世才等相继主政。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD)"
+ },
+ {
+  "year": 1930,
+  "op": "merge",
+  "target": "Manchuria",
+  "result": "Republic of China",
+  "note": "东北为奉系主政，1928 年东北易帜归附国民政府。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%9C%E5%8C%97%E6%98%93%E5%B8%9C"
+ },
+ {
+  "year": 1930,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Republic of China",
+  "note": "民国时期西藏地方与中央关系一度疏离，但中华民国设蒙藏委员会主管藏事，1940 年在拉萨设驻藏办事处，国际上亦无国家承认西藏独立；西藏属中国版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
+ },
+ {
+  "year": 1930,
+  "op": "merge",
+  "target": "Mongolia",
+  "result": "Republic of China",
+  "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1938,
+  "op": "rename",
+  "target": "Chinese warlords",
+  "result": "Republic of China",
+  "note": "北洋政府与国民政府时期虽有地方军阀割据，国家名义上为中华民国。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1938,
+  "op": "merge",
+  "target": "Xinjiang",
+  "result": "Republic of China",
+  "note": "新疆为中华民国一省，杨增新、金树仁、盛世才等相继主政。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD)"
+ },
+ {
+  "year": 1938,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "Republic of China",
+  "note": "民国时期西藏地方与中央关系一度疏离，但中华民国设蒙藏委员会主管藏事，1940 年在拉萨设驻藏办事处，国际上亦无国家承认西藏独立；西藏属中国版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
+ },
+ {
+  "year": 1938,
+  "op": "merge",
+  "target": "Mongolia",
+  "result": "Republic of China",
+  "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1945,
+  "op": "merge",
+  "target": "Xinjiang",
+  "result": "China",
+  "note": "新疆为中华民国一省，杨增新、金树仁、盛世才等相继主政。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD)"
+ },
+ {
+  "year": 1945,
+  "op": "merge",
+  "target": "Manchuria",
+  "result": "China",
+  "note": "1945 年日本投降，伪满洲国覆灭，东北主权归还中华民国。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1945,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "China",
+  "note": "1945 年 10 月中华民国政府接收台湾。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%85%89%E5%A4%8D"
+ },
+ {
+  "year": 1945,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "China",
+  "note": "民国时期西藏地方与中央关系一度疏离，但中华民国设蒙藏委员会主管藏事，1940 年在拉萨设驻藏办事处，国际上亦无国家承认西藏独立；西藏属中国版图。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
+ },
+ {
+  "year": 1960,
+  "op": "merge",
+  "target": "Tibet",
+  "result": "China",
+  "note": "1951 年西藏和平解放，原数据 1960 年仍将西藏单列。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E5%92%8C%E5%B9%B3%E8%A7%A3%E6%94%BE"
+ },
+ {
+  "year": 1960,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "China",
+  "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": 1994,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "China",
+  "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": 2000,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "China",
+  "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": 2010,
+  "op": "merge",
+  "target": "Taiwan",
+  "result": "China",
+  "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": -221,
+  "op": "synthetic",
+  "target": "基于 -300 年",
+  "result": "合成切片",
+  "note": "公元前 221 年秦灭六国。秦朝疆域近似取西汉初年汉、南越、闽越范围之并（秦亡后南越、闽越方才自立），其余地区沿用公元前 300 年数据。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%A7%A6%E6%9C%9D"
+ },
+ {
+  "year": 1206,
+  "op": "synthetic",
+  "target": "基于 1200 年",
+  "result": "合成切片",
+  "note": "1206 年铁木真在斡难河源称成吉思汗，建立大蒙古国；疆域沿用 1200 年蒙古诸部范围。",
+  "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E8%92%99%E5%8F%A4%E5%9B%BD"
+ },
+ {
+  "year": 1142,
+  "op": "synthetic",
+  "target": "基于 1100 年",
+  "result": "合成切片",
+  "note": "1127 年靖康之变后宋室南渡，1142 年绍兴和议确定宋金以淮河—大散关为界；西辽已于 1124—1132 年间立国。东亚范围沿用校勘后的 1200 年，其余地区沿用 1100 年。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%BB%8D%E5%85%B4%E5%92%8C%E8%AE%AE"
+ },
+ {
+  "year": 1234,
+  "op": "synthetic",
+  "target": "基于 1206 年",
+  "result": "合成切片",
+  "note": "大蒙古国先后灭西辽（1218）、花剌子模（1221）、西夏（1227），1234 年联宋灭金。范围取 1206 年各政权多边形之并。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E9%87%91%E6%88%98%E4%BA%89"
+ },
+ {
+  "year": 1368,
+  "op": "synthetic",
+  "target": "基于 1300 年",
+  "result": "合成切片",
+  "note": "1368 年明军攻占大都，元廷北迁。明朝范围近似取 1400 年（明初至 1387 年方陆续统一四川、云南、辽东）；朝鲜半岛此时仍为高丽。",
+  "source": "https://zh.wikipedia.org/wiki/%E6%98%8E%E6%9C%9D"
+ },
+ {
+  "year": 1644,
+  "op": "synthetic",
+  "target": "基于 1600 年",
+  "result": "合成切片",
+  "note": "1644 年李自成攻入北京、明崇祯帝自缢，清军随即入关；东亚范围沿用 1650 年（清与南明并立），其余地区沿用 1600 年。",
+  "source": "https://zh.wikipedia.org/wiki/%E7%94%B2%E7%94%B3%E4%B9%8B%E5%8F%98"
+ },
+ {
+  "year": 1912,
+  "op": "synthetic",
+  "target": "基于 1900 年",
+  "result": "合成切片",
+  "note": "1912 年 1 月 1 日中华民国成立，2 月 12 日清帝退位；日本已于 1910 年吞并朝鲜。东亚范围沿用 1914 年，其余地区沿用 1900 年。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
+ },
+ {
+  "year": 1949,
+  "op": "synthetic",
+  "target": "基于 1945 年",
+  "result": "合成切片",
+  "note": "1949 年 10 月 1 日中华人民共和国成立；朝鲜半岛已于 1948 年分立两国。东亚范围沿用 1960 年，其余地区沿用 1945 年。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD%E5%BC%80%E5%9B%BD%E5%A4%A7%E5%85%B8"
+ }
+]

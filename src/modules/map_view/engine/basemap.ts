@@ -1,0 +1,117 @@
+// 底图：陆地（裁剪与海岸线）、湖泊、河流，均预投影为基准平面上的 Path2D
+import { feature } from 'topojson-client';
+import type { Topology, GeometryCollection } from 'topojson-specification';
+import type { Feature, FeatureCollection, GeoJsonProperties, Geometry, LineString, MultiLineString, MultiPolygon, Polygon } from 'geojson';
+import { geoArea } from 'd3-geo';
+import { BASE_H, BASE_W, project, toPath2D } from './projection';
+
+export interface RiverLabel {
+  name: string;
+  at: [number, number];
+  angle: number;
+  rank: number;
+}
+
+export interface Basemap {
+  land: Path2D;
+  rippleLand: Path2D;
+  lakes: Path2D;
+  riversByRank: Path2D[];
+  riverLabels: RiverLabel[];
+  landTexture: HTMLCanvasElement | null;
+}
+
+const url = (p: string) => `${import.meta.env.BASE_URL}data/${p}`;
+
+async function loadTopo<P extends GeoJsonProperties>(file: string): Promise<FeatureCollection<Geometry, P>> {
+  const topo = (await (await fetch(url(file))).json()) as Topology;
+  const key = Object.keys(topo.objects)[0];
+  return feature(topo, topo.objects[key] as GeometryCollection<P>) as unknown as FeatureCollection<Geometry, P>;
+}
+
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+// 河流标注放在最长线段的中点，沿河道方向旋转（倒置时翻转）
+function riverLabel(f: Feature<Geometry, { n?: string; r: number }>): RiverLabel | null {
+  if (!f.properties.n) return null;
+  const g = f.geometry as LineString | MultiLineString;
+  const lines = g.type === 'LineString' ? [g.coordinates] : g.coordinates;
+  const longest = lines.reduce((a, b) => (b.length > a.length ? b : a), lines[0]);
+  if (!longest || longest.length < 4) return null;
+  const i = Math.floor(longest.length / 2);
+  const a = project(longest[Math.max(0, i - 2)] as [number, number]);
+  const b = project(longest[Math.min(longest.length - 1, i + 2)] as [number, number]);
+  const at = project(longest[i] as [number, number]);
+  let angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  if (angle > Math.PI / 2) angle -= Math.PI;
+  if (angle < -Math.PI / 2) angle += Math.PI;
+  return { name: f.properties.n, at, angle, rank: f.properties.r };
+}
+
+// 水纹只描面积较大的陆块，避免小岛周围的同心圈过于繁密
+function largeLand(land: FeatureCollection<Geometry, GeoJsonProperties>): Path2D {
+  const minSteradian = 2500 / (6371 * 6371);
+  const polygons: Polygon['coordinates'][] = [];
+  for (const f of land.features) {
+    const g = f.geometry as Polygon | MultiPolygon;
+    const parts = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+    for (const p of parts) if (geoArea({ type: 'Polygon', coordinates: p }) > minSteradian) polygons.push(p);
+  }
+  return toPath2D({ type: 'MultiPolygon', coordinates: polygons });
+}
+
+// 陆地淡彩与山体墨色只在加载时合成一次，之后每帧只需一次贴图
+function composeLand(land: Path2D, relief: HTMLImageElement | null): HTMLCanvasElement {
+  const width = window.innerWidth > 1000 ? 4096 : 2048;
+  const c = document.createElement('canvas');
+  c.width = width;
+  c.height = Math.round((width * BASE_H) / BASE_W);
+  const ctx = c.getContext('2d')!;
+  const s = width / BASE_W;
+  ctx.setTransform(s, 0, 0, s, 0, 0);
+  ctx.fillStyle = 'rgba(222, 204, 168, 0.34)';
+  ctx.fill(land);
+  if (relief) {
+    ctx.save();
+    ctx.clip(land);
+    ctx.globalAlpha = 0.62;
+    ctx.drawImage(relief, 0, 0, BASE_W, BASE_H);
+    ctx.restore();
+  }
+  return c;
+}
+
+export async function loadBasemap(): Promise<Basemap> {
+  const [land, lakes, rivers, relief] = await Promise.all([
+    loadTopo<GeoJsonProperties>('base/land.json'),
+    loadTopo<{ n: string }>('base/lakes.json'),
+    loadTopo<{ n?: string; r: number }>('base/rivers.json'),
+    loadImage(url('base/relief.webp')),
+  ]);
+  const riversByRank = Array.from({ length: 7 }, () => new Path2D());
+  const labels = new Map<string, RiverLabel>();
+  for (const f of rivers.features) {
+    const rank = Math.min(6, Math.max(0, Math.round(f.properties.r)));
+    riversByRank[rank].addPath(toPath2D(f));
+    const label = riverLabel(f);
+    const prev = label && labels.get(label.name);
+    if (label && (!prev || prev.rank > label.rank)) labels.set(label.name, label);
+  }
+  const landPath = toPath2D(land);
+  return {
+    land: landPath,
+    rippleLand: largeLand(land),
+    lakes: toPath2D(lakes),
+    riversByRank,
+    riverLabels: [...labels.values()],
+    landTexture: composeLand(landPath, relief),
+  };
+}
