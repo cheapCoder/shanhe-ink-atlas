@@ -1,11 +1,46 @@
-# 山河墨史
+<div align="center">
+
+# 山河墨史 · Shanhe Ink Atlas
+
+**以水墨之笔，绘五千年山河更迭、大事兴替与人物行迹**
+
+*An ink-wash atlas of world history — 5,000 years of empires, events and journeys, unrolled like a Chinese scroll painting.*
+
+[**在线体验**](https://shanhe-ink-atlas.vercel.app) · [English](README.en.md) · 简体中文
+
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-b03a2e)](LICENSE)
+[![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![D3](https://img.shields.io/badge/d3--geo-Canvas-f9a03c?logo=d3dotjs&logoColor=white)](https://d3js.org)
+
+<img src="docs/screenshots/overview.webp" alt="山河墨史：1279 年的世界" width="100%">
+
+</div>
 
 水墨风格的世界历史疆域与大事件交互地图。从公元前 3000 年到当代，沿一条历史长卷自动播放各国疆域的消长，在大事发生地停驻讲解，并以水墨小动画点出事件的典型人物或器物；可单独查看一个国家或文明的历代疆域，也可追寻历史人物一生的行迹。
 
-- **疆域**：62 幅年代切片（54 幅来自 historical-basemaps，8 幅为关键年份补绘），切片之间淡入淡出过渡。
-- **大事**：78 则，含年代、地点、简短讲解、配图与出处。
-- **人物**：56 位，共 556 个生平站点，按大圆航线连成行迹。
-- **国家与文明**：15 个谱系（中国、罗马、波斯、蒙古、俄罗斯、奥斯曼、阿拉伯、英国、法国、西班牙、美国、日本、印度、埃及、德国），可看疆域面积曲线和各时期的疆域。
+## 亮点
+
+- 🖌️ **一幅会动的长卷**：宣纸纹理、淡彩晕染、墨色山体与近岸水纹全部由 Canvas 绘制，太平洋居中的世界地图像国画一样徐徐展开。
+- 🗺️ **五千年疆域**：62 幅年代切片（54 幅来自 historical-basemaps，8 幅为秦统一、绍兴和议、明清易代等关键年份补绘），切片之间淡入淡出。
+- 📜 **78 则大事**：飞往发生地停驻讲解，配图、出处齐全，并以水墨小精灵点出典型人物或器物。
+- 🧭 **56 位人物、556 个生平站点**：从张骞、玄奘、郑和到马可·波罗、麦哲伦，按大圆航线逐段画出一生行迹。
+- 🏯 **15 个国家与文明谱系**：中国、罗马、波斯、蒙古、奥斯曼……朱色突出本部，附疆域面积曲线与分期。
+- 🔍 **处处可追溯**：每一处校勘都写明理由与维基出处，大事与人物逐条和 Wikidata 比对。
+- ⚡ **纯静态、零后端**：全部数据预处理为静态文件，多级细节（LOD）与 Web Worker 解码让缩放飞行保持流畅。
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/intro.webp" alt="开场"><p align="center">开场 · 展卷</p></td>
+    <td width="50%"><img src="docs/screenshots/territory.webp" alt="疆域模式"><p align="center">疆域 · 中国历代疆域与面积曲线</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/figure.webp" alt="人物模式"><p align="center">人物 · 郑和七下西洋</p></td>
+    <td width="50%"><img src="docs/screenshots/overview.webp" alt="纵览模式"><p align="center">纵览 · 1279 年，元灭南宋</p></td>
+  </tr>
+</table>
+
+> 在线体验部署在 Vercel，`*.vercel.app` 在中国大陆访问可能不稳定，可本地运行或自行部署到其他静态托管。
 
 ## 运行
 

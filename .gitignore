@@ -6,3 +6,4 @@ data_raw
 scripts/_*.mjs
 .playwright-cli
 .claude/
+.vercel
