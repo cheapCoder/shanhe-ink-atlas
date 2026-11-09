@@ -38,6 +38,16 @@ export const toScreen = (view: View, p: [number, number]): [number, number] => [
 
 export const toBase = (view: View, s: [number, number]): [number, number] => [(s[0] - view.x) / view.k, (s[1] - view.y) / view.k];
 
+export type Box = [number, number, number, number];
+
+// 视口（外扩 marginPx 屏幕像素）在基准平面上的范围
+export function viewBox(view: View, marginPx: number): Box {
+  const m = marginPx / view.k;
+  return [-view.x / view.k - m, -view.y / view.k - m, (view.width - view.x) / view.k + m, (view.height - view.y) / view.k + m];
+}
+
+export const intersects = (a: Box, b: Box) => a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
+
 // 适配视口的初始缩放：让整个基准平面完整落在视口内（留出时间轴等界面的空间）
 export function fitView(width: number, height: number, padTop = 70, padBottom = 150): { k: number; x: number; y: number } {
   const availH = Math.max(200, height - padTop - padBottom);

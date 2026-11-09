@@ -1,6 +1,6 @@
 // 各图层的绘制函数：所有路径都在基准平面坐标中，线宽等屏幕尺寸需除以 k
 import { geoGraticule10 } from 'd3-geo';
-import { BASE_H, BASE_W, applyView, spherePath, toPath2D, type View } from './projection';
+import { BASE_H, BASE_W, applyView, intersects, spherePath, toPath2D, viewBox, type View } from './projection';
 import type { Basemap } from './basemap';
 import type { Polity, Snapshot } from './snapshots';
 import { CINNABAR, INK, PIGMENTS, WATER_INK, deepen, rgba } from './palette';
@@ -59,6 +59,9 @@ export function drawBase(ctx: CanvasRenderingContext2D, view: View, base: Basema
 let seaCanvas: HTMLCanvasElement | null = null;
 const SEA_SCALE = 0.5;
 
+// 宽描边与模糊会抹平海岸细节，中心线可容许 1 个海面画布像素的简化误差
+const SEA_ERROR_PX = 1;
+
 function drawSea(ctx: CanvasRenderingContext2D, view: View, base: Basemap) {
   seaCanvas ??= document.createElement('canvas');
   const off = seaCanvas;
@@ -75,28 +78,29 @@ function drawSea(ctx: CanvasRenderingContext2D, view: View, base: Basemap) {
   o.setTransform(view.k * s, 0, 0, view.k * s, view.x * s, view.y * s);
   o.lineJoin = 'round';
   const k = view.k;
+  const ripple = base.rippleLand.in(view, 'stroke', SEA_SCALE, SEA_ERROR_PX);
   o.filter = 'blur(5px)';
   o.strokeStyle = 'rgba(78, 112, 128, 0.075)';
   o.lineWidth = 30 / k;
-  o.stroke(base.rippleLand);
+  o.stroke(ripple);
   o.filter = 'blur(1.5px)';
   o.strokeStyle = 'rgba(78, 112, 128, 0.08)';
   o.lineWidth = 9 / k;
-  o.stroke(base.land);
+  o.stroke(base.land.in(view, 'stroke', SEA_SCALE, SEA_ERROR_PX));
   o.filter = 'none';
   [14.5, 9, 4.5].forEach((d, i) => {
     o.globalCompositeOperation = 'source-over';
     o.strokeStyle = `rgba(62, 84, 92, ${0.2 + i * 0.1})`;
     o.lineWidth = (2 * d + 1.4) / k;
-    o.stroke(base.rippleLand);
+    o.stroke(ripple);
     o.globalCompositeOperation = 'destination-out';
     o.strokeStyle = '#000';
     o.lineWidth = (2 * d - 0.2) / k;
-    o.stroke(base.rippleLand);
+    o.stroke(ripple);
   });
   o.globalCompositeOperation = 'destination-out';
   o.fillStyle = '#000';
-  o.fill(base.land);
+  o.fill(base.land.in(view, 'fill', SEA_SCALE));
   o.globalCompositeOperation = 'source-over';
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -104,6 +108,8 @@ function drawSea(ctx: CanvasRenderingContext2D, view: View, base: Basemap) {
   ctx.drawImage(off, 0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.restore();
 }
+
+const strokeEach = (ctx: CanvasRenderingContext2D, paths: Path2D[]) => paths.forEach((p) => ctx.stroke(p));
 
 const patterns = new Map<string, CanvasPattern>();
 
@@ -132,11 +138,12 @@ export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Ba
   clear(ctx);
   applyView(ctx, view);
   ctx.save();
-  ctx.clip(base.land);
   ctx.globalCompositeOperation = 'multiply';
   const dim = style.highlight !== null;
   const minScreen = 1.5 / k;
-  for (const p of snap.polities) {
+  const box = viewBox(view, 16);
+  const visible = snap.polities.filter((p) => intersects(box, p.bbox));
+  for (const p of visible) {
     if (p.bbox[2] - p.bbox[0] < minScreen && p.bbox[3] - p.bbox[1] < minScreen) continue;
     const level = style.highlight?.get(p.index) ?? 0;
     const hex = level ? style.highlightColor : PIGMENTS[style.colors[p.index] ?? 0];
@@ -151,7 +158,7 @@ export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Ba
   // 晕边：在多边形内侧叠几道由宽到窄的描边，模拟颜料在纸上向边缘聚集
 
   if (quality === 'full') {
-    const big = snap.polities
+    const big = visible
       .filter((p) => (p.bbox[2] - p.bbox[0]) * k >= 14 && !isCulture(p.name))
       .sort((a, b) => b.area - a.area)
       .slice(0, 140);
@@ -171,13 +178,14 @@ export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Ba
     }
   }
 
+  const borders = snap.borders.filter((b) => intersects(box, b.box)).map((b) => b.path);
   ctx.lineJoin = 'round';
   ctx.strokeStyle = rgba(INK, dim ? 0.18 : 0.32);
   ctx.lineWidth = 2.2 / k;
-  ctx.stroke(snap.borders);
+  strokeEach(ctx, borders);
   ctx.strokeStyle = rgba(INK, dim ? 0.3 : 0.55);
   ctx.lineWidth = 0.7 / k;
-  ctx.stroke(snap.borders);
+  strokeEach(ctx, borders);
 
   if (style.highlight) {
     for (const [i, level] of style.highlight) {
@@ -188,6 +196,12 @@ export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Ba
     }
     ctx.setLineDash([]);
   }
+
+  // 只保留陆地部分：画完后按陆地遮罩一次性抠掉海面。若先 clip 再画，上千次填充与描边每次都要与复杂裁剪区求交，GPU 开销高出数倍
+
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.fillStyle = '#000';
+  ctx.fill(base.land.in(view, 'fill'));
   ctx.restore();
 }
 
@@ -197,13 +211,14 @@ export function drawWater(ctx: CanvasRenderingContext2D, view: View, base: Basem
   applyView(ctx, view);
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
+  const lakes = base.lakes.in(view, 'fill');
   ctx.fillStyle = 'rgba(236, 232, 220, 0.92)';
-  ctx.fill(base.lakes);
+  ctx.fill(lakes);
   ctx.fillStyle = 'rgba(96, 128, 140, 0.12)';
-  ctx.fill(base.lakes);
+  ctx.fill(lakes);
   ctx.strokeStyle = rgba(WATER_INK, 0.55);
   ctx.lineWidth = 0.7 / k;
-  ctx.stroke(base.lakes);
+  strokeEach(ctx, base.lakes.pieces(view));
 
   // 河流：等级越高越粗；缩放越大显示越多支流
 
@@ -213,11 +228,11 @@ export function drawWater(ctx: CanvasRenderingContext2D, view: View, base: Basem
     const w = Math.max(0.35, 1.5 - rank * 0.2) * Math.min(1.6, Math.sqrt(k / 0.7));
     ctx.strokeStyle = rgba(WATER_INK, 0.6 - rank * 0.04);
     ctx.lineWidth = w / k;
-    ctx.stroke(path);
+    strokeEach(ctx, path.pieces(view));
   });
   ctx.strokeStyle = 'rgba(30, 26, 22, 0.6)';
   ctx.lineWidth = 0.9 / k;
-  ctx.stroke(base.land);
+  strokeEach(ctx, base.land.pieces(view));
 }
 
 export function drawHover(ctx: CanvasRenderingContext2D, view: View, p: Polity | null, color = INK) {

@@ -1,10 +1,6 @@
-// 年代切片仓库：索引查询、按需加载、解码为 Path2D、LRU 缓存与预取
-import { feature, mesh, neighbors as topoNeighbors } from 'topojson-client';
-import type { Topology, GeometryCollection } from 'topojson-specification';
-import type { Feature, MultiPolygon, Polygon } from 'geojson';
-import { geoPath } from 'd3-geo';
+// 年代切片仓库：索引查询、按需加载（拉取与解码在后台线程）、构造 Path2D、LRU 缓存与预取
 import type { Correction, SnapshotMeta } from '@/types';
-import { project, projection, toPath2D } from './projection';
+import type { Box } from './projection';
 
 export interface PolityProps {
   n: string;
@@ -30,13 +26,35 @@ export interface Polity {
   color: number;
 }
 
+// 国界按网格分块：细线整条描边时按全屏面积生成遮罩，分块后只描视口内的小块
+export interface BorderPiece {
+  path: Path2D;
+  box: Box;
+}
+
 export interface Snapshot {
   meta: SnapshotMeta;
   polities: Polity[];
   byName: Map<string, Polity>;
-  borders: Path2D;
+  borders: BorderPiece[];
   neighbors: number[][];
 }
+
+// 后台线程的解码结果：路径以 SVG 路径串传回（Path2D 无法跨线程传递）
+export type DecodedPolity = Omit<Polity, 'index' | 'path' | 'color'> & { d: string };
+
+export interface DecodedSnapshot {
+  polities: DecodedPolity[];
+  borders: { d: string; box: Box }[];
+  neighbors: number[][];
+}
+
+export interface DecodeRequest {
+  id: number;
+  url: string;
+}
+
+export type DecodeResponse = { id: number; data: DecodedSnapshot } | { id: number; error: string };
 
 export interface BordersIndex {
   source: { name: string; author: string; url: string; license: string };
@@ -46,13 +64,15 @@ export interface BordersIndex {
 
 const url = (p: string) => `${import.meta.env.BASE_URL}data/borders/${p}`;
 const CACHE_SIZE = 10;
-const bounds = geoPath(projection);
 
 export class SnapshotStore {
   index: BordersIndex | null = null;
   areas: Record<string, [number, number][]> = {};
   corrections: Correction[] = [];
   private cache = new Map<number, Promise<Snapshot>>();
+  private worker: Worker | null = null;
+  private jobs = new Map<number, { resolve: (d: DecodedSnapshot) => void; reject: (e: Error) => void }>();
+  private seq = 0;
 
   async init() {
     const [index, areas, corrections] = await Promise.all([
@@ -92,9 +112,7 @@ export class SnapshotStore {
       this.cache.set(meta.year, hit);
       return hit;
     }
-    const job = fetch(url(meta.file))
-      .then((r) => r.json() as Promise<Topology>)
-      .then((topo) => decode(meta, topo));
+    const job = this.decode(new URL(url(meta.file), location.href).href).then((data) => build(meta, data));
     this.cache.set(meta.year, job);
     while (this.cache.size > CACHE_SIZE) this.cache.delete(this.cache.keys().next().value as number);
     return job;
@@ -105,36 +123,43 @@ export class SnapshotStore {
     const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
     idle(() => void this.load(meta));
   }
+
+  destroy() {
+    this.worker?.terminate();
+    this.worker = null;
+    this.jobs.clear();
+  }
+
+  // 主线程同步解码一张切片要几十毫秒，放在飞行途中会卡掉数帧，因此交给后台线程
+  private decode(href: string): Promise<DecodedSnapshot> {
+    this.worker ??= this.spawn();
+    const id = ++this.seq;
+    return new Promise((resolve, reject) => {
+      this.jobs.set(id, { resolve, reject });
+      this.worker!.postMessage({ id, url: href } satisfies DecodeRequest);
+    });
+  }
+
+  private spawn(): Worker {
+    const worker = new Worker(new URL('./snapshotWorker.ts', import.meta.url), { type: 'module' });
+    worker.onmessage = ({ data }: MessageEvent<DecodeResponse>) => {
+      const job = this.jobs.get(data.id);
+      this.jobs.delete(data.id);
+      if (!job) return;
+      if ('error' in data) job.reject(new Error(data.error));
+      else job.resolve(data.data);
+    };
+    return worker;
+  }
 }
 
-function decode(meta: SnapshotMeta, topo: Topology): Snapshot {
-  const object = topo.objects.polities as GeometryCollection<PolityProps>;
-  const fc = feature(topo, object);
-  const polities = fc.features.map((f, index) => toPolity(f as Feature<Polygon | MultiPolygon, PolityProps>, index));
-  const borders = toPath2D(mesh(topo, object, (a, b) => a !== b));
+function build(meta: SnapshotMeta, data: DecodedSnapshot): Snapshot {
+  const polities: Polity[] = data.polities.map(({ d, ...p }, index) => ({ ...p, index, path: new Path2D(d), color: 0 }));
   return {
     meta,
     polities,
     byName: new Map(polities.map((p) => [p.name, p])),
-    borders,
-    neighbors: topoNeighbors(object.geometries),
-  };
-}
-
-function toPolity(f: Feature<Polygon | MultiPolygon, PolityProps>, index: number): Polity {
-  const p = f.properties;
-  const [[x0, y0], [x1, y1]] = bounds.bounds(f);
-  return {
-    index,
-    name: p.n,
-    subj: p.s,
-    prec: p.p ?? 1,
-    fixed: p.x === 1,
-    area: p.a,
-    anchor: p.l ? project(p.l) : null,
-    r: p.r ?? 0,
-    path: toPath2D(f),
-    bbox: [x0, y0, x1, y1],
-    color: 0,
+    borders: data.borders.map(({ d, box }) => ({ path: new Path2D(d), box })),
+    neighbors: data.neighbors,
   };
 }
