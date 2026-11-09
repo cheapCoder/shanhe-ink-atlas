@@ -17,6 +17,9 @@ const NE_FILES = [
   'ne_50m_rivers_lake_centerlines',
   'ne_10m_rivers_lake_centerlines',
   'ne_50m_geography_regions_polys',
+  'ne_10m_admin_0_disputed_areas',
+  'ne_10m_admin_0_countries_chn',
+  'ne_10m_admin_0_boundary_lines_maritime_indicator_chn',
 ];
 const RELIEF_ZIP = 'https://naciscdn.org/naturalearth/50m/raster/SR_50M.zip';
 

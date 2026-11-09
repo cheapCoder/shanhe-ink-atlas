@@ -1,10 +1,11 @@
 // 各图层的绘制函数：所有路径都在基准平面坐标中，线宽等屏幕尺寸需除以 k
 import { geoGraticule10 } from 'd3-geo';
 import { BASE_H, BASE_W, applyView, spherePath, toPath2D, type View } from './projection';
-import type { Basemap } from './basemap';
+import type { Basemap, ChinaSea } from './basemap';
 import type { Polity, Snapshot } from './snapshots';
 import { CINNABAR, INK, PIGMENTS, WATER_INK, deepen, rgba } from './palette';
 import { WASH_SIZE, WASH_TILE_BASE, washTile } from './wash';
+import { LABEL_FONT } from './labels';
 
 export type Quality = 'full' | 'fast';
 
@@ -187,6 +188,46 @@ export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Ba
       ctx.stroke(snap.polities[i].path);
     }
     ctx.setLineDash([]);
+  }
+  ctx.restore();
+  if (base.chinaSea && snap.meta.year >= CHINA_SEA_SINCE) drawChinaSea(ctx, view, base.chinaSea, dim ? 0.5 : 1);
+}
+
+// 南海断续线与南海诸岛：中华人民共和国成立后的切片显示；断续线同国界线墨色，岛礁以墨点示意，放大后标注地名
+const CHINA_SEA_SINCE = 1949;
+
+function drawChinaSea(ctx: CanvasRenderingContext2D, view: View, sea: ChinaSea, alpha: number) {
+  const k = view.k;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = rgba(INK, 0.32 * alpha);
+  ctx.lineWidth = 2.2 / k;
+  ctx.stroke(sea.dashes);
+  ctx.strokeStyle = rgba(INK, 0.7 * alpha);
+  ctx.lineWidth = 0.9 / k;
+  ctx.stroke(sea.dashes);
+  const r = Math.min(1.4, 0.5 + k * 0.2) / k;
+  ctx.fillStyle = rgba(INK, 0.6 * alpha);
+  ctx.beginPath();
+  for (const [x, y] of sea.islands) {
+    ctx.moveTo(x + r, y);
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+  }
+  ctx.fill();
+  ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.min(15, 9 + k).toFixed(1)}px ${LABEL_FONT}`;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = `rgba(243, 236, 222, ${0.8 * alpha})`;
+  ctx.fillStyle = rgba(INK, 0.72 * alpha);
+  for (const l of sea.labels) {
+    if (k < l.minK) continue;
+    const x = l.at[0] * k + view.x;
+    const y = l.at[1] * k + view.y;
+    ctx.strokeText(l.name, x, y);
+    ctx.fillText(l.name, x, y);
   }
   ctx.restore();
 }

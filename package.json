@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "山河墨史 —— 水墨风格的世界历史疆域与大事件交互地图",
+  "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",

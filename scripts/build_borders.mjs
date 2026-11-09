@@ -3,9 +3,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import mapshaper from 'mapshaper';
+import { geoContains } from 'd3-geo';
 import { feature as topoFeature } from 'topojson-client';
 import { fixes, synthetic, yearNames } from './borders_fixes.mjs';
-import { toMulti, isEmpty, union, difference, intersection, maskFromLine, boxMask, bbox, boxesOverlap, areaKm2, labelAnchor, baseProjection } from './lib/geo_ops.mjs';
+import { toMulti, isEmpty, union, difference, intersection, maskFromLine, boxMask, bbox, boxesOverlap, areaKm2, labelAnchor, baseProjection, interiorPoint } from './lib/geo_ops.mjs';
 
 const [srcDir, outDir] = process.argv.slice(2);
 if (!srcDir || !outDir) {
@@ -16,6 +17,8 @@ fs.mkdirSync(outDir, { recursive: true });
 
 // 补绘缺失岛屿用的陆地轮廓（Natural Earth 1:50m，与底图同源）
 const LAND_FILE = path.join(srcDir, '..', 'naturalearth', 'ne_50m_land.geojson');
+const DISPUTED_FILE = path.join(srcDir, '..', 'naturalearth', 'ne_10m_admin_0_disputed_areas.geojson');
+const CHINA_VIEW_FILE = path.join(srcDir, '..', 'naturalearth', 'ne_10m_admin_0_countries_chn.geojson');
 const SIMPLIFY_INTERVAL_M = 5000;
 const MIN_PART_KM2 = 30;
 const projection = baseProjection();
@@ -90,6 +93,33 @@ function landIn(ring) {
   return parts.length ? intersection(parts, mask) : [];
 }
 
+// 中国主张的争议地区（Natural Earth 争议地区中由 admin 管辖、中国视角不承认的部分）
+let disputed = null;
+function disputedArea({ admin, box }) {
+  disputed ??= JSON.parse(fs.readFileSync(DISPUTED_FILE, 'utf8')).features;
+  return disputed
+    .filter((f) => f.properties.ADMIN === admin && f.properties.FCLASS_CN === 'Unrecognized')
+    .flatMap((f) => toMulti(f.geometry))
+    .filter((poly) => boxesOverlap(bbox([poly]), box));
+}
+
+// 划归范围取中国视角的中国轮廓在 box 内的部分，使争议地区与原数据边界之间的缝隙一并划入
+let viewFeatures = null;
+const loadView = () => (viewFeatures ??= JSON.parse(fs.readFileSync(CHINA_VIEW_FILE, 'utf8')).features);
+const claimCache = new Map();
+function claimArea({ box }) {
+  const key = box.join(',');
+  if (!claimCache.has(key)) {
+    const china = toMulti(loadView().find((f) => f.properties.ADM0_A3 === 'CHN').geometry);
+    claimCache.set(key, intersection(china, boxMask(box)));
+  }
+  return claimCache.get(key);
+}
+
+// 中国视角数据中某点所属的国家名
+const viewAdmin = (p) => loadView().find((f) => geoContains(f, p))?.properties.ADMIN;
+const REMNANT_KM2 = 2000;
+
 // 从 geom 中扣除与之相邻的其他政权，只留下无人认领的空白
 function blankPart(feats, geom, except) {
   const box = bbox(geom);
@@ -140,6 +170,36 @@ async function applyFixes(year, feats) {
       const piece = blankPart(feats, landIn(fix.area), fix.into);
       if (isEmpty(piece)) ok = false;
       else put(feats, fix.into, piece, { prec: 1 });
+    }
+    if (fix.op === 'transfer') {
+      const area = claimArea(fix.claim);
+      const held = disputedArea(fix.claim);
+      const box = bbox(area);
+      const pieces = [];
+      const donors = [];
+      for (const f of feats.has(fix.into) ? feats.values() : []) {
+        if (f.name === fix.into || !boxesOverlap(bbox(f.geom), box) || isEmpty(intersection(f.geom, held))) continue;
+        const piece = intersection(f.geom, area);
+        if (isEmpty(piece)) continue;
+        pieces.push(piece);
+        donors.push(f);
+        f.geom = difference(f.geom, area);
+        f.fixed = true;
+      }
+
+      // 两套数据边界不重合，出让方会在划归范围边缘留下与本体分离的小块：按中国视角数据交给其实际所属的政权
+
+      for (const f of donors) {
+        for (const poly of f.geom.filter((p) => boxesOverlap(bbox([p]), box) && areaKm2([p]) < REMNANT_KM2)) {
+          const owner = feats.get(viewAdmin(interiorPoint(poly)));
+          if (!owner || owner === f) continue;
+          f.geom = f.geom.filter((p) => p !== poly);
+          put(feats, owner.name, [poly]);
+        }
+      }
+      for (const f of [...feats.values()]) if (isEmpty(f.geom)) feats.delete(f.name);
+      if (pieces.length === 0) ok = false;
+      else put(feats, fix.into, union(...pieces), { prec: 1 });
     }
     const target = fix.from || fix.target || fix.source_name || fix.land;
     if (!ok) warn(`${year} ${fix.op} 未命中：${target}`);

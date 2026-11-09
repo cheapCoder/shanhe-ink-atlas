@@ -1,13 +1,15 @@
 // 多边形运算与度量工具（平面经纬度运算，适用于本项目的区域级修正）
 import pc from 'polygon-clipping';
 import polylabel from 'polylabel';
-import { geoArea, geoNaturalEarth1 } from 'd3-geo';
+import { geoArea, geoNaturalEarth1, geoPath } from 'd3-geo';
 
 export const EARTH_RADIUS_KM = 6371.0088;
 
-// 前端与构建脚本共用的基准投影：自然地球投影，球面适配到 2000 宽
+// 前端与构建脚本共用的基准投影：自然地球投影，中央经线东经 150°，球面适配到 2000 宽
+// 须与 src/modules/map_view/engine/projection.ts 一致
 export const BASE_WIDTH = 2000;
-export const baseProjection = () => geoNaturalEarth1().fitWidth(BASE_WIDTH, { type: 'Sphere' });
+export const CENTER_LON = 150;
+export const baseProjection = () => geoNaturalEarth1().rotate([-CENTER_LON, 0]).fitWidth(BASE_WIDTH, { type: 'Sphere' });
 
 export function toMulti(geometry) {
   if (!geometry) return [];
@@ -108,10 +110,29 @@ export function areaKm2(multi) {
   return a * EARTH_RADIUS_KM * EARTH_RADIUS_KM;
 }
 
+// 多边形在经纬度平面上的内点（与环方向无关；细长碎块的质心可能落在形外，故用最远内点）
+export function interiorPoint(poly) {
+  const p = polylabel(poly, 0.01);
+  return [p[0], p[1]];
+}
+
 function planarArea(ring) {
   let s = 0;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) s += (ring[j][0] + ring[i][0]) * (ring[j][1] - ring[i][1]);
   return Math.abs(s / 2);
+}
+
+const crossesEdge = (ring) => ring.some((p, i) => i > 0 && Math.abs(p[0] - ring[i - 1][0]) > BASE_WIDTH / 2);
+
+// 跨越地图左右边缘的多边形：按投影裁切成若干块，每块外环作为独立的候选多边形
+function clippedParts(polygon, projection) {
+  const rings = [];
+  geoPath(projection, {
+    moveTo: (x, y) => rings.push([[x, y]]),
+    lineTo: (x, y) => rings[rings.length - 1].push([x, y]),
+    closePath: () => rings[rings.length - 1].push(rings[rings.length - 1][0]),
+  })({ type: 'Polygon', coordinates: polygon });
+  return rings.map((ring) => [ring]);
 }
 
 // 在基准投影平面上求最大多边形的“最远内点”，作为标注锚点；r 为内切圆半径（基准平面单位）
@@ -119,9 +140,12 @@ export function labelAnchor(multi, projection) {
   let best = null;
   for (const polygon of multi) {
     const projected = polygon.map((ring) => ring.map((p) => projection(p)).filter(Boolean));
-    if (projected[0].length < 4) continue;
-    const a = planarArea(projected[0]);
-    if (!best || a > best.area) best = { area: a, projected };
+    const parts = crossesEdge(projected[0]) ? clippedParts(polygon, projection) : [projected];
+    for (const part of parts) {
+      if (part[0].length < 4) continue;
+      const a = planarArea(part[0]);
+      if (!best || a > best.area) best = { area: a, projected: part };
+    }
   }
   if (!best) return null;
   const p = polylabel(best.projected, 0.5);

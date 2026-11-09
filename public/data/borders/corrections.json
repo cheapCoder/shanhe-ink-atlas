@@ -528,12 +528,44 @@
   "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
  },
  {
+  "year": 1815,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Manchu Empire",
+  "note": "藏南地区（门隅、珞瑜、下察隅）属西藏地方，英属印度的行政管辖此时止于山麓的“外线”；原数据将其划出中国，此处并入（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1815,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Manchu Empire",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 1878,
   "op": "merge",
   "target": "Taiwan",
   "result": "Manchu Empire",
   "note": "清于 1684 年设台湾府，1885 年建台湾省，原数据将台湾单列。",
   "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
+ },
+ {
+  "year": 1878,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Manchu Empire",
+  "note": "藏南地区（门隅、珞瑜、下察隅）属西藏地方，英属印度的行政管辖此时止于山麓的“外线”；原数据将其划出中国，此处并入（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1878,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Manchu Empire",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 1880,
@@ -544,12 +576,44 @@
   "source": "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E5%BA%9C"
  },
  {
+  "year": 1880,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Manchu Empire",
+  "note": "藏南地区（门隅、珞瑜、下察隅）属西藏地方，英属印度的行政管辖此时止于山麓的“外线”；原数据将其划出中国，此处并入（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1880,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Manchu Empire",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 1900,
   "op": "claimLand",
   "target": "台湾岛",
   "result": "Imperial Japan",
   "note": "1895 年《马关条约》清廷割让台湾、澎湖，此后至 1945 年为日本占据；原数据缺台湾岛。",
   "source": "https://zh.wikipedia.org/wiki/%E9%A9%AC%E5%85%B3%E6%9D%A1%E7%BA%A6"
+ },
+ {
+  "year": 1900,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Manchu Empire",
+  "note": "藏南地区（门隅、珞瑜、下察隅）属西藏地方，英属印度的行政管辖此时止于山麓的“外线”；原数据将其划出中国，此处并入（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1900,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Manchu Empire",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 1914,
@@ -582,6 +646,22 @@
   "result": "Republic of China",
   "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
   "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1914,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Republic of China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1914,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Republic of China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 1920,
@@ -630,6 +710,22 @@
   "result": "Republic of China",
   "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
   "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1920,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Republic of China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1920,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Republic of China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 1930,
@@ -688,6 +784,22 @@
   "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
  },
  {
+  "year": 1930,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Republic of China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1930,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Republic of China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 1938,
   "op": "rename",
   "target": "Chinese warlords",
@@ -718,6 +830,22 @@
   "result": "Republic of China",
   "note": "外蒙古 1911 年底宣布独立，1915 年《中俄蒙协约》改为中国宗主权下的自治，1921 年后在苏俄支持下另立政府；中华民国至 1946 年 1 月方承认其独立，此处按当时的法理地位并入中华民国显示。",
   "source": "https://zh.wikipedia.org/wiki/%E5%A4%96%E8%92%99%E5%8F%A4%E7%8B%AC%E7%AB%8B"
+ },
+ {
+  "year": 1938,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "Republic of China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1938,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "Republic of China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 1945,
@@ -752,6 +880,22 @@
   "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E8%97%8F%E5%A7%94%E5%91%98%E4%BC%9A"
  },
  {
+  "year": 1945,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1945,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 1960,
   "op": "merge",
   "target": "Tibet",
@@ -768,12 +912,44 @@
   "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
  },
  {
+  "year": 1960,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1960,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 1994,
   "op": "merge",
   "target": "Taiwan",
   "result": "China",
   "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
   "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": 1994,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 1994,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": 2000,
@@ -784,12 +960,44 @@
   "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
  },
  {
+  "year": 2000,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 2000,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
+ },
+ {
   "year": 2010,
   "op": "merge",
   "target": "Taiwan",
   "result": "China",
   "note": "依一个中国原则，台湾作为中国领土的一部分合并显示。",
   "source": "https://zh.wikipedia.org/wiki/%E4%B8%80%E4%B8%AA%E4%B8%AD%E5%9B%BD%E5%8E%9F%E5%88%99"
+ },
+ {
+  "year": 2010,
+  "op": "transfer",
+  "target": "藏南地区",
+  "result": "China",
+  "note": "1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E8%97%8F%E5%8D%97%E5%9C%B0%E5%8C%BA"
+ },
+ {
+  "year": 2010,
+  "op": "transfer",
+  "target": "中印边界西段、中段",
+  "result": "China",
+  "note": "中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。",
+  "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%B0%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"
  },
  {
   "year": -221,

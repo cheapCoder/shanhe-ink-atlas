@@ -111,7 +111,7 @@ export const zh = {
   data_content: '事件与人物',
   data_images: '图片',
   data_corrections: '校勘记',
-  data_disclaimer: '历史疆域为示意性复原，不作为划界依据。西藏自元代起、台湾自清代起均按历代中央政府版图表示，民国时期的外蒙古按 1946 年承认其独立前的法理地位表示。现代国界源自开源数据，与中国标准地图存在差异，公开发布前须替换为标准地图并依法送审。',
+  data_disclaimer: '历史疆域为示意性复原，不作为划界依据。西藏自元代起、台湾自清代起均按历代中央政府版图表示，民国时期的外蒙古按 1946 年承认其独立前的法理地位表示；藏南地区及中印边界西段、中段的争议地区按中国政府立场并入中国，1949 年以后的切片绘出南海断续线与南海诸岛。疆域线源自开源数据，与中国标准地图仍可能存在差异；本图为示意图，不是标准地图。',
   data_close: '合上',
   data_method: '说明',
   data_source: '依据',
@@ -123,6 +123,7 @@ export const zh = {
   data_op_split: '拆分',
   data_op_borrow: '借用',
   data_op_land: '补缺',
+  data_op_transfer: '划归',
   data_op_synthetic: '补绘',
   data_wiki: '维基百科',
 

@@ -18,6 +18,7 @@ const OP_LABEL: Record<string, LocaleKey> = {
   splitByLine: 'data_op_split',
   borrow: 'data_op_borrow',
   claimLand: 'data_op_land',
+  transfer: 'data_op_transfer',
   synthetic: 'data_op_synthetic',
 };
 

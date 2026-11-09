@@ -12,6 +12,19 @@ export interface RiverLabel {
   rank: number;
 }
 
+// 南海断续线、岛礁墨点与地名，坐标均已投影到基准平面
+export interface ChinaSea {
+  dashes: Path2D;
+  islands: [number, number][];
+  labels: { name: string; at: [number, number]; minK: number }[];
+}
+
+interface ChinaSeaData {
+  dashes: [number, number][][];
+  islands: [number, number][];
+  labels: { n: string; at: [number, number]; k: number }[];
+}
+
 export interface Basemap {
   land: Path2D;
   rippleLand: Path2D;
@@ -19,6 +32,7 @@ export interface Basemap {
   riversByRank: Path2D[];
   riverLabels: RiverLabel[];
   landTexture: HTMLCanvasElement | null;
+  chinaSea: ChinaSea | null;
 }
 
 const url = (p: string) => `${import.meta.env.BASE_URL}data/${p}`;
@@ -89,12 +103,26 @@ function composeLand(land: Path2D, relief: HTMLImageElement | null): HTMLCanvasE
   return c;
 }
 
+async function loadChinaSea(): Promise<ChinaSea | null> {
+  try {
+    const data = (await (await fetch(url('base/china_sea.json'))).json()) as ChinaSeaData;
+    return {
+      dashes: toPath2D({ type: 'MultiLineString', coordinates: data.dashes }),
+      islands: data.islands.map(project),
+      labels: data.labels.map((l) => ({ name: l.n, at: project(l.at), minK: l.k })),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function loadBasemap(): Promise<Basemap> {
-  const [land, lakes, rivers, relief] = await Promise.all([
+  const [land, lakes, rivers, relief, chinaSea] = await Promise.all([
     loadTopo<GeoJsonProperties>('base/land.json'),
     loadTopo<{ n: string }>('base/lakes.json'),
     loadTopo<{ n?: string; r: number }>('base/rivers.json'),
     loadImage(url('base/relief.webp')),
+    loadChinaSea(),
   ]);
   const riversByRank = Array.from({ length: 7 }, () => new Path2D());
   const labels = new Map<string, RiverLabel>();
@@ -113,5 +141,6 @@ export async function loadBasemap(): Promise<Basemap> {
     riversByRank,
     riverLabels: [...labels.values()],
     landTexture: composeLand(landPath, relief),
+    chinaSea,
   };
 }

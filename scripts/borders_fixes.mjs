@@ -35,11 +35,24 @@ const SIBERIA_LINE = [
 const TAIWAN_AREA = [[119.25, 23.0], [119.9, 22.2], [120.6, 21.7], [121.2, 21.7], [122.3, 24.2], [122.3, 25.5], [121.4, 25.6], [120.6, 25.2], [119.9, 24.0], [119.25, 23.9], [119.25, 23.0]];
 const HAINAN_AREA = [[108.4, 18.0], [111.2, 18.0], [111.2, 20.17], [108.4, 20.17], [108.4, 18.0]];
 
+// 中国主张而为他国实际管辖的地区：原数据中与 Natural Earth 争议地区（admin 管辖、中国视角不承认，即 FCLASS_CN = Unrecognized）
+// 相交的政权，把其落在中国视角中国轮廓内、且位于 box [西, 南, 东, 北] 内的部分划归中国
+const SOUTH_TIBET = { admin: 'India', box: [91, 26, 98, 30] };
+const WEST_SECTOR = { admin: 'India', box: [76, 29, 81.5, 34] };
+
+// 原数据中上述地区被划出中国的年份，及该年份（校勘更名后）中国政权的要素名；1912、1949 两幅合成切片从 1914、1960 移植，随之修正
+const CHINA_YEARS = [
+  ...[1815, 1878, 1880, 1900].map((year) => [year, 'Manchu Empire']),
+  ...[1914, 1920, 1930, 1938].map((year) => [year, 'Republic of China']),
+  ...[1945, 1960, 1994, 2000, 2010].map((year) => [year, 'China']),
+];
+
 const zhwiki = (title) => `https://zh.wikipedia.org/wiki/${encodeURIComponent(title)}`;
 
 // 年份内的单条修正。op 取值：
 // rename：更名；merge：并入另一政权；splitByLine：按线拆分（side 为线的“北/东”侧取名 a，另一侧取名 b）；
-// borrow：借用其他年代的同一地域几何（clip 到 within 指定的现有要素范围内）
+// borrow：借用其他年代的同一地域几何（clip 到 within 指定的现有要素范围内）；
+// claimLand：以陆地轮廓补缺失岛屿；transfer：把 claim 范围从现有政权中划出，并入 into
 export const fixes = [
   { year: 300, op: 'rename', from: 'Parthian Empire', to: 'Sasanian Empire', note: '萨珊王朝于 224 年推翻安息，公元 300 年波斯为萨珊王朝统治。', source: zhwiki('萨珊王朝') },
   { year: 400, op: 'rename', from: 'Persia', to: 'Sasanian Empire', note: '公元 400 年波斯为萨珊王朝统治。', source: zhwiki('萨珊王朝') },
@@ -187,6 +200,20 @@ export const fixes = [
   ...[[1492, 'Ming Empire'], [1500, 'Ming Chinese Empire'], [1530, 'Ming Chinese Empire'], [1600, 'Ming Chinese Empire'], [1783, 'Qing Empire']].map(([year, into]) => ({
     year, op: 'claimLand', land: '海南岛', area: HAINAN_AREA, into,
     note: '海南岛自西汉设珠崖、儋耳二郡，明清为琼州府；原数据缺海南岛。', source: zhwiki('琼州府'),
+  })),
+
+  // 中印边界：原数据把藏南与西段、中段的争议地区划给阿萨姆、英属印度或印度，按中国政府立场并入中国；须在上面的更名之后执行
+  ...CHINA_YEARS.map(([year, into]) => ({
+    year, op: 'transfer', land: '藏南地区', claim: SOUTH_TIBET, into,
+    note: year < 1914
+      ? '藏南地区（门隅、珞瑜、下察隅）属西藏地方，英属印度的行政管辖此时止于山麓的“外线”；原数据将其划出中国，此处并入（范围取 Natural Earth 中国视角的争议地区与国界数据）。'
+      : '1914 年英印单方面划出“麦克马洪线”，中国历届政府均不承认，印度自 1951 年起逐步占据藏南地区；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。',
+    source: zhwiki('藏南地区'),
+  })),
+  ...CHINA_YEARS.map(([year, into]) => ({
+    year, op: 'transfer', land: '中印边界西段、中段', claim: WEST_SECTOR, into,
+    note: '中印边界西段、中段另有数处中国主张属西藏阿里地区的争议地区，原数据划出中国；依中国政府立场并入中国显示（范围取 Natural Earth 中国视角的争议地区与国界数据）。',
+    source: zhwiki('中印边界问题'),
   })),
 ];
 

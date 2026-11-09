@@ -4,7 +4,11 @@ import type { LonLat } from '@/types';
 
 export const BASE_W = 2000;
 
-export const projection = geoNaturalEarth1().fitWidth(BASE_W, { type: 'Sphere' }).precision(0.25);
+// 中央经线取东经 150°（国内世界地图通行的太平洋居中画法），左右边缘落在大西洋，不切开欧亚与美洲大陆
+// 须与 scripts/lib/geo_ops.mjs 一致，改动后要重跑 data:borders 与 data:relief
+const CENTER_LON = 150;
+
+export const projection = geoNaturalEarth1().rotate([-CENTER_LON, 0]).fitWidth(BASE_W, { type: 'Sphere' }).precision(0.25);
 
 export const BASE_H = geoPath(projection).bounds({ type: 'Sphere' })[1][1];
 

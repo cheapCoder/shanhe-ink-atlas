@@ -5,3 +5,4 @@ data_raw
 .DS_Store
 scripts/_*.mjs
 .playwright-cli
+.claude/

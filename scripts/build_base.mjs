@@ -1,8 +1,9 @@
-// 底图矢量：陆地、湖泊（含历史水域）、河流 → 单个 TopoJSON
+// 底图矢量：陆地、湖泊（含历史水域）、河流 → 各一个 TopoJSON；南海断续线与南海诸岛 → china_sea.json
 // 用法：node scripts/build_base.mjs <naturalearth 目录> <输出目录>
 import fs from 'node:fs';
 import path from 'node:path';
 import mapshaper from 'mapshaper';
+import { geoCentroid } from 'd3-geo';
 import { areaKm2, toMulti } from './lib/geo_ops.mjs';
 
 const [srcDir, outDir] = process.argv.slice(2);
@@ -63,3 +64,32 @@ for (const [file, topo] of [['land.json', landTopo], ['lakes.json', lakeTopo], [
   console.log(file, (fs.statSync(path.join(outDir, file)).size / 1024).toFixed(0), 'KB');
 }
 console.log('lakes', lakes.features.length, 'rivers', riverFc.features.length, 'named rivers', riverFc.features.filter((f) => f.properties.n).length);
+
+// 南海断续线与南海诸岛、钓鱼岛（Natural Earth 中国视角数据）：断续线取海上界线指示，岛礁取争议地区中各岛的中心点；
+// 岛礁面积过小，底图陆地中没有，前端以墨点示意，放大到 k 倍以上时标注地名
+const SEA_ISLANDS = new Set(['Paracel Is.', 'Spratly Is.', 'Scarborough Reef', 'Nansei-shoto']);
+const PRATAS = [116.72, 20.7];
+const SEA_LABELS = [
+  { n: '南海诸岛', at: [114.5, 13.4], k: 1.2 },
+  { n: '东沙群岛', at: [116.72, 21.15], k: 3 },
+  { n: '西沙群岛', at: [112.0, 17.15], k: 3 },
+  { n: '中沙群岛', at: [114.4, 15.75], k: 3 },
+  { n: '南沙群岛', at: [114.0, 9.6], k: 3 },
+  { n: '黄岩岛', at: [117.75, 14.75], k: 5 },
+  { n: '钓鱼岛', at: [123.5, 25.35], k: 5 },
+];
+const round = ([x, y]) => [+x.toFixed(3), +y.toFixed(3)];
+const chinaSea = {
+  dashes: read('ne_10m_admin_0_boundary_lines_maritime_indicator_chn').features
+    .flatMap((f) => (f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.coordinates))
+    .map((line) => line.map(round)),
+  islands: [
+    PRATAS,
+    ...read('ne_10m_admin_0_disputed_areas').features
+      .filter((f) => SEA_ISLANDS.has(f.properties.NAME))
+      .flatMap((f) => toMulti(f.geometry).map((poly) => round(geoCentroid({ type: 'Polygon', coordinates: poly })))),
+  ],
+  labels: SEA_LABELS,
+};
+fs.writeFileSync(path.join(outDir, 'china_sea.json'), JSON.stringify(chinaSea));
+console.log('china_sea.json', chinaSea.dashes.length, 'dashes', chinaSea.islands.length, 'islands');
