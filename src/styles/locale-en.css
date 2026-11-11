@@ -177,3 +177,26 @@
 .app--en .event-marker.is-active .event-marker__label {
   font-size: 18px;
 }
+
+.app--en .intro__title {
+  font-size: clamp(44px, min(11vh, 16vw), 104px);
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .app--en .mode-tabs__tab {
+    padding: 4px 6px 8px;
+    font-size: 16px;
+    letter-spacing: 0;
+  }
+
+  .app--en .intro__lead {
+    font-size: 18px;
+  }
+
+  .app--en .timeline__speeds button {
+    min-width: 30px;
+    padding: 0 5px;
+    font-size: 13px;
+  }
+}

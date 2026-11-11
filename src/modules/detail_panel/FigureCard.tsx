@@ -67,7 +67,8 @@ export default function FigureCard({ figure }: { figure: Figure }) {
   const other = getLang() === 'zh' ? figure.name.en : figure.name.zh;
 
   useEffect(() => {
-    list.current?.querySelector('.is-current')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    // 当前站点连同它的讲解滚到面板上方，前一站还露出一点
+    list.current?.querySelector('.is-current')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }, [current]);
 
   const jump = (i: number) => {

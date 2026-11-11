@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { geoDistance } from 'd3-geo';
-import { EVENTS } from '../src/data/events.ts';
+import { EVENTS } from '../src/data/events/index.ts';
 import { FIGURES } from '../src/data/figures/index.ts';
 
 const UA = 'ShanheMoshi/1.0 (educational offline history atlas build script)';
@@ -63,28 +63,28 @@ for (const e of EVENTS) {
   const qid = media.events[e.id]?.wikidata;
   const ent = qid && (await entity(qid));
   if (!ent) {
-    flag('事件', e.id, e.title, '条目', qid ?? '无', '未取得', '');
+    flag('事件', e.id, e.title.zh, '条目', qid ?? '无', '未取得', '');
     continue;
   }
   const times = ['P585', 'P580', 'P582'].flatMap((p) => ent.claims[p].map((v) => ({ p, t: parseTime(v) }))).filter((x) => x.t);
   if (times.length) {
     const best = times.reduce((a, b) => (Math.abs(b.t.year - e.year) < Math.abs(a.t.year - e.year) ? b : a));
     const tol = e.approx ? 60 : 1;
-    if (Math.abs(best.t.year - e.year) > tol) flag('事件', e.id, e.title, '年份', e.year, times.map((x) => `${x.p}:${x.t.year}`).join(' '), '');
+    if (Math.abs(best.t.year - e.year) > tol) flag('事件', e.id, e.title.zh, '年份', e.year, times.map((x) => `${x.p}:${x.t.year}`).join(' '), '');
     if (e.date && best.t.precision >= 11) {
       const [, mm, dd] = e.date.match(/-(\d\d)-(\d\d)$/) ?? [];
-      if (mm && (Number(mm) !== best.t.month || Number(dd) !== best.t.day)) flag('事件', e.id, e.title, '日期', e.date, `${best.t.year}-${best.t.month}-${best.t.day}(${best.t.calendar})`, '');
+      if (mm && (Number(mm) !== best.t.month || Number(dd) !== best.t.day)) flag('事件', e.id, e.title.zh, '日期', e.date, `${best.t.year}-${best.t.month}-${best.t.day}(${best.t.calendar})`, '');
     }
     if (e.endYear) {
       const end = ent.claims.P582.map(parseTime).filter(Boolean)[0];
-      if (end && Math.abs(end.year - e.endYear) > 1) flag('事件', e.id, e.title, '终止年', e.endYear, end.year, '');
+      if (end && Math.abs(end.year - e.endYear) > 1) flag('事件', e.id, e.title.zh, '终止年', e.endYear, end.year, '');
     }
   }
   const own = coordOf(ent.claims.P625[0]);
   const loc = own ? { coord: own, label: '条目坐标' } : await placeCoord(ent, 'P276');
   if (loc) {
     const d = km(e.coord, loc.coord);
-    if (d > 150) flag('事件', e.id, e.title, '地点', `${e.place} ${e.coord.join(',')}`, `${loc.label} ${loc.coord.map((v) => v.toFixed(2)).join(',')}`, `${d} km`);
+    if (d > 150) flag('事件', e.id, e.title.zh, '地点', `${e.place.zh} ${e.coord.join(',')}`, `${loc.label} ${loc.coord.map((v) => v.toFixed(2)).join(',')}`, `${d} km`);
   }
 }
 
@@ -92,20 +92,20 @@ for (const f of FIGURES) {
   const qid = media.figures[f.id]?.wikidata;
   const ent = qid && (await entity(qid));
   if (!ent) {
-    flag('人物', f.id, f.name, '条目', qid ?? '无', '未取得', '');
+    flag('人物', f.id, f.name.zh, '条目', qid ?? '无', '未取得', '');
     continue;
   }
   const tol = f.approx ? 6 : 1;
   for (const [p, ours, label] of [['P569', f.birth, '生年'], ['P570', f.death, '卒年']]) {
     const years = ent.claims[p].map(parseTime).filter(Boolean).map((t) => t.year);
-    if (years.length && !years.some((y) => Math.abs(y - ours) <= tol)) flag('人物', f.id, f.name, label, ours, years.join(' / '), '');
+    if (years.length && !years.some((y) => Math.abs(y - ours) <= tol)) flag('人物', f.id, f.name.zh, label, ours, years.join(' / '), '');
   }
   const first = f.route[0];
   const last = f.route[f.route.length - 1];
   const birth = first.year === f.birth ? await placeCoord(ent, 'P19') : null;
   const death = last.year === f.death ? await placeCoord(ent, 'P20') : null;
-  if (birth && km(first.coord, birth.coord) > 100) flag('人物', f.id, f.name, '出生地', `${first.place} ${first.coord.join(',')}`, `${birth.label} ${birth.coord.map((v) => v.toFixed(2)).join(',')}`, `${km(first.coord, birth.coord)} km`);
-  if (death && km(last.coord, death.coord) > 100) flag('人物', f.id, f.name, '逝世地', `${last.place} ${last.coord.join(',')}`, `${death.label} ${death.coord.map((v) => v.toFixed(2)).join(',')}`, `${km(last.coord, death.coord)} km`);
+  if (birth && km(first.coord, birth.coord) > 100) flag('人物', f.id, f.name.zh, '出生地', `${first.place.zh} ${first.coord.join(',')}`, `${birth.label} ${birth.coord.map((v) => v.toFixed(2)).join(',')}`, `${km(first.coord, birth.coord)} km`);
+  if (death && km(last.coord, death.coord) > 100) flag('人物', f.id, f.name.zh, '逝世地', `${last.place.zh} ${last.coord.join(',')}`, `${death.label} ${death.coord.map((v) => v.toFixed(2)).join(',')}`, `${km(last.coord, death.coord)} km`);
 }
 
 const lines = [

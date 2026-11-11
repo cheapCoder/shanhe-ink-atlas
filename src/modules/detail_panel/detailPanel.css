@@ -196,6 +196,7 @@
 
 .figure-card__route li {
   position: relative;
+  scroll-margin-top: 58px;
 }
 
 .figure-card__route li::before {

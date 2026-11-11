@@ -6,6 +6,12 @@ import { EVENTS_MEDIEVAL } from './medieval.ts';
 import { EVENTS_EARLY_MODERN } from './early_modern.ts';
 import { EVENTS_MODERN } from './modern.ts';
 
-export const EVENTS: HistoryEvent[] = [...EVENTS_ANTIQUITY, ...EVENTS_MEDIEVAL, ...EVENTS_EARLY_MODERN, ...EVENTS_MODERN].sort((a, b) => a.year - b.year);
+// 同一年内按日期先后（没有日期的排在前面，保持文件里的次序）
+const dayOf = (e: HistoryEvent): number => {
+  const m = e.date?.match(/^-?\d+-(\d{2})(?:-(\d{2}))?$/);
+  return m ? Number(m[1]) * 32 + Number(m[2] ?? 0) : 0;
+};
+
+export const EVENTS: HistoryEvent[] = [...EVENTS_ANTIQUITY, ...EVENTS_MEDIEVAL, ...EVENTS_EARLY_MODERN, ...EVENTS_MODERN].sort((a, b) => a.year - b.year || dayOf(a) - dayOf(b));
 
 export const EVENT_BY_ID = new Map(EVENTS.map((e) => [e.id, e]));

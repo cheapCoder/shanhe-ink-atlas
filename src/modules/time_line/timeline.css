@@ -340,5 +340,30 @@
 
   .timeline__controls {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .timeline__play {
+    width: 40px;
+    height: 40px;
+  }
+
+  .timeline__play svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  /* 窄屏只留要事的印记，并缩小一号 */
+  .timeline__event.is-1,
+  .timeline__event.is-2 {
+    display: none;
+  }
+
+  .timeline__event.is-3 {
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    box-shadow: 0 0 0 1px rgba(244, 236, 219, 0.9);
   }
 }

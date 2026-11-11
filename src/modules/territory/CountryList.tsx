@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { t, tx } from '@/locale';
 import { useAtlas } from '@/store/useAtlas';
 import { LINEAGES } from '@/data/lineages';
@@ -25,11 +26,16 @@ export default function CountryList() {
     if (year !== null) setYear(year);
   };
 
-  // 鼠标移到条目上就先备好那一年的切片，点下去时镜头可以立刻起飞
+  // 鼠标在条目上稍作停留，就先备好那一年的切片与代理纹理，点下去时镜头可以立刻起飞
+  const timer = useRef(0);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
   const warm = (id: string) => {
-    const year = peakYear(id);
-    const l = LINEAGES.find((x) => x.id === id)!;
-    if (year !== null) engine?.prefetchYear(year, { key: id, level: (name, subj, y) => levelOf(l, name, subj, y) });
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      const year = peakYear(id);
+      const l = LINEAGES.find((x) => x.id === id)!;
+      if (year !== null) engine?.prefetchYear(year, { key: id, level: (name, subj, y) => levelOf(l, name, subj, y) });
+    }, 120);
   };
 
   return (

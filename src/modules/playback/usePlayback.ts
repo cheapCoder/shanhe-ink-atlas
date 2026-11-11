@@ -10,10 +10,12 @@ import { getMapEngine } from '@/modules/map_view/mapBus';
 import { FULL_RUN_SECONDS, tToYear, yearToT } from '@/modules/time_line/timeScale';
 import { lineagePeriods } from '@/modules/territory/lineage';
 import { haversineKm, legLonLats } from '@/modules/figure_route/geometry';
+import { playChime } from '@/modules/sound/useAmbience';
 
 type State = ReturnType<typeof useAtlas.getState>;
 
-const TOUR_EVENTS = EVENTS.map((e) => ({ e, t: yearToT(e.year) })).sort((a, b) => a.t - b.t || a.e.importance - b.e.importance);
+// EVENTS 已按年份与日期排好
+const TOUR_EVENTS = EVENTS.map((e) => ({ e, t: yearToT(e.year) }));
 const presented = new Set<string>();
 
 // 导览详略对应的最低重要度
@@ -51,7 +53,10 @@ export function presentEvent(e: HistoryEvent, hold: boolean) {
   s.setYear(e.year);
   presented.add(e.id);
   getMapEngine()?.flyTo(e.coord, e.zoom ?? 3.2, 2000);
-  if (hold) s.setHold(performance.now() + dwellMs(e, s.speed));
+  if (hold) {
+    s.setHold(performance.now() + dwellMs(e, s.speed));
+    playChime();
+  }
 }
 
 const nextStop = (s: State, from: number, to: number) =>
