@@ -1,8 +1,9 @@
 {
   "name": "shanhe-moshi",
   "private": true,
-  "version": "1.0.0",
-  "description": "山河墨史 —— 水墨风格的世界历史疆域与大事件交互地图",
+  "version": "2.0.0",
+  "description": "山河墨史 —— 水墨风格的世界历史疆域与大事件交互地图 · An ink-wash atlas of world history",
+  "keywords": ["history", "atlas", "map", "ink-wash", "timeline", "canvas", "d3", "react", "i18n", "历史", "地图", "水墨"],
   "license": "GPL-3.0-only",
   "homepage": "https://shanhe-ink-atlas.vercel.app",
   "repository": {
