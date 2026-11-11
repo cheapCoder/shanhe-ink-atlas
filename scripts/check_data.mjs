@@ -113,7 +113,8 @@ function checkFigure(f, known) {
     if (i > 0 && Array.isArray(p.coord) && Array.isArray(f.route[i - 1].coord)) {
       const d = km(f.route[i - 1].coord, p.coord);
       const years = p.year - f.route[i - 1].year;
-      if (p.year < 1850 && years === 0 && d > 4500) warn(at, `与上一站点同年却相距 ${Math.round(d)} 公里，请核对年份或坐标`);
+      // 远洋航行一年内横渡大洋并不稀奇，只对陆路提醒
+      if (!p.sea && p.year < 1850 && years === 0 && d > 4500) warn(at, `与上一站点同年却相距 ${Math.round(d)} 公里，请核对年份或坐标`);
       if (d < 1 && p.note.zh === f.route[i - 1].note.zh) warn(at, '与上一站点重复');
     }
   });

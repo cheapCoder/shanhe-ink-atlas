@@ -12,7 +12,8 @@ export default function YearBanner() {
   const snap = useSnapshotMeta();
   const y = displayYear(year);
   const zh = getLang() === 'zh';
-  const era = <span className="year-banner__era">{y < 0 ? t('year_bc') : t('year_ad')}</span>;
+  // 英文里公元一千年以后的年份不再缀 CE
+  const era = zh || y < 1000 ? <span className="year-banner__era">{y < 0 ? t('year_bc') : t('year_ad')}</span> : null;
   return (
     <div className="year-banner" aria-live="polite">
       <div className="year-banner__main">

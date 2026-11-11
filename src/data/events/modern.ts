@@ -239,7 +239,7 @@ export const EVENTS_MODERN: HistoryEvent[] = [
     coord: [122.18, 37.5], category: 'war', sprite: 'cannon', importance: 3,
     summary: {
       zh: '1894年7月，日本舰队在朝鲜丰岛海面袭击清军军舰和运兵船，甲午战争爆发。清军在平壤之战和黄海海战中相继失利，1895年2月北洋海军在威海卫刘公岛全军覆没。4月17日签订的《马关条约》规定，清政府割让辽东半岛、台湾岛及其附属岛屿和澎湖列岛，赔款白银2亿两。此后列强竞相在华划分势力范围，维新变法运动兴起。台湾于1945年抗日战争胜利后回归中国。',
-      en: 'In July 1894 a Japanese squadron attacked Chinese warships and a troop transport off Pungdo on the Korean coast, and the war began. Qing forces were defeated at Pyongyang and in the Battle of the Yellow Sea, and in February 1895 the Beiyang Fleet was destroyed at Liugong Island, Weihaiwei. By the Treaty of Shimonoseki of 17 April China ceded the Liaodong Peninsula, Taiwan with its associated islands and the Penghu Islands, and paid 200 million taels of silver. The powers then competed for spheres of influence in China, and a reform movement arose. Taiwan was returned to China in 1945.',
+      en: 'In July 1894 a Japanese squadron attacked Chinese warships and a troop transport off Pungdo on the Korean coast, and the war began. Qing forces were defeated at Pyongyang and in the Battle of the Yellow Sea, and in February 1895 the Beiyang Fleet was destroyed at Liugong Island, Weihaiwei. By the Treaty of Shimonoseki of 17 April China ceded the Liaodong Peninsula, Taiwan with its associated islands and the Penghu Islands, and paid 200 million taels of silver. The powers then competed for spheres of influence in China. Taiwan was returned to China in 1945.',
     },
     lineage: 'china', zoom: 4, wiki: { zh: '甲午战争', en: 'First Sino-Japanese War' },
   },
@@ -850,7 +850,7 @@ export const EVENTS_MODERN: HistoryEvent[] = [
     place: { zh: '日内瓦世界卫生组织总部', en: 'World Health Organization headquarters, Geneva' },
     coord: [6.134, 46.233], category: 'disaster', sprite: 'plague', importance: 2,
     summary: {
-      zh: '2019年12月，湖北武汉报告了一批不明原因肺炎病例，随后确认病原体为一种新型冠状病毒。2020年1月30日，世界卫生组织宣布疫情构成国际关注的突发公共卫生事件，3月11日宣布其已具有全球大流行特征。各国相继采取旅行限制、居家隔离等措施，疫苗自2020年底开始大规模接种。2023年5月5日，世卫组织宣布疫情不再构成国际关注的突发公共卫生事件，此时全球报告的死亡病例近700万。',
+      zh: '2019年12月，湖北武汉报告了一批不明原因肺炎病例，病原体随后确认为新型冠状病毒。2020年1月30日，世界卫生组织宣布疫情构成国际关注的突发公共卫生事件，3月11日宣布其已具有全球大流行特征。各国相继采取旅行限制与居家隔离，疫苗自2020年底开始大规模接种。2023年5月5日，世卫组织宣布这一紧急状态结束，此时全球报告的死亡病例近700万。',
       en: 'In December 2019 a cluster of pneumonia cases of unknown cause was reported in Wuhan, Hubei, and the pathogen was soon identified as a novel coronavirus. On 30 January 2020 the World Health Organization declared the outbreak a public health emergency of international concern, and on 11 March it characterised it as a pandemic. Countries introduced travel restrictions and stay-at-home measures, and mass vaccination began at the end of 2020. On 5 May 2023 the WHO declared that COVID-19 was no longer a public health emergency of international concern; nearly 7 million deaths had by then been reported worldwide.',
     },
     zoom: 4, wiki: { zh: '2019冠状病毒病疫情', en: 'COVID-19 pandemic' },

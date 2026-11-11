@@ -145,7 +145,8 @@
 }
 
 .station__figure img {
-  max-height: 210px;
+  height: auto;
+  max-height: 230px;
 }
 
 .station__links {

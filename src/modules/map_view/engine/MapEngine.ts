@@ -136,6 +136,9 @@ export class MapEngine {
   private loadToken = 0;
   private labelEpoch = '';
   private policyEpoch = 0;
+  // 图层每重绘一次加一；与视图、淡入进度等一起构成“画面是否有变”的判据
+  private renderEpoch = 0;
+  private composed = '';
   private dim = 1;
   private crispAlpha = 1;
   private labelAlpha = 1;
@@ -453,6 +456,8 @@ export class MapEngine {
       c.height = Math.round(height * dpr);
     }
     paintPaper(this.paper, width, height, dpr);
+    // 画布尺寸一改内容即被清空，须重新合成
+    this.composed = '';
     const prev = this.view;
     const { top, bottom } = this.padding;
     const fit = fitView(width, height, top, bottom);
@@ -593,7 +598,12 @@ export class MapEngine {
     this.labelAlpha = approach(this.labelAlpha, labelWant, dt / LABEL_FADE_MS);
     if (this.labelAlpha !== labelWant) busy = true;
 
-    this.compose(v, fade, proxy);
+    // 地图画面没有变化时不必重新合成（例如只有特效层上的路线在动）
+    const state = `${v.k}|${v.x}|${v.y}|${v.width}|${v.height}|${fade}|${this.dim}|${this.crispAlpha}|${this.labelAlpha}|${proxy}|${this.renderEpoch}|${this.policyEpoch}|${cur.worldKey}|${prev.worldKey}|${cur.snap?.year}|${prev.snap?.year}`;
+    if (state !== this.composed) {
+      this.composed = state;
+      this.compose(v, fade, proxy);
+    }
     if (this.drawFx(now)) busy = true;
     if (busy || this.interacting) this.kick();
   };
@@ -622,7 +632,10 @@ export class MapEngine {
     }
 
     const due = jobs.filter((j) => j.layer.needsRender(v, moving, quality));
-    if (due.length) due[0].layer.render(v, quality, due[0].draw);
+    if (due.length) {
+      due[0].layer.render(v, quality, due[0].draw);
+      this.renderEpoch++;
+    }
     return due.length > 1;
   }
 

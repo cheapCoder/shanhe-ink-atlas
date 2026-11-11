@@ -118,10 +118,11 @@ export interface SnapshotMeta {
   source?: string;
 }
 
+// target：被处理的政权或地区；“借用”一类的校勘里是所借切片的年份
 export interface Correction {
   year: number;
   op: string;
-  target: string;
+  target: string | number;
   result: string;
   note: string;
   noteEn?: string;

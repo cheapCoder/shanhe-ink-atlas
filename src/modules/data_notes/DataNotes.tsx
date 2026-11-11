@@ -32,7 +32,8 @@ const TERM_EN: Record<string, string> = {
   '中印边界西段、中段': 'Western and middle sectors of the China-India boundary',
 };
 
-function term(s: string): string {
+function term(s: string | number): string {
+  if (typeof s === 'number') return formatYear(s);
   if (getLang() === 'zh') return s;
   const based = s.match(/^基于 (-?\d+) 年$/);
   if (based) return `Based on ${formatYear(Number(based[1]))}`;
