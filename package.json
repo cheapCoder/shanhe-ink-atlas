@@ -21,6 +21,7 @@
     "data:relief": "node scripts/build_relief.mjs data_raw/relief/SR_50M.tif public/data/base/relief.webp 4096",
     "data:wiki": "node scripts/fetch_wiki.mjs",
     "data:verify": "node scripts/verify_data.mjs",
+    "data:lint": "node scripts/check_data.mjs",
     "data:check": "node scripts/check_borders.mjs public/data/borders"
   },
   "dependencies": {

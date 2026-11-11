@@ -1,5 +1,5 @@
 // 谱系查询：某切片年份的谱系成员、政权的高亮级别、家族色与疆域面积序列
-import type { Lineage, LineageMember } from '@/types';
+import type { Lineage, LineageMember, Text } from '@/types';
 import { DEPENDENT_PATTERNS, LINEAGES } from '@/data/lineages';
 import { PIGMENTS } from '@/modules/map_view/engine/palette';
 
@@ -39,7 +39,7 @@ export interface AreaPoint {
   year: number;
   core: number;
   related: number;
-  label: string;
+  label: Text;
 }
 
 export function areaSeries(lineage: Lineage, areas: Record<string, [number, number][]>, snapshotYears: number[]): AreaPoint[] {

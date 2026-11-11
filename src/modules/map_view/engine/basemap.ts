@@ -5,6 +5,7 @@ import type { Feature, FeatureCollection, GeoJsonProperties, Geometry, LineStrin
 import { geoArea } from 'd3-geo';
 import { BASE_H, BASE_W, project, toPath2D } from './projection';
 import { LodPath } from './lod';
+import { ctxOf, makeCanvas, type AnyCanvas } from './surface';
 
 export interface RiverLabel {
   name: string;
@@ -32,26 +33,28 @@ export interface Basemap {
   lakes: LodPath;
   riversByRank: LodPath[];
   riverLabels: RiverLabel[];
-  landTexture: HTMLCanvasElement | null;
+  landTexture: AnyCanvas | null;
   chinaSea: ChinaSea | null;
 }
 
-const url = (p: string) => `${import.meta.env.BASE_URL}data/${p}`;
+// 数据目录的绝对地址：后台线程里没有页面的相对路径基准，由调用方传入
+export const dataRoot = (): string => new URL(`${import.meta.env.BASE_URL}data/`, self.location.href).href;
 
-async function loadTopo<P extends GeoJsonProperties>(file: string): Promise<FeatureCollection<Geometry, P>> {
-  const topo = (await (await fetch(url(file))).json()) as Topology;
+async function loadTopo<P extends GeoJsonProperties>(root: string, file: string): Promise<FeatureCollection<Geometry, P>> {
+  const topo = (await (await fetch(root + file)).json()) as Topology;
   const key = Object.keys(topo.objects)[0];
   return feature(topo, topo.objects[key] as GeometryCollection<P>) as unknown as FeatureCollection<Geometry, P>;
 }
 
-function loadImage(src: string): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.decoding = 'async';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = src;
-  });
+// 主线程与后台线程通用的图片解码
+async function loadImage(src: string): Promise<ImageBitmap | null> {
+  try {
+    const res = await fetch(src);
+    if (!res.ok) return null;
+    return await createImageBitmap(await res.blob());
+  } catch {
+    return null;
+  }
 }
 
 // 河流标注放在最长线段的中点，沿河道方向旋转（倒置时翻转）
@@ -84,12 +87,9 @@ function largeLand(land: FeatureCollection<Geometry, GeoJsonProperties>): LodPat
 }
 
 // 陆地淡彩与山体墨色只在加载时合成一次，之后每帧只需一次贴图
-function composeLand(lod: LodPath, relief: HTMLImageElement | null): HTMLCanvasElement {
-  const width = window.innerWidth > 1000 ? 4096 : 2048;
-  const c = document.createElement('canvas');
-  c.width = width;
-  c.height = Math.round((width * BASE_H) / BASE_W);
-  const ctx = c.getContext('2d')!;
+function composeLand(lod: LodPath, relief: ImageBitmap | null, width: number): AnyCanvas {
+  const c = makeCanvas(width, Math.round((width * BASE_H) / BASE_W));
+  const ctx = ctxOf(c);
   const s = width / BASE_W;
   const land = lod.whole(s);
   ctx.setTransform(s, 0, 0, s, 0, 0);
@@ -105,9 +105,9 @@ function composeLand(lod: LodPath, relief: HTMLImageElement | null): HTMLCanvasE
   return c;
 }
 
-async function loadChinaSea(): Promise<ChinaSea | null> {
+async function loadChinaSea(root: string): Promise<ChinaSea | null> {
   try {
-    const data = (await (await fetch(url('base/china_sea.json'))).json()) as ChinaSeaData;
+    const data = (await (await fetch(root + 'base/china_sea.json')).json()) as ChinaSeaData;
     return {
       dashes: toPath2D({ type: 'MultiLineString', coordinates: data.dashes }),
       islands: data.islands.map(project),
@@ -118,13 +118,14 @@ async function loadChinaSea(): Promise<ChinaSea | null> {
   }
 }
 
-export async function loadBasemap(): Promise<Basemap> {
+// textureWidth：陆地淡彩与山体合成纹理的宽度
+export async function loadBasemap(root: string, textureWidth: number): Promise<Basemap> {
   const [land, lakes, rivers, relief, chinaSea] = await Promise.all([
-    loadTopo<GeoJsonProperties>('base/land.json'),
-    loadTopo<{ n: string }>('base/lakes.json'),
-    loadTopo<{ n?: string; r: number }>('base/rivers.json'),
-    loadImage(url('base/relief.webp')),
-    loadChinaSea(),
+    loadTopo<GeoJsonProperties>(root, 'base/land.json'),
+    loadTopo<{ n: string }>(root, 'base/lakes.json'),
+    loadTopo<{ n?: string; r: number }>(root, 'base/rivers.json'),
+    loadImage(root + 'base/relief.webp'),
+    loadChinaSea(root),
   ]);
   const byRank = Array.from({ length: 7 }, () => [] as Feature<Geometry, { n?: string; r: number }>[]);
   const labels = new Map<string, RiverLabel>();
@@ -141,7 +142,7 @@ export async function loadBasemap(): Promise<Basemap> {
     lakes: new LodPath(lakes),
     riversByRank: byRank.map((features) => new LodPath({ type: 'FeatureCollection', features })),
     riverLabels: [...labels.values()],
-    landTexture: composeLand(landPath, relief),
+    landTexture: composeLand(landPath, relief, textureWidth),
     chinaSea,
   };
 }

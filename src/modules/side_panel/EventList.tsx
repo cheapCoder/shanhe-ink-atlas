@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { t } from '@/locale';
+import { t, tx } from '@/locale';
 import type { EventCategory } from '@/types';
 import { useAtlas } from '@/store/useAtlas';
 import { EVENTS } from '@/data/events';
@@ -8,23 +8,23 @@ import { CATEGORIES } from '@/modules/common/categories';
 import { presentEvent } from '@/modules/playback/usePlayback';
 import './sidePanel.css';
 
-const ORDERED = [...EVENTS].sort((a, b) => a.year - b.year);
-
-// 纪事列表：关键字检索 + 类别筛选，点选即飞往事件发生地
+// 纪事列表：关键字检索（中英文皆可）+ 类别筛选 + 只看要事，点选即飞往事件发生地
 export default function EventList() {
   const eventId = useAtlas((s) => s.eventId);
   const setPlaying = useAtlas((s) => s.setPlaying);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<EventCategory | null>(null);
+  const [major, setMajor] = useState(false);
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return ORDERED.filter((e) => {
+    return EVENTS.filter((e) => {
       if (category && e.category !== category) return false;
+      if (major && e.importance < 3) return false;
       if (!q) return true;
-      return [e.title, e.titleEn, e.place, e.summary].some((s) => s.toLowerCase().includes(q));
+      return [e.title, e.place, e.summary].some((s) => s.zh.toLowerCase().includes(q) || s.en.toLowerCase().includes(q));
     });
-  }, [query, category]);
+  }, [query, category, major]);
 
   return (
     <section className="side-list">
@@ -44,6 +44,9 @@ export default function EventList() {
             {t(c.key)}
           </button>
         ))}
+        <button className={`side-list__major${major ? ' is-active' : ''}`} aria-pressed={major} onClick={() => setMajor(!major)}>
+          ★ {t('events_rank')}
+        </button>
       </div>
       {list.length === 0 && <p className="side-list__empty">{t('events_empty')}</p>}
       <ul className="event-list">
@@ -61,8 +64,8 @@ export default function EventList() {
                 {e.approx ? t('year_approx') : ''}
                 {formatYear(e.year)}
               </span>
-              <span className="event-list__title">{e.title}</span>
-              <span className="event-list__place">{e.place}</span>
+              <span className="event-list__title">{tx(e.title)}</span>
+              <span className="event-list__place">{tx(e.place)}</span>
             </button>
           </li>
         ))}

@@ -1,7 +1,12 @@
+// 历史人物及其生平行迹，按时代分文件存放；撰写约定见 docs/content-guide.md
 import type { Figure } from '../../types.ts';
-import { ANCIENT_FIGURES } from './ancient.ts';
-import { MODERN_FIGURES } from './modern.ts';
+import { FIGURES_ANTIQUITY } from './f1_antiquity.ts';
+import { FIGURES_MEDIEVAL } from './f3_medieval.ts';
+import { LEGACY_FIGURES } from './legacy.ts';
 
-export const FIGURES: Figure[] = [...ANCIENT_FIGURES, ...MODERN_FIGURES].sort((a, b) => a.birth - b.birth);
+const REWRITTEN: Figure[] = [...FIGURES_ANTIQUITY, ...FIGURES_MEDIEVAL];
+const done = new Set(REWRITTEN.map((f) => f.id));
+
+export const FIGURES: Figure[] = [...REWRITTEN, ...LEGACY_FIGURES.filter((f) => !done.has(f.id))].sort((a, b) => a.birth - b.birth);
 
 export const FIGURE_BY_ID = new Map(FIGURES.map((f) => [f.id, f]));

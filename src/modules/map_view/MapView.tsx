@@ -1,20 +1,29 @@
 import { useEffect, useRef } from 'react';
+import type { Lang } from '@/types';
 import { MapEngine, type EnginePolicy } from './engine/MapEngine';
 import { CINNABAR } from './engine/palette';
 import { setMapEngine } from './mapBus';
 import { useAtlas } from '@/store/useAtlas';
-import { liveLabelEpoch, polityZh } from '@/data/polityNames';
-import { LINEAGE_BY_ID } from '@/data/lineages';
-import { familyColor, levelOf } from '@/modules/territory/lineage';
-import { LINEAGES } from '@/data/lineages';
+import { useLocale } from '@/locale';
+import { liveLabelEpoch, polityLabel } from '@/data/polityNames';
+import { RIVER_EN, SEA_LABEL_EN } from '@/data/geoNames';
+import { LINEAGES, LINEAGE_BY_ID } from '@/data/lineages';
+import { levelOf } from '@/modules/territory/lineage';
 import { useHover } from '@/store/useHover';
 import './mapView.css';
 
-function highlightFor(lineageId: string | null, mode: string): EnginePolicy['highlight'] {
+function highlightFor(lineageId: string | null, mode: string): Pick<EnginePolicy, 'highlight' | 'highlightKey'> {
   const lineage = lineageId && mode === 'territory' ? LINEAGE_BY_ID.get(lineageId) : null;
-  if (!lineage) return null;
-  return (name, subj, year) => levelOf(lineage, name, subj, year);
+  if (!lineage) return { highlight: null, highlightKey: null };
+  return { highlight: (name, subj, year) => levelOf(lineage, name, subj, year), highlightKey: lineage.id };
 }
+
+// 标注随界面语言：政权名、河流与岛礁地名
+const namingFor = (lang: Lang): Pick<EnginePolicy, 'lang' | 'nameOf' | 'placeName'> => ({
+  lang,
+  nameOf: (name, snapshotYear, year) => polityLabel(lang, name, snapshotYear, year),
+  placeName: (zh) => (lang === 'zh' ? zh : (RIVER_EN[zh] ?? SEA_LABEL_EN[zh] ?? null)),
+});
 
 export default function MapView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -23,7 +32,7 @@ export default function MapView() {
     const { lineageId, mode } = useAtlas.getState();
     const engine = new MapEngine(
       ref.current!,
-      { nameOf: polityZh, labelEpoch: liveLabelEpoch, preferredColor: familyColor, highlight: highlightFor(lineageId, mode), highlightColor: CINNABAR },
+      { ...namingFor(useLocale.getState().lang), labelEpoch: liveLabelEpoch, ...highlightFor(lineageId, mode), highlightColor: CINNABAR },
       {
         onHover: (p, meta, [x, y]) =>
           useHover.getState().setHover(
@@ -46,10 +55,14 @@ export default function MapView() {
     });
     const unsub = useAtlas.subscribe((s, prev) => {
       if (s.year !== prev.year) void engine.setYear(s.year);
-      if (s.lineageId !== prev.lineageId || s.mode !== prev.mode) engine.setPolicy({ highlight: highlightFor(s.lineageId, s.mode) });
+      if (s.lineageId !== prev.lineageId || s.mode !== prev.mode) engine.setPolicy(highlightFor(s.lineageId, s.mode));
+    });
+    const unsubLang = useLocale.subscribe((s, prev) => {
+      if (s.lang !== prev.lang) engine.setPolicy(namingFor(s.lang));
     });
     return () => {
       unsub();
+      unsubLang();
       setMapEngine(null);
       engine.destroy();
     };

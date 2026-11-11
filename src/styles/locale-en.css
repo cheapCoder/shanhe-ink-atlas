@@ -1,0 +1,179 @@
+/* 英文界面的排版调整。西文在“毛笔字”位置改用衬线体 Cormorant Garamond；
+   字体栈里仍保留毛笔字，书名、印章等汉字照旧以毛笔字呈现 */
+.app--en {
+  --font-brush: 'Cormorant Garamond', 'Ma Shan Zheng', 'STKaiti', 'KaiTi', Georgia, serif;
+  --font-serif: 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+}
+
+.app--en .seal {
+  font-family: 'Ma Shan Zheng', 'Cormorant Garamond', 'STKaiti', serif;
+}
+
+/* 开篇：导语横排，置于书名与朱印之下 */
+.app--en .intro__body {
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.app--en .intro__title {
+  writing-mode: horizontal-tb;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+}
+
+.app--en .intro__side {
+  flex-direction: row;
+  gap: 16px;
+  padding-top: 0;
+  max-width: min(560px, calc(100vw - 48px));
+}
+
+.app--en .intro__seal {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  font-size: 19px;
+}
+
+.app--en .intro__lead {
+  writing-mode: horizontal-tb;
+  font-family: var(--font-latin);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+.app--en .intro__enter {
+  font-family: var(--font-latin);
+  font-weight: 500;
+  font-size: 23px;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  text-transform: uppercase;
+}
+
+.app--en .intro__enter:disabled {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+}
+
+.app--en .intro__stats,
+.app--en .intro__hint {
+  letter-spacing: 0.03em;
+}
+
+/* 题签：书名保持竖排汉字，副题沿书脊方向排西文 */
+.app--en .title-seal__name {
+  font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+}
+
+.app--en .title-seal__sub {
+  font-family: var(--font-latin);
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+/* 模式标签与纪年 */
+.app--en .mode-tabs__tab {
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.app--en .year-banner__era {
+  font-size: 19px;
+  letter-spacing: 0.08em;
+}
+
+.app--en .year-banner__meta {
+  letter-spacing: 0.03em;
+  font-size: 13px;
+}
+
+/* 时间轴 */
+.app--en .timeline__speeds button {
+  width: auto;
+  min-width: 34px;
+  padding: 0 7px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.app--en .timeline__tour {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.app--en .timeline__era span {
+  font-size: 13px;
+  font-style: italic;
+}
+
+.app--en .timeline__dynasty {
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+/* 面板 */
+.app--en .panel-title {
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.app--en .panel-subtitle {
+  font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+  font-style: normal;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+}
+
+.app--en .panel-meta {
+  letter-spacing: 0.01em;
+}
+
+.app--en .panel-text,
+.app--en .station__text {
+  text-align: left;
+  line-height: 1.7;
+  hyphens: auto;
+}
+
+.app--en .panel-section,
+.app--en .ink-button {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.app--en .ink-button {
+  font-size: 16px;
+}
+
+.app--en .detail-hint {
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.app--en .hover-tip__name {
+  font-weight: 500;
+}
+
+.app--en .hover-tip__en {
+  font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+  font-style: normal;
+  font-size: 15px;
+}
+
+.app--en .event-marker__label {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.app--en .event-marker.is-active .event-marker__label {
+  font-size: 18px;
+}

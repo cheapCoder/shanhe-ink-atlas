@@ -1,24 +1,34 @@
-// 地图引擎：宣纸层 + 合成地图层 + 特效层。离屏分层缓存，交互中位图变换、静止后高质量重绘
+// 地图引擎：宣纸层 + 合成地图层 + 特效层。
+//
+// 静止时显示按当前视图精绘的“清晰图层”。镜头一动到清晰图层盖不住视口（飞行、拖拽、缩放），
+// 就换上后台线程预先画好的“整幅世界代理纹理”：每帧只是把这张位图贴到当前视图，不再重绘矢量，
+// 因此飞行的流畅度与政权数量、海岸线复杂度无关；停稳后为新视图重绘清晰图层，再淡入。
+// 浏览器不支持所需能力时退回旧办法：缓存图层的位图变换 + 偏离过多时快速重绘
 import { zoom, zoomIdentity, type ZoomBehavior, type D3ZoomEvent } from 'd3-zoom';
 import { select } from 'd3-selection';
 import { interpolateZoom } from 'd3-interpolate';
 import { easeCubicInOut } from 'd3-ease';
-import type { LonLat, SnapshotMeta } from '@/types';
+import type { Lang, LonLat, SnapshotMeta } from '@/types';
 import { BASE_H, BASE_W, fitView, project, toBase, unproject, type View } from './projection';
-import { loadBasemap, type Basemap } from './basemap';
+import { dataRoot, loadBasemap, type Basemap } from './basemap';
 import { SnapshotStore, type Polity, type Snapshot } from './snapshots';
+import { ProxySource, type ProxyHighlight } from './proxies';
 import { paintPaper } from './paper';
-import { assignColors, CINNABAR, PIGMENTS } from './palette';
+import { CINNABAR, PIGMENTS } from './palette';
 import { warmWashTiles } from './wash';
-import { drawBase, drawHover, drawPolities, drawWater, type PolityStyle, type Quality } from './render';
-import { drawLabels, drawRiverLabels, layoutLabels, LABEL_FONT } from './labels';
-import { Layer, composeLayer } from './layer';
+import { CHINA_SEA_SINCE, drawBase, drawHighlight, drawHover, drawPolities, drawWater, type Quality } from './render';
+import { drawLabels, drawRiverLabels, drawSeaLabels, labelFont, layoutLabels, resetLabelMetrics } from './labels';
+import { Layer, composeLayer, near } from './layer';
 
 export interface EnginePolicy {
+  lang: Lang;
   nameOf: (name: string, snapshotYear: number, year: number) => string | null;
+  // 河流、岛礁等底图地名（数据中为中文）在当前语言下的写法
+  placeName: (zh: string) => string | null;
   labelEpoch: (snapshotYear: number, year: number) => string;
-  preferredColor: (name: string, year: number) => number | null;
   highlight: ((name: string, subj: string | undefined, year: number) => 0 | 1 | 2) | null;
+  // 高亮方案的标识（如国家谱系 id）：同一切片在不同高亮方案下各有一张代理纹理
+  highlightKey: string | null;
   highlightColor: string;
 }
 
@@ -32,8 +42,6 @@ export interface EngineEvents {
 
 export type FxPainter = (ctx: CanvasRenderingContext2D, view: View, now: number) => boolean;
 
-type LayerJob = [Layer, (ctx: CanvasRenderingContext2D) => void];
-
 export interface Padding {
   left: number;
   right: number;
@@ -45,8 +53,63 @@ const FADE_MS = 900;
 const HOME_CENTER: LonLat = [85, 8];
 const HOME_MAX_ZOOM = 3.2;
 
+// 选中某国时其余政权退淡到的不透明度，及其过渡时长
+const DIM = 0.42;
+const DIM_MS = 260;
+
+// 清晰图层让位给代理纹理、以及停稳后重新淡入的时长
+const CROSS_OUT_MS = 170;
+const CROSS_IN_MS = 240;
+const LABEL_FADE_MS = 220;
+
+
+// 起飞前等当前切片的代理纹理、飞行中换切片前等新切片的代理纹理，最多各等这么久
+const FLIGHT_WAIT_MS = 360;
+const SWAP_WAIT_MS = 480;
+
+const approach = (value: number, target: number, step: number) => (value < target ? Math.min(target, value + step) : Math.max(target, value - step));
+
+// 一张年代切片的全部图层：政权设色、高亮与标注（清晰图层），以及它的整幅世界代理纹理
+class Slot {
+  snap: Snapshot | null = null;
+  readonly pol = new Layer();
+  readonly hl = new Layer();
+  readonly lab = new Layer();
+  world: ImageBitmap | null = null;
+  worldKey: string | null = null;
+  levels: Map<number, 1 | 2> | null = null;
+  levelsEpoch = -1;
+
+  assign(snap: Snapshot) {
+    this.snap = snap;
+    this.pol.reset();
+    this.hl.reset();
+    this.lab.reset();
+    this.levelsEpoch = -1;
+  }
+
+  show(bitmap: ImageBitmap, key: string) {
+    this.world?.close();
+    this.world = bitmap;
+    this.worldKey = key;
+  }
+}
+
+interface Scheme {
+  key: string;
+  level: NonNullable<EnginePolicy['highlight']>;
+}
+
+interface Flight {
+  start: number;
+  duration: number;
+  interp: (t: number) => [number, number, number];
+  dest: View;
+}
+
 export class MapEngine {
   readonly store = new SnapshotStore();
+  readonly proxies = new ProxySource();
   view: View = { k: 1, x: 0, y: 0, width: 1, height: 1, dpr: 1 };
   padding: Padding = { left: 0, right: 0, top: 70, bottom: 150 };
   private paper = document.createElement('canvas');
@@ -55,24 +118,29 @@ export class MapEngine {
   private base: Basemap | null = null;
   private baseLayer = new Layer();
   private waterLayer = new Layer(false);
-  private polLayers: [Layer, Layer] = [new Layer(), new Layer()];
-  private labLayers: [Layer, Layer] = [new Layer(), new Layer()];
-  private current: Snapshot | null = null;
-  private previous: Snapshot | null = null;
+  // [淡出中的前一张, 当前]
+  private slots: [Slot, Slot] = [new Slot(), new Slot()];
   private fadeStart = 0;
   private year = 0;
   private hover: Polity | null = null;
   private zoomer: ZoomBehavior<HTMLCanvasElement, unknown>;
   private raf = 0;
+  private lastFrame = 0;
   private interacting = false;
   private idleTimer = 0;
-  private flight: { start: number; duration: number; interp: (t: number) => [number, number, number] } | null = null;
+  private flight: Flight | null = null;
+  private queued: { cx: number; cy: number; zoomLevel: number; duration: number; deadline: number } | null = null;
   private painters = new Set<FxPainter>();
   private viewListeners = new Set<(v: View) => void>();
   private snapshotListeners = new Set<(meta: SnapshotMeta) => void>();
   private loadToken = 0;
   private labelEpoch = '';
+  private policyEpoch = 0;
+  private dim = 1;
+  private crispAlpha = 1;
+  private labelAlpha = 1;
   private resizeObserver: ResizeObserver;
+  private unsubscribeProxies: () => void;
   private destroyed = false;
 
   constructor(private container: HTMLElement, private policy: EnginePolicy, private events: EngineEvents = {}) {
@@ -83,7 +151,10 @@ export class MapEngine {
     this.zoomer = zoom<HTMLCanvasElement, unknown>()
       .scaleExtent([0.2, 40])
       .on('start', (e: D3ZoomEvent<HTMLCanvasElement, unknown>) => {
-        if (e.sourceEvent) this.flight = null;
+        if (e.sourceEvent) {
+          this.flight = null;
+          this.queued = null;
+        }
         this.interacting = true;
       })
       .on('zoom', (e: D3ZoomEvent<HTMLCanvasElement, unknown>) => {
@@ -95,7 +166,7 @@ export class MapEngine {
       .on('end', () => {
         window.clearTimeout(this.idleTimer);
         this.idleTimer = window.setTimeout(() => {
-          this.interacting = false;
+          this.interacting = this.flight !== null;
           this.kick();
         }, 140);
       });
@@ -103,17 +174,19 @@ export class MapEngine {
     this.fx.addEventListener('pointermove', this.handleMove);
     this.fx.addEventListener('pointerleave', () => this.setHover(null, [0, 0]));
     this.fx.addEventListener('click', this.handleClick);
+    this.unsubscribeProxies = this.proxies.subscribe(this.kick);
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(container);
     this.resize(true);
   }
 
   async init() {
-    const [base] = await Promise.all([loadBasemap(), this.store.init()]);
+    this.proxies.start(this.view.width, this.view.dpr);
+    const [base] = await Promise.all([loadBasemap(dataRoot(), window.innerWidth > 1000 ? 4096 : 2048), this.store.init()]);
     this.base = base;
     warmWashTiles(PIGMENTS, [0.3, 0.13]);
-    warmWashTiles([CINNABAR], [0.4, 0.2]);
-    await document.fonts.load(`20px ${LABEL_FONT}`, '黄河长江').catch(() => undefined);
+    warmWashTiles([CINNABAR], [0.42, 0.2]);
+    await this.loadFonts('黄河长江');
     await this.setYear(this.year, true);
     this.events.onReady?.();
   }
@@ -121,16 +194,32 @@ export class MapEngine {
   destroy() {
     this.destroyed = true;
     cancelAnimationFrame(this.raf);
+    window.clearTimeout(this.idleTimer);
     this.resizeObserver.disconnect();
+    this.unsubscribeProxies();
+    this.proxies.destroy();
     this.store.destroy();
     this.container.replaceChildren();
   }
 
+  // 换国家高亮只影响高亮层、标注层与合成时的退淡，政权设色层不必重绘
   setPolicy(policy: Partial<EnginePolicy>) {
+    const langChanged = policy.lang !== undefined && policy.lang !== this.policy.lang;
     this.policy = { ...this.policy, ...policy };
-    if (this.current) this.recolor(this.current);
-    if (this.previous) this.recolor(this.previous);
-    this.invalidate();
+    this.policyEpoch++;
+    for (const slot of this.slots) {
+      slot.hl.invalidate();
+      slot.lab.invalidate();
+    }
+    if (langChanged) {
+      resetLabelMetrics();
+      void this.loadFonts('Abc').then(() => {
+        resetLabelMetrics();
+        this.slots.forEach((s) => s.lab.invalidate());
+        this.kick();
+      });
+    }
+    this.kick();
   }
 
   setPadding(p: Partial<Padding>) {
@@ -177,17 +266,23 @@ export class MapEngine {
     };
   }
 
+  // 提前备好某一年生效的切片及其代理纹理（如鼠标移到某国条目上时），可指定届时要用的高亮方案
+  prefetchYear(year: number, scheme?: { key: string; level: NonNullable<EnginePolicy['highlight']> }) {
+    if (this.store.index) this.prefetch(this.store.metaFor(year), scheme ?? this.scheme());
+  }
+
   // 切换年份：若生效的切片变化则加载并淡入
   async setYear(year: number, immediate = false) {
     this.year = year;
     if (!this.store.index || this.destroyed) return;
     const meta = this.store.metaFor(year);
-    this.store.prefetch(this.store.nextMeta(meta));
-    if (this.current?.meta.year === meta.year) {
+    this.prefetch(this.store.nextMeta(meta));
+    const cur = this.slots[1];
+    if (cur.snap?.meta.year === meta.year) {
       const epoch = this.policy.labelEpoch(meta.year, year);
       if (epoch !== this.labelEpoch) {
         this.labelEpoch = epoch;
-        this.labLayers[1].invalidate();
+        cur.lab.invalidate();
         this.kick();
       }
       return;
@@ -195,17 +290,19 @@ export class MapEngine {
     const token = ++this.loadToken;
     const snap = await this.store.load(meta);
     if (token !== this.loadToken || this.destroyed) return;
-    this.recolor(snap);
-    await document.fonts.load(`20px ${LABEL_FONT}`, this.labelText(snap)).catch(() => undefined);
+    const key = this.requestProxy(snap, true, this.scheme());
+    await this.loadFonts(this.labelText(snap));
     if (token !== this.loadToken) return;
-    this.previous = immediate ? null : this.current;
-    this.current = snap;
+    // 正在飞行时等新切片的代理纹理到了再换，免得半途退回逐帧重绘
+    if ((this.flight || this.queued) && this.proxies.active) {
+      await this.proxies.wait(key, SWAP_WAIT_MS);
+      if (token !== this.loadToken || this.destroyed) return;
+    }
+    this.slots.reverse();
+    this.slots[1].assign(snap);
+    if (immediate) this.slots[0].snap = null;
     this.labelEpoch = this.policy.labelEpoch(meta.year, this.year);
     this.fadeStart = performance.now();
-    this.polLayers.reverse();
-    this.labLayers.reverse();
-    this.polLayers[1].reset();
-    this.labLayers[1].reset();
     this.events.onSnapshot?.(meta);
     this.snapshotListeners.forEach((l) => l(meta));
     this.kick();
@@ -253,6 +350,49 @@ export class MapEngine {
     return unproject(toBase(this.view, screen));
   }
 
+  private get current(): Snapshot | null {
+    return this.slots[1].snap;
+  }
+
+  // 当前的高亮方案
+  private scheme(): Scheme | null {
+    const { highlight, highlightKey } = this.policy;
+    return highlight && highlightKey ? { key: highlightKey, level: highlight } : null;
+  }
+
+  private proxyKey(snap: Snapshot, scheme: Scheme | null = this.scheme()) {
+    return `${snap.year}|${scheme?.key ?? ''}`;
+  }
+
+  // 向后台线程索取某张切片在某高亮方案下的整幅世界位图，返回其标识
+  private requestProxy(snap: Snapshot, urgent: boolean, scheme: Scheme | null): string {
+    const key = this.proxyKey(snap, scheme);
+    if (!this.proxies.active) return key;
+    let highlight: ProxyHighlight | null = null;
+    if (scheme) {
+      const levels: [number, 1 | 2][] = [];
+      for (const p of snap.polities) {
+        const level = scheme.level(p.name, p.subj, snap.meta.year);
+        if (level) levels.push([p.index, level]);
+      }
+      highlight = { levels, color: this.policy.highlightColor, dim: DIM };
+    }
+    this.proxies.request(key, snap.meta, urgent, highlight);
+    return key;
+  }
+
+  private prefetch(meta: SnapshotMeta | null, scheme: Scheme | null = this.scheme()) {
+    if (!meta) return;
+    const go = () => void this.store.load(meta).then((snap) => this.requestProxy(snap, false, scheme));
+    if (this.store.has(meta)) go();
+    else (window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200)))(go);
+  }
+
+  private loadFonts(text: string) {
+    const lang = this.policy.lang;
+    return document.fonts.load(`${lang === 'zh' ? '' : '500 '}20px ${labelFont(lang)}`, text).catch(() => undefined);
+  }
+
   // 起始视图：竖屏时全图按宽度适配会过小，改为放大到填满可用高度，横向以欧亚大陆为中心
   private home(width: number, height: number): [number, number, number] {
     const { top, bottom } = this.padding;
@@ -271,7 +411,18 @@ export class MapEngine {
     return { width: this.view.width - left - right, height: this.view.height - top - bottom };
   }
 
+  // 当前切片的代理纹理还没到时，先等一小会儿再起飞：整段飞行就都能交给合成器
   private flyToBase(cx: number, cy: number, zoomLevel: number, duration: number) {
+    if (this.proxies.active && this.current && !this.proxyReady()) {
+      this.queued = { cx, cy, zoomLevel, duration, deadline: performance.now() + FLIGHT_WAIT_MS };
+      this.kick();
+      return;
+    }
+    this.queued = null;
+    this.beginFlight(cx, cy, zoomLevel, duration);
+  }
+
+  private beginFlight(cx: number, cy: number, zoomLevel: number, duration: number) {
     const { left, top } = this.padding;
     const { width, height } = this.focusSize();
     const k1 = this.fitK() * zoomLevel;
@@ -285,7 +436,8 @@ export class MapEngine {
       const k = width / w;
       return [k, left + width / 2 - x * k, top + height / 2 - y * k];
     };
-    this.flight = { start: performance.now(), duration: d, interp: toView };
+    const [k, x, y] = toView(1);
+    this.flight = { start: performance.now(), duration: d, interp: toView, dest: { ...cur, k, x, y } };
     this.interacting = true;
     this.kick();
   }
@@ -315,6 +467,8 @@ export class MapEngine {
       const k = fit.k * (prev.k / prevFit.k);
       next = { k, x: width / 2 - center[0] * k, y: (top + height - bottom) / 2 - center[1] * k };
     }
+    this.flight = null;
+    this.queued = null;
     this.view = { ...prev, width, height, dpr, ...next };
     // 显式给出视口范围：默认的 extent 每次变换都读 clientWidth，飞行中逐帧触发强制同步布局
     this.zoomer
@@ -326,37 +480,28 @@ export class MapEngine {
   }
 
   private invalidate() {
-    for (const l of [this.baseLayer, this.waterLayer, ...this.polLayers, ...this.labLayers]) l.invalidate();
+    for (const l of [this.baseLayer, this.waterLayer, ...this.slots.flatMap((s) => [s.pol, s.hl, s.lab])]) l.invalidate();
     this.kick();
   }
 
-  private recolor(snap: Snapshot) {
-    const y = snap.meta.year;
-    const colors = assignColors(
-      snap.polities.map((p) => p.name),
-      snap.polities.map((p) => p.area),
-      snap.neighbors,
-      (name) => this.policy.preferredColor(name, y),
-    );
-    snap.polities.forEach((p, i) => (p.color = colors[i]));
-  }
-
-  private polityStyle(snap: Snapshot): PolityStyle {
-    return { colors: snap.polities.map((p) => p.color), highlight: this.highlightSet(snap), highlightColor: this.policy.highlightColor };
-  }
-
-  private highlightSet(snap: Snapshot): Map<number, 1 | 2> | null {
+  private levelsOf(slot: Slot): Map<number, 1 | 2> | null {
     const h = this.policy.highlight;
-    if (!h) return null;
-    const map = new Map<number, 1 | 2>();
-    for (const p of snap.polities) {
-      const level = h(p.name, p.subj, snap.meta.year);
-      if (level) map.set(p.index, level);
+    const snap = slot.snap;
+    if (!h || !snap) return null;
+    if (slot.levelsEpoch !== this.policyEpoch) {
+      const map = new Map<number, 1 | 2>();
+      for (const p of snap.polities) {
+        const level = h(p.name, p.subj, snap.meta.year);
+        if (level) map.set(p.index, level);
+      }
+      slot.levels = map;
+      slot.levelsEpoch = this.policyEpoch;
     }
-    return map;
+    return slot.levels;
   }
 
   private labelText(snap: Snapshot) {
+    if (this.policy.lang !== 'zh') return 'Abc';
     return snap.polities.map((p) => this.policy.nameOf(p.name, snap.meta.year, snap.meta.year) ?? '').join('') + '楚汉三国魏蜀吴新东西晋南朝宋齐梁陈北周隋唐五代十国辽金蒙古夏藩俄德';
   }
 
@@ -364,10 +509,43 @@ export class MapEngine {
     if (!this.raf && !this.destroyed) this.raf = requestAnimationFrame(this.frame);
   };
 
+  private proxied(slot: Slot): boolean {
+    return !!slot.snap && slot.world !== null && slot.worldKey === this.proxyKey(slot.snap);
+  }
+
+  // 代理纹理是否足以承担当前画面：当前切片在当前高亮方案下的位图已就位，且退淡的过渡已完成
+  private proxyReady(): boolean {
+    return this.proxies.active && this.proxied(this.slots[1]) && this.dim === (this.policy.highlight ? DIM : 1);
+  }
+
+  // 把后台线程送达的位图移交给显示画布；缺的再去要
+  private adoptProxies() {
+    if (!this.proxies.active) return;
+    this.slots.forEach((slot, i) => {
+      if (!slot.snap || this.proxied(slot)) return;
+      const key = this.proxyKey(slot.snap);
+      const bitmap = this.proxies.take(key);
+      if (bitmap) slot.show(bitmap, key);
+      else if (i === 1) this.requestProxy(slot.snap, true, this.scheme());
+    });
+  }
+
   private frame = (now: number) => {
     this.raf = 0;
-    if (!this.base) return;
-    let animating = false;
+    const base = this.base;
+    if (!base) return;
+    const dt = Math.min(80, now - (this.lastFrame || now));
+    this.lastFrame = now;
+    let busy = false;
+
+    if (this.queued) {
+      if (this.proxyReady() || now >= this.queued.deadline) {
+        const q = this.queued;
+        this.queued = null;
+        this.beginFlight(q.cx, q.cy, q.zoomLevel, q.duration);
+      } else busy = true;
+    }
+
     if (this.flight) {
       const t = Math.min(1, (now - this.flight.start) / this.flight.duration);
       const [k, x, y] = this.flight.interp(easeCubicInOut(t));
@@ -376,68 +554,143 @@ export class MapEngine {
         this.flight = null;
         this.interacting = false;
       }
-      animating = true;
+      busy = true;
     }
-    const quality: Quality = this.interacting ? 'fast' : 'full';
-    this.renderLayers(quality);
-    const fade = this.previous ? Math.min(1, (now - this.fadeStart) / FADE_MS) : 1;
-    if (fade >= 1) this.previous = null;
-    else animating = true;
-    this.compose(fade);
-    if (this.drawFx(now)) animating = true;
-    if (animating || this.interacting) this.kick();
+
+    const v = this.view;
+    const [prev, cur] = this.slots;
+    let fade = 1;
+    if (prev.snap) {
+      fade = Math.min(1, (now - this.fadeStart) / FADE_MS);
+      if (fade >= 1) prev.snap = null;
+      else busy = true;
+    }
+    const dimTarget = this.policy.highlight ? DIM : 1;
+    if (this.dim !== dimTarget) {
+      this.dim = approach(this.dim, dimTarget, (dt / DIM_MS) * (1 - DIM));
+      busy = true;
+    }
+
+    this.adoptProxies();
+    const proxy = this.proxyReady();
+    const moving = this.interacting;
+
+    // 有代理纹理时，清晰图层等镜头停稳后再重绘：重绘再慢也只发生在画面静止的时候
+    if (this.upkeep(base, v, moving, proxy, fade)) busy = true;
+
+    // 清晰图层的去留：各层都已画好且盖得住当前视口就显示，否则让位给代理纹理
+
+    const lit = this.policy.highlight !== null;
+    const covers = [this.baseLayer, this.waterLayer, cur.pol, ...(lit ? [cur.hl] : [])].every((l) => near(l.view, v, 0.72, 1.45, 0.006));
+    if (!proxy) this.crispAlpha = 1;
+    else {
+      const want = covers ? 1 : 0;
+      this.crispAlpha = approach(this.crispAlpha, want, dt / (want ? CROSS_IN_MS : CROSS_OUT_MS));
+      if (this.crispAlpha !== want) busy = true;
+    }
+    // 标注随视图排布：偏离不多时跟着位图平移缩放，偏离多了就淡出，停稳重排后再淡入
+    const labelWant = !proxy || near(cur.lab.view, v, 0.8, 1.25, 0.2) ? 1 : 0;
+    this.labelAlpha = approach(this.labelAlpha, labelWant, dt / LABEL_FADE_MS);
+    if (this.labelAlpha !== labelWant) busy = true;
+
+    this.compose(v, fade, proxy);
+    if (this.drawFx(now)) busy = true;
+    if (busy || this.interacting) this.kick();
   };
 
-  // 缓存失效或偏离视图过多时重绘图层（交互中只在缩放比偏离 1.6 倍或露边较多时快速重绘）。
-  // 每帧至多重绘一层、最急者优先，把开销摊到多帧，避免飞行中所有图层挤在同一帧重绘
-  private renderLayers(quality: Quality) {
-    const base = this.base!;
-    const v = this.view;
-    const snapJobs = (snap: Snapshot | null, pl: Layer, ll: Layer): LayerJob[] =>
-      snap
-        ? [
-            [pl, (ctx) => drawPolities(ctx, v, base, snap, this.polityStyle(snap), quality)],
-            [
-              ll,
-              (ctx) => {
-                const specs = layoutLabels(snap, v, (n) => this.policy.nameOf(n, snap.meta.year, this.year), this.highlightSet(snap));
-                drawRiverLabels(ctx, base.riverLabels, v);
-                drawLabels(ctx, specs, v.dpr, quality === 'full');
-              },
-            ],
-          ]
-        : [];
-    const jobs: LayerJob[] = [
-      ...snapJobs(this.current, this.polLayers[1], this.labLayers[1]),
-      [this.waterLayer, (ctx) => drawWater(ctx, v, base)],
-      [this.baseLayer, (ctx) => drawBase(ctx, v, base, quality)],
-      ...snapJobs(this.previous, this.polLayers[0], this.labLayers[0]),
-    ];
-    const due = jobs.filter(([l]) => l.needsRender(v, this.interacting, quality));
-    if (!due.length) return;
-    const [layer, draw] = due.reduce((a, b) => (b[0].staleness(v) > a[0].staleness(v) ? b : a));
-    layer.render(v, quality, draw);
-    if (due.length > 1) this.kick();
+  // 维护各图层：每帧至多重绘一层，把开销摊到多帧。返回是否还有待办
+  private upkeep(base: Basemap, v: View, moving: boolean, proxy: boolean, fade: number): boolean {
+    if (moving && proxy) return false;
+    const [prev, cur] = this.slots;
+    // 没有代理纹理而镜头在动：沿用缓存位图，偏离过多时以快速画质应急重绘
+    const quality: Quality = moving ? 'fast' : 'full';
+    const jobs: { layer: Layer; draw: (ctx: CanvasRenderingContext2D) => void }[] = [];
+    const add = (layer: Layer, draw: (ctx: CanvasRenderingContext2D) => void) => jobs.push({ layer, draw });
+    const snap = cur.snap;
+    const levels = this.levelsOf(cur);
+
+    // 高亮是疆域模式的主角，排在最前；标注排在底图之前：底图的近岸水纹最费时，先让地名出来
+
+    if (snap && levels) add(cur.hl, (ctx) => drawHighlight(ctx, v, base, snap, levels, this.policy.highlightColor, quality));
+    if (snap) add(cur.pol, (ctx) => drawPolities(ctx, v, base, snap, quality));
+    add(this.waterLayer, (ctx) => drawWater(ctx, v, base));
+    if (snap) add(cur.lab, (ctx) => this.drawLabelLayer(ctx, cur, snap, base, v, quality));
+    add(this.baseLayer, (ctx) => drawBase(ctx, v, base, quality));
+    if (prev.snap && fade < 1 && !moving) {
+      const old = prev.snap;
+      add(prev.pol, (ctx) => drawPolities(ctx, v, base, old, quality));
+    }
+
+    const due = jobs.filter((j) => j.layer.needsRender(v, moving, quality));
+    if (due.length) due[0].layer.render(v, quality, due[0].draw);
+    return due.length > 1;
   }
 
-  private compose(fade: number) {
+  private drawLabelLayer(ctx: CanvasRenderingContext2D, slot: Slot, snap: Snapshot, base: Basemap, at: View, quality: Quality) {
+    const { lang, placeName } = this.policy;
+    const specs = layoutLabels(snap, at, lang, (n) => this.policy.nameOf(n, snap.meta.year, this.year), this.levelsOf(slot));
+    drawRiverLabels(ctx, base.riverLabels, at, lang, placeName);
+    if (base.chinaSea && snap.year >= CHINA_SEA_SINCE) drawSeaLabels(ctx, base.chinaSea, at, lang, placeName);
+    drawLabels(ctx, specs, at.dpr, quality === 'full');
+  }
+
+  // 合成一帧。清晰图层与代理纹理按权重相加（权重之和恒为 1），交叉淡入淡出时画面不会忽明忽暗
+  private compose(v: View, fade: number, proxy: boolean) {
     const ctx = this.canvas.getContext('2d')!;
+    const [prev, cur] = this.slots;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const v = this.view;
-    composeLayer(ctx, this.baseLayer, v, 1);
-    if (this.previous) composeLayer(ctx, this.polLayers[0], v, 1 - fade);
-    composeLayer(ctx, this.polLayers[1], v, fade);
-    composeLayer(ctx, this.waterLayer, v, 1);
-    if (this.previous) composeLayer(ctx, this.labLayers[0], v, 1 - fade);
-    composeLayer(ctx, this.labLayers[1], v, fade);
+    const fading = prev.snap !== null && fade < 1;
+    const a = proxy ? this.crispAlpha : 1;
+
+    if (a > 0) {
+      composeLayer(ctx, this.baseLayer, v, 1);
+      if (fading) composeLayer(ctx, prev.pol, v, (1 - fade) * this.dim);
+      composeLayer(ctx, cur.pol, v, (fading ? fade : 1) * this.dim);
+      composeLayer(ctx, this.waterLayer, v, 1);
+      // 高亮像一层朱砂淡彩罩在画上：以正片叠底合成，河流与海岸线仍透出来
+      if (this.policy.highlight) {
+        ctx.globalCompositeOperation = 'multiply';
+        if (fading) composeLayer(ctx, prev.hl, v, 1 - fade);
+        composeLayer(ctx, cur.hl, v, fading ? fade : 1);
+      }
+      if (a < 1) {
+        // 把已画的清晰图层整体乘以 a
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = `rgba(0, 0, 0, ${a})`;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+    }
+
+    // 代理纹理已含退淡与高亮；清晰图层不显示时不必相加，直接铺上去更省
+
+    if (proxy && a < 1) {
+      const weight = 1 - a;
+      const prevShare = fading && this.proxied(prev) ? 1 - fade : 0;
+      ctx.globalCompositeOperation = a > 0 || prevShare > 0 ? 'lighter' : 'source-over';
+      ctx.setTransform(v.k * v.dpr, 0, 0, v.k * v.dpr, v.x * v.dpr, v.y * v.dpr);
+      const paint = (bitmap: ImageBitmap | null, alpha: number) => {
+        if (!bitmap || alpha <= 0.002) return;
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(bitmap, 0, 0, BASE_W, BASE_H);
+      };
+      paint(prev.world, weight * prevShare);
+      paint(cur.world, weight * (1 - prevShare));
+      ctx.globalAlpha = 1;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    if (fading) composeLayer(ctx, prev.lab, v, this.labelAlpha * (1 - fade));
+    composeLayer(ctx, cur.lab, v, this.labelAlpha * (fading ? fade : 1));
   }
 
   private drawFx(now: number): boolean {
     const ctx = this.fx.getContext('2d')!;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.fx.width, this.fx.height);
-    drawHover(ctx, this.view, this.hover);
+    drawHover(ctx, this.view, this.hover?.path ?? null);
     let more = false;
     for (const p of this.painters) if (p(ctx, this.view, now)) more = true;
     return more;

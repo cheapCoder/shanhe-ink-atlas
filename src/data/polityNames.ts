@@ -1,5 +1,7 @@
 // 政权中文译名：键为底图数据（经校勘后）的英文规范名。
 // 译名参照《中国大百科全书》与中文维基百科的通行译法；无通行译名的原住民群体不强译。
+import type { Lang } from '../types.ts';
+
 const EAST_ASIA: Record<string, string> = {
   Xia: '夏', Shang: '商', 'Western Zhou': '西周', 'Eastern Zhou': '东周', Sinic: '华夏诸部', Wu: '吴越',
   'Zhou states': '东周列国', Qin: '秦', 'Qin Empire': '秦', 'Han Empire': '西汉', Han: '汉', Jin: '晋', 'Han Zhao': '汉赵',
@@ -271,65 +273,320 @@ export const POLITY_ZH: Record<string, string> = {
   ...EAST_ASIA, ...SOUTH_EAST_ASIA, ...SOUTH_ASIA, ...CENTRAL_WEST_ASIA, ...EUROPE, ...AFRICA, ...AMERICAS, ...OCEANIA_POLAR,
 };
 
-// 同名而跨越朝代的政权：按切片年份给出更精确的称谓
-const BY_YEAR: Record<string, [number, number, string][]> = {
-  Han: [[-1, -1, '西汉'], [1, 220, '东汉']],
-  Jin: [[300, 300, '西晋'], [301, 420, '东晋']],
-  'Tang Empire': [[700, 700, '武周']],
-  'Zhou states': [[-500, -500, '春秋列国'], [-499, -221, '战国诸国']],
-  Tibet: [[1000, 1278, '吐蕃诸部'], [1279, 1644, '乌思藏'], [1645, 2010, '西藏']],
-  Korea: [[1000, 1391, '高丽']],
-  Egypt: [[-5000, -300, '古埃及']],
-  Mali: [[1000, 1800, '马里帝国']],
-  Ghana: [[700, 1300, '加纳帝国']],
-  Congo: [[1400, 1900, '刚果王国'], [1945, 2010, '刚果（布）']],
-  Persia: [[400, 400, '萨珊波斯'], [1783, 1914, '波斯（恺加）']],
-  Armenia: [[-400, 500, '亚美尼亚王国']],
-  Japan: [[800, 900, '日本（平安）'], [1492, 1500, '日本（室町）']],
-  Spain: [[1530, 1644, '西班牙帝国']],
-  Sweden: [[1600, 1715, '瑞典帝国']],
-  France: [[1279, 1783, '法兰西王国'], [1800, 1815, '法兰西帝国']],
+// 政权英文显示名：底图英文名拼写有误、冗长或不合英文历史地图惯例者，在此给出通行写法；未列出者直接沿用底图原名。
+// 领土称谓与中文表一致：中文作“中国”“中华民国”“清”之处，英文所指为同一政权。连接号一律用 ASCII 的 “-”。
+const EN_EAST_ASIA: Record<string, string> = {
+  Sinic: 'Huaxia', Wu: 'Wu and Yue', 'Zhou states': 'Eastern Zhou states', 'Qin Empire': 'Qin', 'Han Empire': 'Western Han', 'Han Zhao': 'Han-Zhao',
+  'Toba Wei': 'Northern Wei', 'Sui Empire': 'Sui', 'Tang Empire': 'Tang', 'Song Empire': 'Northern Song', 'Jin (Jurchen)': 'Jin',
+  Xixia: 'Western Xia', 'Great Khanate': 'Yuan', 'Ming Empire': 'Ming', 'Ming Chinese Empire': 'Ming', 'Post-Ming Warlords': 'Southern Ming',
+  'Manchu Empire': 'Qing', 'Qing Empire': 'Qing', "People's Republic of China": 'China', 'Chinese Warlords': 'Republic of China',
+  'Chinese warlords': 'Republic of China', Manchuria: 'Northeast China', 'Tufan Empire': 'Tibetan Empire', 'Zhangzhung Kingdom': 'Zhangzhung',
+  'Nan Chao': 'Nanzhao', 'Nan-Zhao': 'Nanzhao', 'Dali Kingdom': 'Dali', 'Min-Yue': 'Minyue', 'Nan-Yue': 'Nanyue', 'Donghu tribes': 'Donghu',
+  Ruanruan: 'Rouran', 'Western Gokturk Khaganate': 'Western Göktürks', 'Kara Khitai Khaganate': 'Western Liao', Mongols: 'Mongol tribes',
+  'Oirat Confederation': 'Oirats', 'central Asian khanates': 'Central Asian khanates', Tungus: 'Tungusic tribes',
+  'Tungusic Tribes': 'Tungusic tribes', 'Turcik tribes': 'Turkic tribes', 'Proto-Thai cultures': 'Proto-Tai cultures', Thai: 'Tai peoples',
+  'Tibeto-Burmanese': 'Tibeto-Burman peoples', 'Taiwanese Tribes': 'Taiwanese tribes', 'Dakapeng culture': 'Dapenkeng culture',
+  'Far Eastern SSR': 'Far Eastern Republic', Koguryo: 'Goguryeo', Paekche: 'Baekje', Silia: 'Silla', Parhae: 'Balhae',
+  'Korea (USSR)': 'Korea (Soviet zone)', 'Korea (USA)': 'Korea (US zone)', "Korea, Democratic People's Republic of": 'North Korea',
+  'Korea, Republic of': 'South Korea', 'Late Jomon culture': 'Late Jōmon culture', 'Imperial Japan (Fujiwara)': 'Japan (Heian)',
+  'Shogun Japan (Kamakura)': 'Kamakura Shogunate', 'Japan (Warring States)': 'Japan (Sengoku)', 'Tokugawa shogunate': 'Tokugawa Shogunate',
+  'Imperial Japan': 'Japan', 'Japan (USA)': 'Occupied Japan', Ainus: 'Ainu', 'Sakhalin (RU)': 'Sakhalin (Russia)',
+};
+
+const EN_SOUTH_EAST_ASIA: Record<string, string> = {
+  'Mon-Khmer': 'Mon-Khmer peoples', 'Chen-La': 'Chenla', 'Champa City States': 'Champa', 'Đại Việt': 'Dai Viet', 'Cochin China': 'Cochinchina',
+  'French Indo-China': 'French Indochina', Luva: 'Lavo', Haripunjaya: 'Hariphunchai', Harapunchai: 'Hariphunchai', 'Kingdom of Sukhotai': 'Sukhothai',
+  'Rattanakosin Kingdom': 'Siam', 'Thai Kingdoms': 'Tai kingdoms', Burmese: 'Burmese peoples', 'Pyu state': 'Pyu city-states',
+  'Mon state': 'Mon kingdoms', 'Mon States': 'Mon kingdoms', 'Kingdom of Pagan': 'Pagan', Bagan: 'Pagan', 'Shan states': 'Shan States',
+  'Arakan (Indian princely state)': 'Arakan', Malay: 'Malay states', 'minor states under Indian influence': 'Indianized states',
+  'minor Hindu and Buddhist states': 'Hindu-Buddhist states', 'minor Hindu and Buddhist kingdoms': 'Hindu-Buddhist kingdoms',
+  'Srivijaya Empire': 'Srivijaya', 'Malaysian Islamic states': 'Malay sultanates', 'Netherlands Indies': 'Dutch East Indies', Papuan: 'Papuans',
+  'Papuan neolithic farmers': 'Papuan Neolithic farmers', 'Dutch Guinea': 'Dutch New Guinea',
+};
+
+const EN_SOUTH_ASIA: Record<string, string> = {
+  'Indus valley civilization': 'Indus Valley Civilization', 'Gandhāra': 'Gandhara', Pancala: 'Panchala', Kasi: 'Kashi',
+  'Iron Age chieftainships': 'Iron Age chiefdoms', Satavahanihara: 'Satavahana', 'Kushan Principalities': 'Kushan principalities',
+  'Suren Kingdom': 'Indo-Parthian Kingdom', 'Vishnu-Kundins': 'Vishnukundinas', 'Pallava state': 'Pallavas', Pallava: 'Pallavas',
+  'Pandya state': 'Pandyas', Chola: 'Cholas', Rashtrakuta: 'Rashtrakutas', 'Rashtrakuta state': 'Rashtrakutas', Kanauj: 'Kannauj',
+  Shaskanka: 'Gauda Kingdom', 'Kingdom of Kashmir': 'Kashmir', 'Kingdom of Kapisa': 'Kapisa', 'Kingdom of Zunbil': 'Zunbils',
+  'Rajput Clans and Small States': 'Rajput states', 'Gurjara Pratihara': 'Gurjara-Pratiharas', Somvamsis: 'Somavamshis', Paramas: 'Paramaras',
+  Chandellas: 'Chandelas', Klachuris: 'Kalachuris', 'Sultanate of Delhi': 'Delhi Sultanate', 'minor Hindu kingdoms': 'Minor Hindu kingdoms',
+  Golkonda: 'Golconda', Rajastan: 'Rajasthan', Sind: 'Sindh', 'Kingdom of Sind': 'Sindh', 'Mahratta states': 'Maratha states',
+  'Mysore (Indian princely state)': 'Mysore', 'Sikkim (Indian princely state)': 'Sikkim', "Nizam's Dominions": 'Hyderabad',
+  Circars: 'Northern Circars', 'British East India Company': 'East India Company', Simhala: 'Sinhalese kingdom', Lambakannas: 'Sinhalese kingdom',
+  Saylan: 'Ceylon', 'Ceylon (Dutch)': 'Dutch Ceylon',
+};
+
+const EN_CENTRAL_WEST_ASIA: Record<string, string> = {
+  'city-states': 'Sumerian city-states', Ubaid: 'Ubaid culture', 'Amuq D': 'Amuq culture', Ghassul: 'Ghassulian culture',
+  'Levantine Corridor (Neolithic Farmers)': 'Levantine Neolithic farmers', 'Neolithic Farmers': 'Neolithic farmers',
+  'Hurrian Kingdoms': 'Hurrian kingdoms', 'state societies and Aramaean kingdoms': 'Levantine kingdoms',
+  'Kingdom of David and Solomon': 'Kingdom of Israel', 'minor states': 'Minor states', 'Seleucid Kingdom': 'Seleucid Empire',
+  'Nabatean Kingdom': 'Nabataean Kingdom', Maan: "Ma'in", Hadramaut: 'Hadhramaut', Mascat: 'Muscat', Maskat: 'Muscat',
+  'Buwayhid Emirates': 'Buyid Emirates', 'Ghaznavid Emirate': 'Ghaznavid Empire', Karkhanids: 'Karakhanids', 'Seljuk Caliphate': 'Sultanate of Rum',
+  'Khwarazmian dynasty': 'Khwarazmian Empire', Kwarezm: 'Khwarazm', 'Emirate of the White Sheep Turks': 'Aq Qoyunlu', Oxus: 'Oxus civilization',
+  Namazga: 'Namazga culture', Kelteminar: 'Kelteminar culture', Andronovo: 'Andronovo culture', Sintashta: 'Sintashta culture',
+  Afanasevo: 'Afanasievo culture', Saces: 'Sakas', Sarmates: 'Sarmatians', Cimerians: 'Cimmerians',
+  'Kimek-Kipchak khaganate': 'Kimek-Kipchak Khaganate', 'Cuman-Kipchak confederation': 'Cuman-Kipchaks',
+  'Khanate of the Golden Horde': 'Golden Horde', 'Quazaq Khanate': 'Kazakh Khanate', 'Bukara Khanate': 'Bukhara Khanate',
+  'Bokhara Khanate': 'Bukhara Khanate', Turan: 'Central Asian khanates', 'Ottoman Sultanate': 'Ottoman Empire', 'Republic of Turkey': 'Turkey',
+  'Arabia (Nejd)': 'Nejd', Hail: "Ha'il", 'Oman (British Raj)': 'Oman', 'Trucial Oman': 'Trucial States', 'Mesopotamia (GB)': 'Iraq (UK)',
+  'Mandatory Palestine (GB)': 'Palestine (UK)',
+};
+
+const EN_EUROPE: Record<string, string> = {
+  'Kingdom of Kassander': 'Kingdom of Cassander', '?': 'Thracian tribes', Etrurians: 'Etruscans', Sabini: 'Sabines', Rome: 'Roman Republic',
+  'Rome (Diocletianus)': 'Rome (Diocletian)', 'Rome (Constantinus)': 'Rome (Constantius)', 'Bosporian Kingdom': 'Bosporan Kingdom',
+  'N. European Bronze Age cultures': 'Nordic Bronze Age', 'Funnel-Beaker': 'Funnelbeaker culture', Beaker: 'Bell Beaker culture',
+  'Únětice': 'Unetice culture', Narva: 'Narva culture', 'Early combware': 'Comb Ceramic culture', Dimini: 'Dimini culture',
+  'Volga-Kamm': 'Volga-Kama culture', Nemay: 'Neman culture', 'Sambian-Nothangian culture': 'Sambian-Natangian culture', Cycladic: 'Cycladic culture',
+  Minoan: 'Minoans', Boihaenum: 'Bohemia', Dumonii: 'Dumnonii', Northmen: 'Norsemen', 'West Getaes': 'West Geats', 'East Getaes': 'East Geats',
+  Guta: 'Gutes', Alamans: 'Alamanni', Skirii: 'Sciri', Turingians: 'Thuringians', Peshemegs: 'Pechenegs', 'Bulgar Khanate': 'Bulgaria',
+  Burgandy: 'Burgundy', Britany: 'Brittany', 'Comté de Toulouse': 'County of Toulouse', Castilla: 'Castile', Castille: 'Castile', 'Aragón': 'Aragon',
+  Irlanda: 'Ireland', Cantia: 'Kent', 'English territory': 'England', 'United Kingdom of Great Britain and Ireland': 'United Kingdom', Suomi: 'Finns',
+  Ests: 'Estonians', Kurs: 'Curonians', Polanes: 'Polans', Kryvichs: 'Krivichs', 'Slavonic tribes': 'Slavic tribes', 'Raška': 'Serbia',
+  Chelmia: 'Zachlumia', 'Croatian kingdom': 'Kingdom of Croatia', 'Polish–Lithuanian Commonwealth': 'Poland-Lithuania',
+  'Sweden–Norway': 'Sweden-Norway', 'Imperial Hungary': 'Hungary', 'Principality of Wallachia': 'Wallachia', 'Kingdom of Norway': 'Norway',
+  'Kyivan Rus': "Kievan Rus'", 'Kievan Rus': "Kievan Rus'", 'Principality of Kyiv': 'Principality of Kiev', 'Principality of Polotsk': 'Polotsk',
+  'Principality of Novgorod': 'Novgorod', 'Principality of Vladimir-Suzdal': 'Vladimir-Suzdal',
+  'Principality of Galicia-Volhynia': 'Galicia-Volhynia', 'Other Rus Principalities': "Rus' principalities",
+  'Tsardom of Muscovy': 'Tsardom of Russia', 'White Russia': 'Byelorussia', Byelarus: 'Belarus', 'Austrian Empire': 'Austria',
+  'Austria Hungary': 'Austria-Hungary', 'Austro-Hungarian Empire': 'Austria-Hungary', 'Milano (Austria)': 'Milan (Austria)',
+  'Germany (Soviet)': 'Germany (Soviet zone)', 'Germany (USA)': 'Germany (US zone)', 'Germany (UK)': 'Germany (UK zone)',
+  'Germany (France)': 'Germany (French zone)', 'Turkish Cypriot-administered area': 'Northern Cyprus', Mordvinians: 'Mordvins', Veps: 'Vepsians',
+  'Samoyèdes': 'Samoyeds', Saami: 'Sámi', Sami: 'Sámi', Samis: 'Sámi', 'Finno-Ugric taiga hunter-gatherers': 'Finno-Ugric hunter-gatherers',
+  'Steppe Mesolithic Hunter-Foragers': 'Steppe hunter-foragers', 'Coastal and Woodland Mesolithic Hunter-Foragers': 'Coastal and woodland foragers',
+  'Highland Mesolithic Hunter-Foragers': 'Highland hunter-foragers', 'Alluvial Lowland Mesolithic Hunter-Foragers': 'Lowland hunter-foragers',
+  Neanderthal: 'Neanderthals',
+};
+
+const EN_AFRICA: Record<string, string> = {
+  'Naquada I': 'Naqada culture', Axum: 'Aksum', Makkura: 'Makuria', Bega: 'Beja', 'Beja people': 'Beja', 'Carthaginian Empire': 'Carthage',
+  'Kingdom of Syphax': 'Numidia (Syphax)', 'Kingdom of Gala': 'Numidia (Gala)', Aures: 'Aurès', Warsenis: 'Ouarsenis',
+  'Berber Tribes': 'Berber tribes', 'Idrisid Caliphate': 'Idrisids', Ibadites: 'Ibadis', 'Hafsid Caliphate': 'Hafsids', Merinides: 'Marinids',
+  Abdelouadides: 'Zayyanids', 'Zayyanid Caliphate': 'Zayyanids', 'Wattasid Caliphate': 'Wattasids', 'Watassid Morocco': 'Wattasids',
+  'Mamluke Sultanate': 'Mamluk Sultanate', 'Algeria (FR)': 'Algeria (France)', 'Tripolitana (UK Lybia)': 'Tripolitania (UK)',
+  'Cyraneica (UK Lybia)': 'Cyrenaica (UK)', 'Fezzan (Frech Lybia)': 'Fezzan (France)', 'Libya (IT)': 'Libya (Italy)',
+  'Saharan Nomadic Tribes': 'Saharan nomads', 'Tuareg Nomadic Tribes': 'Tuareg', Touareg: 'Tuareg', Tuaregs: 'Tuareg',
+  'Empire of Ghana': 'Ghana Empire', Tekrur: 'Takrur', Mandes: 'Mande peoples', Funj: 'Funj Sultanate', Air: 'Aïr',
+  'Tukular Caliphate': 'Toucouleur Empire', 'First Samori Empire': 'Samori Empire', 'Second Samori Empire': 'Samori Empire',
+  'Futa Jalon': 'Futa Jallon', 'Ato trading confederacy': 'Aro Confederacy', 'Gold Coast (GB)': 'Gold Coast', 'Senegal (FR)': 'Senegal (France)',
+  'Gambia, The': 'The Gambia', 'Ethiopian Highland Peoples': 'Ethiopian highland peoples', 'Ethiopia (Italy)': 'Italian East Africa', Awsa: 'Aussa',
+  Shoa: 'Shewa', 'Harer (Egypt)': 'Harar (Egypt)', Kushites: 'Cushites', 'Islamic city-states': 'Swahili city-states',
+  'Sultinate of Zanzibar': 'Sultanate of Zanzibar', Azandes: 'Azande', Bantu: 'Bantu peoples', 'Hunters-gatherers': 'Hunter-gatherers',
+  Mwenemutapa: 'Mutapa', Barotse: 'Barotseland', Mbailundu: 'Bailundo', 'Mirambo Unyanyembe Ukimbu': "Mirambo's kingdom",
+  'Dutch settlements': 'Dutch Cape Colony', 'Zaire (Belgium)': 'Belgian Congo', 'Congo (France)': 'French Congo',
+  'French Cameroons': 'French Cameroon', 'Southern Cameroon': 'Southern Cameroons', 'German E. Africa (Tanganyika)': 'German East Africa',
+  'Tanzania, United Republic of': 'Tanzania', 'Walbis Bay': 'Walvis Bay', 'Rio De Oro': 'Rio de Oro',
+};
+
+const EN_AMERICAS: Record<string, string> = {
+  'Archaic Amerindian hunter-gatherers': 'Archaic hunter-gatherers', 'Mesoamerican hunter-gatherers and maïze farmers': 'Mesoamerican maize farmers',
+  'Patagonian shellfish and marine mammal hunters': 'Patagonian marine hunters', 'Plain bison hunters': 'Plains bison hunters',
+  'Subarctic forest hunter-gatherers': 'Subarctic hunter-gatherers', 'Arctic marine mammal hunters': 'Arctic marine hunters',
+  'Eastern North American hunter-gatherers': 'Eastern Woodlands foragers', 'Plateau fichers and hunter gatherers': 'Plateau fishers and foragers',
+  'North American Pacific foraging, hunting and fishing peoples': 'Pacific Coast foragers',
+  'Mesoamerican city-states and chiefdoms': 'Mesoamerican city-states', Valdivia: 'Valdivia culture', Chorrera: 'Chorrera culture',
+  'El Paraiso': 'El Paraíso', Chavin: 'Chavín culture', Chinchoros: 'Chinchorro culture', 'Tiahuanaco Empire': 'Tiwanaku',
+  'Huari Empire': 'Wari Empire', Chankas: 'Chanka', Mayas: 'Maya', 'Mexihcah (Triple Alliance)': 'Aztec Triple Alliance', 'P’urhépecha': 'Purépecha',
+  Anasazi: 'Ancestral Puebloans', Mogollon: 'Mogollon culture', 'Hopewell Culture': 'Hopewell culture', Hopewell: 'Hopewell culture',
+  'Adena Culture': 'Adena culture', Adena: 'Adena culture', 'Poverty point culture': 'Poverty Point culture',
+  'Swift Creek Culture': 'Swift Creek culture', 'Marksville Culture': 'Marksville culture', 'Fourche Maline Culture': 'Fourche Maline culture',
+  'Mill Creek Culture': 'Mill Creek culture', 'Glades Culture': 'Glades culture', 'Saugeen Complex': 'Saugeen complex',
+  'Couture Complex': 'Couture complex', 'Goodall Focus': 'Goodall focus', 'Point Peninsula': 'Point Peninsula complex', Copena: 'Copena culture',
+  Miller: 'Miller culture', Porter: 'Porter culture', Thule: 'Thule culture', Dorset: 'Dorset culture', Tlinoit: 'Tlingit', Coqs: 'Coos',
+  Obiwa: 'Ojibwe', Abnaki: 'Abenaki', Boethuk: 'Beothuk', Navaho: 'Navajo', Hopie: 'Hopi', Assiniboin: 'Assiniboine', Menomini: 'Menominee',
+  Shoshoni: 'Shoshone', Athabascan: 'Athabaskan', Inupiaq: 'Iñupiat', Inupiat: 'Iñupiat', Eyaq: 'Eyak', Suspiaq: 'Sugpiaq',
+  Susquehanna: 'Susquehannock', Muskogee: 'Muscogee (Creek)', Yankontai: 'Yanktonai', Winebago: 'Winnebago', Wappynger: 'Wappinger',
+  Pocumtuk: 'Pocumtuc', Ninticoy: 'Nanticoke', Montana: 'Montauk', Naniaho: 'Naniaba', Kijkitat: 'Klickitat', Tenimo: 'Tenino', Maiou: 'Maidu',
+  Saunan: 'Salinan', Cahulia: 'Cahuilla', Luiseno: 'Luiseño', Serano: 'Serrano', Kawahsu: 'Kawaiisu', Chtimacha: 'Chitimacha', Riro: 'Piro',
+  Pewa: 'Tewa', Apalachees: 'Apalachee', Chisos: 'Chiso', Tobosos: 'Toboso', Cahitas: 'Cahita', Caxcane: 'Caxcan', Zacatecs: 'Zacateco',
+  Guachichiles: 'Guachichil', 'Guamar / Pecchichitane': 'Guamares', Tepehuane: 'Tepehuán', Otomies: 'Otomi', Coahuiltec: 'Coahuiltecan',
+  Tamalipueca: 'Tamaulipec', Tupis: 'Tupi', Taino: 'Taíno', Guanahatabeyes: 'Guanahatabey', 'Viceroyalty of New Spain': 'New Spain',
+  'Viceroyalty of New Granada': 'New Granada', 'Viceroyalty of the Río de la Plata': 'Río de la Plata', 'Viceroyalty of Brazil': 'Portuguese Brazil',
+  'United Provinces of the Río de la Plata': 'United Provinces of La Plata', 'Kingdom of Brazil': 'Brazil', 'Guyana (Netherlands)': 'Dutch Guiana',
+  'Virgin Islands (Danemark)': 'Danish West Indies', 'United States Virgin Islands': 'US Virgin Islands', 'Saint Barthelemy': 'Saint Barthélemy',
+  Luisiana: 'Louisiana', 'New Amsterdam': 'New Netherland', 'Acadian Peninsula (UK)': 'Nova Scotia (UK)', 'United States of America': 'United States',
+  'Dominion of Newfoundland': 'Newfoundland',
+};
+
+// 1492 年切片的原住民领地（Native Land Digital）：原名多为“自称（通称）”或数种拼写并列，英文取通行称谓
+const EN_INDIGENOUS: Record<string, string> = {
+  'Á,LEṈENEȻ ȽTE (W̱SÁNEĆ)': 'Saanich', 'Anishinabewaki ᐊᓂᔑᓈᐯᐗᑭ': 'Anishinaabe', 'Chontal de Guerrero – Tuxteco': 'Chontal de Guerrero',
+  'Dakeł Keyoh (ᑕᗸᒡ ᗲᘏᑋ)': 'Dakelh (Carrier)', 'Denendeh (Dënësųłinë́ Nëné)': 'Denesuline (Chipewyan)',
+  'ditidaqiic̓aq disib̓aʔk (Ditidaht)': 'Ditidaht', 'Féénemɨnaa': 'Muinane', 'Gitx̱san Lax̱yip': 'Gitxsan', "Gwich'in Nành": "Gwich'in",
+  'K’áálǫ Got’ine': "K'aalo Got'ine", 'Kanienʼkehá꞉ka (Mohawk)': 'Mohawk', 'kòréβahώ (korebaju/Koreguaje)': 'Koreguaje',
+  'Ktunaxa ɁamakɁis': 'Ktunaxa', 'Lənape Haki-nk (Lenni-Lenape)': 'Lenape', "ɬaʔamɩn gɩǰɛ (Tla'amin/Sliammon)": "Tla'amin",
+  'ƛaʔuukʷiʔatḥ (Tla-o-qui-aht)': 'Tla-o-qui-aht', "Me̱'pha̱a̱ (Tlapaneco)": 'Tlapanec', 'Meškwahki·aša·hina (Fox)': 'Meskwaki (Fox)',
+  'Miwkoʔ Waaliʔ': 'Miwok', 'Muina Murui / Murui-Muinanɨ': 'Murui (Witoto)',
+  'Niitsítpiis-stahkoii ᖹᐟᒧᐧᐨᑯᐧ ᓴᐦᖾᐟ (Blackfoot / Niitsítapi ᖹᐟᒧᐧᒣᑯ)': 'Blackfoot', "Nisg̱a'a": "Nisga'a",
+  "Nłeʔkepmx Tmíxʷ (Nlaka'pamux)": "Nlaka'pamux", 'np̓əšqʷáw̓səxʷ (Wenatchi)': 'Wenatchi', 'Núu-agha-tʉvʉ-pʉ̱ (Ute)': 'Ute',
+  'nuučaan̓uuɫɁatḥ nism̓a (Nuu-chah-nulth)': 'Nuu-chah-nulth', 'Nʉmʉnʉʉ (Comanche)': 'Comanche', 'O-ga-xpa Ma-zhoⁿ (O-ga-xpa)': 'Quapaw',
+  "O'odham Jeweḍ": "O'odham", 'Odǫhwęja:deˀ (Cayuga)': 'Cayuga', "Onʌyote'a•ka (Oneida)": 'Oneida', 'oθaakiiwaki‧hina‧ki (Sauk)': 'Sauk',
+  'pʌʌsíʌhʌ (Andoque/Paasiaja)': 'Andoque', 'S’ólh Téméxw (Stó:lō)': 'Stó:lō', 'sc̓əwaθenaɁɬ təməxʷ (Tsawwassen)': 'Tsawwassen',
+  'sdukʷalbixʷ (Snoqualmie)': 'Snoqualmie', 'səl̓ilwətaɁɬ təməxʷ (Tsleil-Waututh)': 'Tsleil-Waututh',
+  'Skwxwú7mesh-ulh Temíx̱w (Squamish)': 'Squamish', 'snʕickstx tmxʷúlaʔxʷ (Sinixt)': 'Sinixt', 'sq̓əc̓iy̓aɁɬ təməxʷ (Katzie)': 'Katzie',
+  "St̓át̓imc Tmicw (St'at'imc)": "St'at'imc", 'šxʷməθkʷəy̓əmaɁɬ təməxʷ (Musqueam)': 'Musqueam', 'Syilx tmixʷ (Okanagan)': 'Syilx (Okanagan)',
+  'Tāłtān Konelīne (Tahltan)': 'Tahltan', 'Tłı̨chǫ Ndè': 'Tlicho', "Ts'msyen La̱xyuup (Tsimshian)": 'Tsimshian', 'Tŝilhqot’in Nen': "Tsilhqot'in",
+  'Umoⁿhoⁿ (Omaha)': 'Omaha', 'Unangam Tanangin (Unangax̂ /Aleut)': 'Unangan (Aleut)', 'Washtáge Moⁿzháⁿ (Kaw / Kansa)': 'Kaw (Kansa)',
+  'Wašišiw Ɂítdeʔ (Washoe)': 'Washoe', 'Xawiƚƚ kwñchawaay (Cocopah)': 'Cocopah', 'x̣àʼisla w̓áwís (Haisla)': 'Haisla',
+  'ᏣᎳᎫᏪᏘᏱ Tsalaguwetiyi (Cherokee, East)': 'Cherokee', '𐓏𐒰𐓓𐒰𐓓𐒷 𐒼𐓂𐓊𐒻 𐓆𐒻𐒿𐒷 𐓀𐒰^𐓓𐒰^(Osage)': 'Osage',
+  "ᒋᑦ ᐊᔅᒋᓄᐤ St'aschinuw (Naskapi)": 'Naskapi', 'ᓀᐦᐃᔭᐤ ᐊᐢᑭᕀ Nêhiyaw-Askiy (Plains Cree)': 'Plains Cree',
+  'Očhéthi Šakówiŋ': 'Oceti Sakowin (Sioux)', '[Gáuigú (Kiowa)': 'Kiowa', "A'i Cofán/Kofán": 'Cofán', 'Abenaki / Abénaquis': 'Abenaki',
+  'Akawaio/Akawayo': 'Akawaio', "Akimel O'odham (Upper Pima)": "Akimel O'odham", 'Älsé (Alsea)': 'Alsea', 'Aónikenk (Tehuelche)': 'Tehuelche',
+  'Apsaalooké (Crow)': 'Crow', 'Aseniwuche Winewak (Rocky Mountain)': 'Aseniwuche Winewak', 'Attiwonderonk (Neutral)': 'Neutral Nation',
+  'Awaeté (Asurini of the Xingu)': 'Asurini do Xingu', "Ayuukjä'äy (Mixe)": 'Mixe', 'Barasano/Panenoá': 'Barasana',
+  "Batsil Winik' Otik (Tzotzil)": 'Tzotzil', "Ben 'Zaa/Binnizá/Mén Diiste/Bene Xhon (Zapoteco)": 'Zapotec',
+  'Bodéwadmiakiwen (Potawatomi)': 'Potawatomi', Boe: 'Bororo', 'Cabiyari/Kawiyarí': 'Cabiyarí',
+  'Carcross/Tagish First Nation (BC)': 'Carcross/Tagish (BC)', 'Carcross/Tagish First Nation (Yukon)': 'Carcross/Tagish (Yukon)',
+  'Chahta Yakni (Choctaw)': 'Choctaw', 'ChalAt’i’lo t’sikAti (Chalat’)': 'Hoh (Chalat)', 'Champagne & Aishihik': 'Champagne and Aishihik',
+  'Cheroenhaka (Nottoway)': 'Nottoway', 'Chikashsha Yaki (Chickasaw)': 'Chickasaw', 'Chimariko (territory)': 'Chimariko',
+  'Chinantla (Tsa ju jmí’)': 'Chinantec', 'Chit-dee-ni (Chetco)': 'Chetco', 'Chitonahua/Murunahua': 'Murunahua', 'Comca’ac (Seri)': 'Seri',
+  'Confederated Tribes of Grand Ronde': 'Grand Ronde', 'Confederated Tribes of Siletz Indians': 'Siletz Confederated Tribes',
+  'Confederated Tribes of Warm Springs': 'Warm Springs', 'Confederated Villages of Lisjan': 'Lisjan (Ohlone)',
+  "Deg Xit'an Ngan' (Deg Xit'an)": "Deg Xit'an", "Dena'ina Ełnena": "Dena'ina", 'Diné Bikéyah': 'Navajo', 'Dokapuara (Tuyuca)': 'Tuyuca',
+  "Dyo'xaiya-o-Ivo'tsa (Okaina)": 'Ocaina', 'Dyungungoo (Gubbi Gubbi)': 'Gubbi Gubbi', 'Eastern Mono/Monache': 'Eastern Mono',
+  'Eduria (Taiwano)': 'Taiwano', 'Eeyou Istchee': 'James Bay Cree', 'Emberá Katío/Eyabida': 'Emberá Katío',
+  'Emberá/Eperara/Épera': 'Emberá (Eperara)', "Esketemculeucw (Esk'etemc)": "Esk'etemc", 'Gitanyow Lax’yip': 'Gitanyow',
+  'Gitga’at Lax Yuup': "Gitga'at", 'Guahibo/Hiwi': 'Guahibo', 'Guarijío/Guarijó': 'Guarijío', 'Guasaves/Tamazulas': 'Guasave',
+  'Gunadule (Kuna-Tule)': 'Guna (Kuna)', 'Günün a atük (Günün a küna)': 'Günün a küna', "Gwitch'in Settlement Region": "Gwich'in Settlement Region",
+  'Ha Shuta Enima (Mazateco)': 'Mazatec', 'Hach Winik (Lacandon)': 'Lacandon', 'Havasu Baaja (Havasupai)': 'Havasupai',
+  'Hi Ui (Pame/Chichimeco Jonaz)': 'Pame', 'Hñähñu (Otomí)': 'Otomi', 'Ho-de-no-sau-nee-ga (Haudenosaunee)': 'Haudenosaunee',
+  'Hoocąk (Ho-Chunk)': 'Ho-Chunk', 'Hoopa (Reservation)': 'Hoopa', Hopitutskwa: 'Hopi', 'Huasteco/Teenek': 'Huastec', 'Ijku (Arhuaco)': 'Arhuaco',
+  'Ikoots/Kunajts/Ikoojts (Huave)': 'Huave', 'Inikana/Kukama Kukamiria/Kokama': 'Kokama', 'Irritilas/Lagunero': 'Irritilas',
+  'Isle de Jean Charles Biloxi-Chitimacha-Choctaw': 'Biloxi-Chitimacha-Choctaw', 'Juhup-Yuju/Yuhupdëh': 'Yuhup',
+  'Ka:’yu:’k’t’h’/Che:k’tles7et’h’': 'Kyuquot/Checleseht', 'Kacha Edze (Urarina)': 'Urarina', 'Kalina/Kariña': 'Kalina', 'Kambeba/Omagua': 'Omagua',
+  'Kamejeya (Yukuna)': 'Yukuna', 'Karapana/Muteamasa': 'Karapanã', 'Kaska Dena Kayeh': 'Kaska Dena', Kawashkar: 'Kawésqar',
+  'Kelly Lake Metis Settlement Society': 'Kelly Lake Métis', 'Ket Chonhab’ Kob’a (Chuj)': 'Chuj', 'Kichwa (Amazónico)': 'Amazonian Kichwa',
+  'Kiikaapoi (Kickapoo)': 'Kickapoo', KiKiallus: 'Kikiallus', 'Kitsé Cha’tnio (Chatino)': 'Chatino', 'Kogui/Kaggabba': 'Kogi',
+  "Kojomk'awi (Konkow)": 'Konkow', 'Kubéwa/Cubeo': 'Cubeo', 'Lhaq’temish (Lummi)': 'Lummi', 'Lingít Aaní (Tlingit)': 'Tlingit',
+  'Lower Tohono O’odham (Lower Pima)': 'Lower Pima', 'Magüta/Ticuna': 'Ticuna', 'Mánekenk/Haush': 'Haush',
+  'Massa-adchu-es-et (Massachusett)': 'Massachusett', 'Matagalpa/Cacaopera': 'Matagalpa', 'Matetamãe/Cinta Larga': 'Cinta Larga',
+  'Matlatzinco/matlatzinteca': 'Matlatzinca', 'Matlatzinco/Tlahuica/Ocuiltec': 'Tlahuica (Ocuiltec)', 'Matses (Matis)': 'Matis',
+  'Me-Wuk (Bay Miwok)': 'Bay Miwok', 'Me-Wuk (Central Sierra Miwok)': 'Central Sierra Miwok', 'Me-Wuk (Coast Miwok)': 'Coast Miwok',
+  'Me-Wuk (Lake Miwok)': 'Lake Miwok', 'Me-Wuk (Northern Sierra Miwok)': 'Northern Sierra Miwok',
+  'Me-Wuk (Southern Sierra Miwok)': 'Southern Sierra Miwok', 'Mebêngôkre (Kayapó)': 'Kayapó', 'Mexicanero (Nahuas)': 'Mexicanero',
+  "Mi'kma'ki": "Mi'kmaq", 'Michif Piyii (Métis)': 'Métis', 'Mississaugas of the Credit First Nation': 'Mississaugas of the Credit',
+  'Mundurukânia (Wuy jugu)': 'Munduruku', 'Muteamasa (Karapanã)': 'Karapanã', 'Mvskoke (Muscogee / Creek)': 'Muscogee (Creek)', Myaamia: 'Miami',
+  'Náayerite (Cora)': 'Cora', 'Nacotchtank (Anacostan)': 'Nacotchtank',
+  'Nahua ( Morelos, Puebla, Tlaxcala, Veracruz, Hidalgo, San Luis Potosi)': 'Nahua (central Mexico)', 'Ndee/Nnēē: (Western Apache)': 'Western Apache',
+  'Nentego (Nanticoke)': 'Nanticoke', 'Newe (Western Shoshone)': 'Western Shoshone', 'Ngi-iva (Popoloca)': 'Popoloca', 'Nicarao/Nahoa': 'Nicarao',
+  'Nimiipuu (Nez Perce)': 'Nez Perce', 'Nitaskinan (Atikamekw / Nehirowisi Aski)': 'Atikamekw', 'Nitassinan (Innu)': 'Innu',
+  'Numu (Northern Paiute)': 'Northern Paiute', 'Ñuu Savi (Mixtecapan)': 'Mixtec', 'Nuwuvi (Southern Paiute)': 'Southern Paiute',
+  'Nüwüwü (Chemehuevi)': 'Chemehuevi', "Nuxwsa'7aq (Nooksack)": 'Nooksack', 'Nyvukagmit (Naukan)': 'Naukan Yupik',
+  'O’ de püt/Angpøn (Zoque)': 'Zoque', 'Omàmìwininìwag (Algonquin)': 'Algonquin', "Onöndowa'ga:' (Seneca)": 'Seneca',
+  'Onundagaonoga (Onondaga)': 'Onondaga', 'Ópata (Tegüima-Eudebe-Hoba)': 'Opata', 'Oro Win/Oro Towati’': 'Oro Win', 'Pâri (Pawnee)': 'Pawnee',
+  'Patamona/Ingarikó': 'Patamona', 'Payómkawichum (Luiseño)': 'Luiseño', 'Piipaash (Maricopa)': 'Maricopa', 'Pipa Aha Macav (Mojave)': 'Mojave',
+  'Popeloutchom (Amah Mutsun)': 'Amah Mutsun', 'Popoluca (mixe-zoque)': 'Popoluca', 'Quuiich (Lower Umpqua)': 'Lower Umpqua',
+  "Qwû'lh-hwai-pûm (Klickitat)": 'Klickitat', 'Rarámuri (Tarahumara-Guarijio)': 'Tarahumara', 'Runixa Ngiigua (Chocho)': 'Chocho',
+  'S’atsoyaha (Yuchi)': 'Yuchi', 'Salish & Kootenai Tribes': 'Salish and Kootenai', 'Salish Kootenai (Flathead)': 'Salish (Flathead)',
+  'Schitsu’umsh (Coeur d’Alene)': "Coeur d'Alene", "Secwepemcúl'ecw (Secwépemc)": 'Secwépemc',
+  'Seminole Tribe of Florida (Big Cypress Reservation)': 'Seminole (Big Cypress)',
+  'Seminole Tribe of Florida (Brighton Reservation)': 'Seminole (Brighton)',
+  'Seminole Tribe of Florida (Hollywood Reservation)': 'Seminole (Hollywood)',
+  'Seminole Tribe of Florida (Immokalee Reservation)': 'Seminole (Immokalee)', 'Seminole Tribe of Florida (Tampa Reservation)': 'Seminole (Tampa)',
+  'Shawandasse Tula (Shawanwaki/Shawnee)': 'Shawnee', 'Shiwinna (Zuni)': 'Zuni', 'Shmuwich (Barbareño)': 'Barbareño Chumash',
+  'Sicaog (Saukiog)': 'Saukiog', 'Siekopa’aiInte/Aido-Pãi (Secoya)': 'Secoya', 'Siginygmit (Sireniki) Yupik': 'Sireniki Yupik',
+  'Siria-masã (Siriano)': 'Siriano', 'Sivuqaq (St. Lawrence Island) Yupik': 'St. Lawrence Island Yupik',
+  'Skaruhreh/Tuscarora (North Carolina)': 'Tuscarora', 'Slijuala Xanuc (Chontal)': 'Chontal of Oaxaca', "So'to (Yekuana)": "Ye'kuana",
+  "Somi Se'k (Esto’k Gna)": "Esto'k Gna", 'Tagé Cho Hudän (Little Salmon/Carmacks)': 'Little Salmon/Carmacks', 'Tampachoa (Mansos)': 'Manso',
+  'Tapachulteco (mixe-zoque)': 'Tapachultec', 'Tapieté/Guaraní-Ñandeva': 'Tapieté', 'Tekohá (Guarani)': 'Guaraní',
+  'Tekohá (Ñandeva - Avá Guaraní)': 'Avá Guaraní', 'Tekohá (Paĩ Tavytera/Kaiowá)': 'Kaiowá', 'Tenetehara (Tembé)': 'Tembé',
+  'Teslin Tlingit Council (BC)': 'Teslin Tlingit (BC)', 'Teslin Tlingit Council (Yukon)': 'Teslin Tlingit (Yukon)',
+  'Thul Garrie Waja (Bindal)': 'Bindal', 'Tjer-di/Teribe Broram': 'Teribe', 'Tojolwinik’otik (Tojolabal)': 'Tojolabal',
+  'Tontotuna (Totoró)': 'Totoró', 'Trio/Wü tarëno': 'Trio (Tiriyó)', 'Tsase/Piapoco': 'Piapoco', "Tzjon Non/ Tzo'tyio (Amuzgo)": 'Amuzgo',
+  'Umukomasã/Desana': 'Desana', 'Umurecoómajá (Tatuyo)': 'Tatuyo', 'Ungazigmit (Chaplino) Yupik': 'Chaplino Yupik',
+  'Wabanaki (Dawnland Confederacy)': 'Wabanaki Confederacy', 'Waípinõmakã (Bará)': 'Bará', 'Wakuenai/Walimanai (Kuripako)': 'Kuripako',
+  'Walimanai (Baniwa)': 'Baniwa', 'Wallmapu (Mapuche)': 'Mapuche', 'Wanano/Kotiria': 'Wanano', 'Wapishana/Wapixana': 'Wapishana',
+  'Weenhayek/Wichí': 'Wichí', 'Wendake-Nionwentsïo': 'Huron-Wendat', 'Western Mono/Monache': 'Western Mono', "Wet'suwet'en Yintikh": "Wet'suwet'en",
+  'Winaq Qo’ (Mam)': 'Mam', 'Winik Atel (Tzeltal)': 'Tzeltal', "Winikon bä lojon/Xk’ukwits/Ajlumob/Otulob (Ch'ol)": "Ch'ol",
+  'Wixárika (Huichol)': 'Huichol', 'WiYaPeMiAk (Weapemeoc-Yeopim)': 'Weapemeoc', 'Wolastoqiyik Wahsipekuk (Maliseet)': 'Maliseet',
+  'Wôpanâak (Wampanoag)': 'Wampanoag', 'Wuikinuxv (Oweekeno)': 'Wuikinuxv', 'Yamayeka (Yamaye)': 'Yamaye', 'Yanam (Ninam)': 'Ninam',
+  'Yaruro/Pumé': 'Yaruro', 'Yavapaiv Apache': 'Yavapai-Apache', 'Ye"pâ-masa': 'Tukano', 'Yihamwo (Yagua)': 'Yagua', 'Yoeme (Yaqui)': 'Yaqui',
+  'Yoko T’aan (Chontal)': 'Chontal Maya', 'Yoli (Concho)': 'Concho', 'Yoreme (Mayo)': 'Mayo', 'Yuhaviatam/Maarenga’yam (Serrano)': 'Serrano',
+  "Yup'ik & Cup'ik": "Yup'ik and Cup'ik", 'Yup’ik/Cup’ik': "Yup'ik and Cup'ik", 'ZioBain (Siona)': 'Siona', 'Zoró/Pangyjej': 'Zoró',
+};
+
+const EN_OCEANIA_POLAR: Record<string, string> = {
+  'Australian aboriginal hunter-gatherers': 'Aboriginal Australians', 'Aboriginal tribes': 'Aboriginal Australians',
+  'Tasmanian hunter-gatherers': 'Aboriginal Tasmanians', Maori: 'Māori', Maoris: 'Māori', 'M?ori': 'Māori', 'Tuʻi Tonga Empire': "Tu'i Tonga Empire",
+  'Wallis and Futuna Islands': 'Wallis and Futuna', Siberians: 'Siberian peoples', 'Paleo-Siberian hunter-gatherers': 'Paleo-Siberian hunters',
+  Yukagir: 'Yukaghir',
+};
+
+export const POLITY_EN: Record<string, string> = {
+  ...EN_EAST_ASIA, ...EN_SOUTH_EAST_ASIA, ...EN_SOUTH_ASIA, ...EN_CENTRAL_WEST_ASIA, ...EN_EUROPE, ...EN_AFRICA, ...EN_AMERICAS, ...EN_INDIGENOUS, ...EN_OCEANIA_POLAR,
+};
+
+// 同名而跨越朝代的政权：按切片年份给出更精确的称谓（起年、止年、中文、英文）
+const BY_YEAR: Record<string, [number, number, string, string][]> = {
+  Han: [[-1, -1, '西汉', 'Western Han'], [1, 220, '东汉', 'Eastern Han']],
+  Jin: [[300, 300, '西晋', 'Western Jin'], [301, 420, '东晋', 'Eastern Jin']],
+  'Tang Empire': [[700, 700, '武周', 'Wu Zhou']],
+  'Zhou states': [[-500, -500, '春秋列国', 'Spring and Autumn states'], [-499, -221, '战国诸国', 'Warring States']],
+  Tibet: [[1000, 1278, '吐蕃诸部', 'Tibetan polities'], [1279, 1644, '乌思藏', 'Ü-Tsang'], [1645, 2010, '西藏', 'Tibet']],
+  Korea: [[1000, 1391, '高丽', 'Goryeo']],
+  Egypt: [[-5000, -300, '古埃及', 'Ancient Egypt']],
+  Mali: [[1000, 1800, '马里帝国', 'Mali Empire']],
+  Ghana: [[700, 1300, '加纳帝国', 'Ghana Empire']],
+  Congo: [[1400, 1900, '刚果王国', 'Kingdom of Kongo'], [1945, 2010, '刚果（布）', 'Congo (Brazzaville)']],
+  Persia: [[400, 400, '萨珊波斯', 'Sasanian Empire'], [1783, 1914, '波斯（恺加）', 'Persia (Qajar)']],
+  Armenia: [[-400, 500, '亚美尼亚王国', 'Kingdom of Armenia']],
+  Japan: [[800, 900, '日本（平安）', 'Japan (Heian)'], [1492, 1500, '日本（室町）', 'Japan (Muromachi)']],
+  Spain: [[1530, 1644, '西班牙帝国', 'Spanish Empire']],
+  Sweden: [[1600, 1715, '瑞典帝国', 'Swedish Empire']],
+  France: [[1279, 1783, '法兰西王国', 'Kingdom of France'], [1800, 1815, '法兰西帝国', 'French Empire']],
+};
+
+// 中文同名、英文称谓随年代而异的政权（起年、止年、英文）；中文仍取上表与 POLITY_ZH
+const BY_YEAR_EN: Record<string, [number, number, string][]> = {
+  Korea: [[1392, 1896, 'Joseon']],
+  Burma: [[1989, 2010, 'Myanmar']],
+  Moldova: [[1300, 1900, 'Moldavia']],
+  Zaire: [[1945, 1959, 'Belgian Congo'], [1960, 1970, 'Congo (Leopoldville)'], [1997, 2010, 'DR Congo']],
+  Israel: [[1920, 1947, 'Palestine (UK)']],
 };
 
 // 两幅切片之间发生的朝代更替：几何沿用切片，名称按当前年份显示（年份区间含两端）
-const LIVE: { snapshot: number; name: string; from: number; to: number; label: string }[] = [
-  { snapshot: -221, name: 'Qin Empire', from: -206, to: -203, label: '楚汉相争' },
-  { snapshot: -221, name: 'Qin Empire', from: -202, to: -201, label: '西汉' },
-  { snapshot: -100, name: 'Roman Republic', from: -27, to: -2, label: '罗马帝国' },
-  { snapshot: -1, name: 'Han', from: 9, to: 24, label: '新' },
-  { snapshot: -1, name: 'Han', from: 25, to: 99, label: '东汉' },
-  { snapshot: 200, name: 'Han', from: 220, to: 265, label: '三国（魏·蜀·吴）' },
-  { snapshot: 200, name: 'Han', from: 266, to: 299, label: '西晋' },
-  { snapshot: 200, name: 'Parthian Empire', from: 224, to: 299, label: '萨珊波斯' },
-  { snapshot: 300, name: 'Jin', from: 317, to: 399, label: '东晋' },
-  { snapshot: 300, name: 'Han Zhao', from: 329, to: 399, label: '十六国' },
-  { snapshot: 400, name: 'Jin', from: 420, to: 478, label: '南朝宋' },
-  { snapshot: 400, name: 'Jin', from: 479, to: 499, label: '南齐' },
-  { snapshot: 400, name: 'Sixteen Kingdoms', from: 439, to: 499, label: '北魏' },
-  { snapshot: 400, name: 'Northern Liang', from: 439, to: 499, label: '北魏' },
-  { snapshot: 400, name: 'Western Roman Empire', from: 476, to: 499, label: '奥多亚塞王国' },
-  { snapshot: 500, name: 'Southern Qi', from: 502, to: 556, label: '南梁' },
-  { snapshot: 500, name: 'Southern Qi', from: 557, to: 588, label: '南陈' },
-  { snapshot: 500, name: 'Southern Qi', from: 589, to: 599, label: '隋' },
-  { snapshot: 500, name: 'Toba Wei', from: 535, to: 549, label: '东魏·西魏' },
-  { snapshot: 500, name: 'Toba Wei', from: 550, to: 576, label: '北齐·北周' },
-  { snapshot: 500, name: 'Toba Wei', from: 577, to: 580, label: '北周' },
-  { snapshot: 500, name: 'Toba Wei', from: 581, to: 599, label: '隋' },
-  { snapshot: 600, name: 'Sui Empire', from: 618, to: 699, label: '唐' },
-  { snapshot: 700, name: 'Tang Empire', from: 705, to: 799, label: '唐' },
-  { snapshot: 900, name: 'Tang Empire', from: 907, to: 959, label: '五代十国' },
-  { snapshot: 900, name: 'Tang Empire', from: 960, to: 999, label: '北宋' },
-  { snapshot: 900, name: 'Khitans', from: 916, to: 999, label: '辽' },
-  { snapshot: 1100, name: 'Song Empire', from: 1127, to: 1141, label: '南宋' },
-  { snapshot: 1100, name: 'Liao', from: 1125, to: 1141, label: '金' },
-  { snapshot: 1206, name: 'Xixia', from: 1227, to: 1233, label: '蒙古（西夏故地）' },
-  { snapshot: 1400, name: 'Byzantine Empire', from: 1453, to: 1491, label: '奥斯曼帝国' },
-  { snapshot: 1650, name: 'Post-Ming Warlords', from: 1662, to: 1699, label: '清（三藩）' },
-  { snapshot: 1914, name: 'Russian Empire', from: 1917, to: 1919, label: '苏俄' },
-  { snapshot: 1914, name: 'German Empire', from: 1919, to: 1919, label: '魏玛德国' },
-  { snapshot: 1960, name: 'USSR', from: 1991, to: 1993, label: '俄罗斯' },
-  { snapshot: 1960, name: 'West Germany', from: 1990, to: 1993, label: '德国' },
-  { snapshot: 1960, name: 'East Germany', from: 1990, to: 1993, label: '德国' },
+const LIVE: { snapshot: number; name: string; from: number; to: number; label: string; labelEn: string }[] = [
+  { snapshot: -221, name: 'Qin Empire', from: -206, to: -203, label: '楚汉相争', labelEn: 'Chu-Han Contention' },
+  { snapshot: -221, name: 'Qin Empire', from: -202, to: -201, label: '西汉', labelEn: 'Western Han' },
+  { snapshot: -100, name: 'Roman Republic', from: -27, to: -2, label: '罗马帝国', labelEn: 'Roman Empire' },
+  { snapshot: -1, name: 'Han', from: 9, to: 24, label: '新', labelEn: 'Xin' },
+  { snapshot: -1, name: 'Han', from: 25, to: 99, label: '东汉', labelEn: 'Eastern Han' },
+  { snapshot: 200, name: 'Han', from: 220, to: 265, label: '三国（魏·蜀·吴）', labelEn: 'Three Kingdoms' },
+  { snapshot: 200, name: 'Han', from: 266, to: 299, label: '西晋', labelEn: 'Western Jin' },
+  { snapshot: 200, name: 'Parthian Empire', from: 224, to: 299, label: '萨珊波斯', labelEn: 'Sasanian Empire' },
+  { snapshot: 300, name: 'Jin', from: 317, to: 399, label: '东晋', labelEn: 'Eastern Jin' },
+  { snapshot: 300, name: 'Han Zhao', from: 329, to: 399, label: '十六国', labelEn: 'Sixteen Kingdoms' },
+  { snapshot: 400, name: 'Jin', from: 420, to: 478, label: '南朝宋', labelEn: 'Liu Song' },
+  { snapshot: 400, name: 'Jin', from: 479, to: 499, label: '南齐', labelEn: 'Southern Qi' },
+  { snapshot: 400, name: 'Sixteen Kingdoms', from: 439, to: 499, label: '北魏', labelEn: 'Northern Wei' },
+  { snapshot: 400, name: 'Northern Liang', from: 439, to: 499, label: '北魏', labelEn: 'Northern Wei' },
+  { snapshot: 400, name: 'Western Roman Empire', from: 476, to: 499, label: '奥多亚塞王国', labelEn: 'Kingdom of Odoacer' },
+  { snapshot: 500, name: 'Southern Qi', from: 502, to: 556, label: '南梁', labelEn: 'Liang' },
+  { snapshot: 500, name: 'Southern Qi', from: 557, to: 588, label: '南陈', labelEn: 'Chen' },
+  { snapshot: 500, name: 'Southern Qi', from: 589, to: 599, label: '隋', labelEn: 'Sui' },
+  { snapshot: 500, name: 'Toba Wei', from: 535, to: 549, label: '东魏·西魏', labelEn: 'Eastern and Western Wei' },
+  { snapshot: 500, name: 'Toba Wei', from: 550, to: 576, label: '北齐·北周', labelEn: 'Northern Qi and Zhou' },
+  { snapshot: 500, name: 'Toba Wei', from: 577, to: 580, label: '北周', labelEn: 'Northern Zhou' },
+  { snapshot: 500, name: 'Toba Wei', from: 581, to: 599, label: '隋', labelEn: 'Sui' },
+  { snapshot: 600, name: 'Sui Empire', from: 618, to: 699, label: '唐', labelEn: 'Tang' },
+  { snapshot: 700, name: 'Tang Empire', from: 705, to: 799, label: '唐', labelEn: 'Tang' },
+  { snapshot: 900, name: 'Tang Empire', from: 907, to: 959, label: '五代十国', labelEn: 'Five Dynasties and Ten Kingdoms' },
+  { snapshot: 900, name: 'Tang Empire', from: 960, to: 999, label: '北宋', labelEn: 'Northern Song' },
+  { snapshot: 900, name: 'Khitans', from: 916, to: 999, label: '辽', labelEn: 'Liao' },
+  { snapshot: 1100, name: 'Song Empire', from: 1127, to: 1141, label: '南宋', labelEn: 'Southern Song' },
+  { snapshot: 1100, name: 'Liao', from: 1125, to: 1141, label: '金', labelEn: 'Jin' },
+  { snapshot: 1206, name: 'Xixia', from: 1227, to: 1233, label: '蒙古（西夏故地）', labelEn: 'Mongols (former Western Xia)' },
+  { snapshot: 1400, name: 'Byzantine Empire', from: 1453, to: 1491, label: '奥斯曼帝国', labelEn: 'Ottoman Empire' },
+  { snapshot: 1650, name: 'Post-Ming Warlords', from: 1662, to: 1699, label: '清（三藩）', labelEn: 'Qing (Three Feudatories)' },
+  { snapshot: 1914, name: 'Russian Empire', from: 1917, to: 1919, label: '苏俄', labelEn: 'Soviet Russia' },
+  { snapshot: 1914, name: 'German Empire', from: 1919, to: 1919, label: '魏玛德国', labelEn: 'Weimar Germany' },
+  { snapshot: 1960, name: 'USSR', from: 1991, to: 1993, label: '俄罗斯', labelEn: 'Russia' },
+  { snapshot: 1960, name: 'West Germany', from: 1990, to: 1993, label: '德国', labelEn: 'Germany' },
+  { snapshot: 1960, name: 'East Germany', from: 1990, to: 1993, label: '德国', labelEn: 'Germany' },
 ];
 
 export function polityZh(name: string, snapshotYear: number, year?: number): string | null {
@@ -341,6 +598,25 @@ export function polityZh(name: string, snapshotYear: number, year?: number): str
   const ranges = BY_YEAR[name];
   const hit = ranges?.find(([a, b]) => snapshotYear >= a && snapshotYear <= b);
   return hit ? hit[2] : (POLITY_ZH[name] ?? null);
+}
+
+// 英文显示名：更替规则 → 年代称谓 → POLITY_EN 规范写法 → 底图原名。名称非空时必有结果
+export function polityEn(name: string, snapshotYear: number, year?: number): string {
+  if (year !== undefined) {
+    const y = Math.round(year);
+    const live = LIVE.find((l) => l.snapshot === snapshotYear && l.name === name && y >= l.from && y <= l.to);
+    if (live) return live.labelEn;
+  }
+  const hit = Object.hasOwn(BY_YEAR, name) && BY_YEAR[name].find(([a, b]) => snapshotYear >= a && snapshotYear <= b);
+  if (hit) return hit[3];
+  const enOnly = Object.hasOwn(BY_YEAR_EN, name) && BY_YEAR_EN[name].find(([a, b]) => snapshotYear >= a && snapshotYear <= b);
+  if (enOnly) return enOnly[2];
+  return Object.hasOwn(POLITY_EN, name) ? POLITY_EN[name] : name;
+}
+
+// 按界面语言取政权标注：中文无译名者返回 null（不标注）；英文总有名称，空名除外
+export function polityLabel(lang: Lang, name: string, snapshotYear: number, year?: number): string | null {
+  return lang === 'en' ? polityEn(name, snapshotYear, year) || null : polityZh(name, snapshotYear, year);
 }
 
 // 当前年份下生效的更替规则组合，变化时地图需重绘标注

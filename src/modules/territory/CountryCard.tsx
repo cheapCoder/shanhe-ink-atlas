@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
-import { t } from '@/locale';
+import { getLang, t, tx } from '@/locale';
 import type { Lineage } from '@/types';
 import { useAtlas } from '@/store/useAtlas';
-import { formatYear } from '@/utils/year';
+import { formatArea, formatYear } from '@/utils/year';
 import { useEngine, useSnapshotMeta } from '@/modules/map_view/useMapState';
 import AreaChart from './AreaChart';
 import { areaSeries } from './lineage';
 import './territory.css';
-
-const wan = (km2: number) => (km2 / 10000).toFixed(km2 >= 1e6 ? 0 : 1);
 
 // 疆域详情：面积曲线、当前时期与逐期列表（列表同时充当图表的表格视图）
 export default function CountryCard({ lineage }: { lineage: Lineage }) {
@@ -41,9 +39,9 @@ export default function CountryCard({ lineage }: { lineage: Lineage }) {
 
   return (
     <article className="country-card">
-      <h2 className="panel-title">{lineage.name}</h2>
-      <p className="panel-subtitle">{lineage.nameEn}</p>
-      {lineage.note && <p className="panel-text country-card__note">{lineage.note}</p>}
+      <h2 className="panel-title">{tx(lineage.name)}</h2>
+      <p className="panel-subtitle">{getLang() === 'zh' ? lineage.name.en : lineage.name.zh}</p>
+      {lineage.note && <p className="panel-text country-card__note">{tx(lineage.note)}</p>}
 
       <h3 className="panel-section">
         {t('country_area')}
@@ -55,10 +53,10 @@ export default function CountryCard({ lineage }: { lineage: Lineage }) {
         {current ? (
           <>
             <span className="seal country-card__now-seal">{t('country_period')}</span>
-            <b>{current.label}</b>
+            <b>{tx(current.label)}</b>
             <span>{formatYear(current.year)}</span>
             <span>
-              {wan(current.core)} {t('country_unit')}
+              {formatArea(current.core)} {t('country_unit')}
             </span>
           </>
         ) : (
@@ -74,8 +72,8 @@ export default function CountryCard({ lineage }: { lineage: Lineage }) {
           <li key={p.year} className={i === currentIndex ? 'is-current' : ''}>
             <button onClick={() => pick(p.year)}>
               <span className="latin">{formatYear(p.year, false)}</span>
-              <span>{p.label}</span>
-              <span className="country-card__area">{wan(p.core)}</span>
+              <span>{tx(p.label)}</span>
+              <span className="country-card__area">{formatArea(p.core)}</span>
             </button>
           </li>
         ))}

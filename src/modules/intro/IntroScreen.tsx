@@ -4,8 +4,12 @@ import { useAtlas } from '@/store/useAtlas';
 import { EVENTS } from '@/data/events';
 import { FIGURES } from '@/data/figures';
 import { useEngine } from '@/modules/map_view/useMapState';
+import { LangToggle, SoundToggle } from '@/modules/title_bar/ModeTabs';
+import { hasDeepLink } from '@/modules/share/urlState';
 import InkMountains from './InkMountains';
 import './intro.css';
+
+const STOPS = FIGURES.reduce((n, f) => n + f.route.length, 0);
 
 // 开篇：竖排题名、朱印、水墨远山；地图就绪后可“展卷”，随即开始导览
 export default function IntroScreen() {
@@ -20,20 +24,20 @@ export default function IntroScreen() {
     window.setTimeout(() => {
       const s = useAtlas.getState();
       s.start();
-      s.setPlaying(true);
+      // 从分享链接进来时直接停在链接所指的画面，不自动开播
+      if (!hasDeepLink()) s.setPlaying(true);
     }, 900);
   };
 
-  const stats = tf('app_stats', {
-    s: engine?.store.list.length ?? '—',
-    e: EVENTS.length,
-    f: FIGURES.length,
-    c: engine?.store.corrections.length ?? '—',
-  });
+  const stats = tf('app_stats', { s: engine?.store.list.length ?? '—', e: EVENTS.length, f: FIGURES.length, w: STOPS });
 
   return (
     <div className={`intro${leaving ? ' is-leaving' : ''}`}>
       <InkMountains />
+      <div className="intro__tools">
+        <SoundToggle />
+        <LangToggle />
+      </div>
       <div className="intro__body">
         <h1 className="intro__title">{t('app_title')}</h1>
         <div className="intro__side">

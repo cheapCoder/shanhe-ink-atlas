@@ -1,6 +1,14 @@
 // 全局数据类型。年份约定：负数为公元前（-221 即公元前 221 年），无公元 0 年
 export type LonLat = [number, number];
 
+// 界面语言与双语文案：内容数据把两种语言写在一处，新增条目时一并提供
+export type Lang = 'zh' | 'en';
+
+export interface Text {
+  zh: string;
+  en: string;
+}
+
 export type Mode = 'overview' | 'territory' | 'figure' | 'events';
 
 export type EventCategory = 'war' | 'politics' | 'culture' | 'science' | 'religion' | 'exploration' | 'disaster' | 'economy';
@@ -16,45 +24,53 @@ export interface WikiRef {
   en: string;
 }
 
+// importance：3 为改变世界格局的转折（导览“精要”即停驻），2 为重要大事，1 为值得一记
 export interface HistoryEvent {
   id: string;
-  title: string;
-  titleEn: string;
+  title: Text;
   year: number;
   endYear?: number;
   approx?: boolean;
   date?: string;
-  place: string;
+  place: Text;
   coord: LonLat;
   category: EventCategory;
   sprite: SpriteKind;
   importance: 1 | 2 | 3;
-  summary: string;
+  summary: Text;
   figures?: string[];
   lineage?: string;
   zoom?: number;
   wiki: WikiRef;
 }
 
+// 行迹站点：note 为一句话标题，detail 为两三句讲解；
+// event 关联一则大事（沿用其配图并可跳转），wiki 为配图与延伸阅读所依据的条目
 export interface Waypoint {
   year: number;
-  place: string;
   coord: LonLat;
-  note: string;
+  place: Text;
+  note: Text;
+  detail?: Text;
   via?: LonLat[];
   sea?: boolean;
+  event?: string;
+  wiki?: WikiRef;
 }
 
+export type Region = 'china' | 'east-asia' | 'south-asia' | 'central-asia' | 'west-asia' | 'europe' | 'africa' | 'americas';
+
+// lineage：人物所属的国家谱系，人物模式下时间轴据此显示该国纪年
 export interface Figure {
   id: string;
-  name: string;
-  nameEn: string;
+  name: Text;
   birth: number;
   death: number;
   approx?: boolean;
-  title: string;
-  region: string;
-  summary: string;
+  title: Text;
+  region: Region;
+  lineage?: string;
+  summary: Text;
   sprite: SpriteKind;
   route: Waypoint[];
   wiki: WikiRef;
@@ -66,16 +82,15 @@ export interface LineageMember {
   names: string[];
   related?: string[];
   dependents?: boolean;
-  label: string;
+  label: Text;
 }
 
 export interface Lineage {
   id: string;
-  name: string;
-  nameEn: string;
+  name: Text;
   color: string;
   members: LineageMember[];
-  note?: string;
+  note?: Text;
 }
 
 // 由 scripts/fetch_wiki.mjs 生成：图片、维基条目链接与 Wikidata 校验信息
@@ -99,6 +114,7 @@ export interface SnapshotMeta {
   synthetic: boolean;
   base?: number;
   note?: string;
+  noteEn?: string;
   source?: string;
 }
 
@@ -108,5 +124,6 @@ export interface Correction {
   target: string;
   result: string;
   note: string;
+  noteEn?: string;
   source: string;
 }

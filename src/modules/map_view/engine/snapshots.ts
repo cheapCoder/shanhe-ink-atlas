@@ -1,6 +1,7 @@
-// 年代切片仓库：索引查询、按需加载（拉取与解码在后台线程）、构造 Path2D、LRU 缓存与预取
+// 年代切片仓库：索引查询、按需加载（拉取与解码在后台线程）、LRU 缓存与预取
 import type { Correction, SnapshotMeta } from '@/types';
 import type { Box } from './projection';
+import { politicalColors } from './colors';
 
 export interface PolityProps {
   n: string;
@@ -21,19 +22,21 @@ export interface Polity {
   area: number;
   anchor: [number, number] | null;
   r: number;
-  path: Path2D;
+  // 首次用到时才由路径串构造：换切片的那一帧不必为上千个政权逐一解析路径
+  readonly path: Path2D;
   bbox: [number, number, number, number];
   color: number;
 }
 
 // 国界按网格分块：细线整条描边时按全屏面积生成遮罩，分块后只描视口内的小块
 export interface BorderPiece {
-  path: Path2D;
+  readonly path: Path2D;
   box: Box;
 }
 
 export interface Snapshot {
   meta: SnapshotMeta;
+  year: number;
   polities: Polity[];
   byName: Map<string, Polity>;
   borders: BorderPiece[];
@@ -64,6 +67,8 @@ export interface BordersIndex {
 
 const url = (p: string) => `${import.meta.env.BASE_URL}data/borders/${p}`;
 const CACHE_SIZE = 10;
+
+export const snapshotUrl = (meta: SnapshotMeta) => new URL(url(meta.file), location.href).href;
 
 export class SnapshotStore {
   index: BordersIndex | null = null;
@@ -105,6 +110,10 @@ export class SnapshotStore {
     return this.list[i + step] ?? null;
   }
 
+  has(meta: SnapshotMeta): boolean {
+    return this.cache.has(meta.year);
+  }
+
   load(meta: SnapshotMeta): Promise<Snapshot> {
     const hit = this.cache.get(meta.year);
     if (hit) {
@@ -112,16 +121,10 @@ export class SnapshotStore {
       this.cache.set(meta.year, hit);
       return hit;
     }
-    const job = this.decode(new URL(url(meta.file), location.href).href).then((data) => build(meta, data));
+    const job = this.decode(snapshotUrl(meta)).then((data) => build(meta, data));
     this.cache.set(meta.year, job);
     while (this.cache.size > CACHE_SIZE) this.cache.delete(this.cache.keys().next().value as number);
     return job;
-  }
-
-  prefetch(meta: SnapshotMeta | null) {
-    if (!meta || this.cache.has(meta.year)) return;
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
-    idle(() => void this.load(meta));
   }
 
   destroy() {
@@ -153,13 +156,21 @@ export class SnapshotStore {
   }
 }
 
+// 给对象挂上惰性构造的 path
+function lazyPath<T extends object>(target: T, d: string): T & { readonly path: Path2D } {
+  let path: Path2D | null = null;
+  return Object.defineProperty(target, 'path', { enumerable: true, get: () => (path ??= new Path2D(d)) }) as T & { readonly path: Path2D };
+}
+
 function build(meta: SnapshotMeta, data: DecodedSnapshot): Snapshot {
-  const polities: Polity[] = data.polities.map(({ d, ...p }, index) => ({ ...p, index, path: new Path2D(d), color: 0 }));
+  const colors = politicalColors(data.polities, data.neighbors, meta.year);
+  const polities: Polity[] = data.polities.map(({ d, ...p }, index) => lazyPath({ ...p, index, color: colors[index] }, d));
   return {
     meta,
+    year: meta.year,
     polities,
     byName: new Map(polities.map((p) => [p.name, p])),
-    borders: data.borders.map(({ d, box }) => ({ path: new Path2D(d), box })),
+    borders: data.borders.map(({ d, box }) => lazyPath({ box }, d)),
     neighbors: data.neighbors,
   };
 }

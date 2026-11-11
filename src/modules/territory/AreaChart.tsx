@@ -1,4 +1,4 @@
-import { t } from '@/locale';
+import { getLang, t, tx } from '@/locale';
 import { useMemo, useRef, useState, type PointerEvent } from 'react';
 import { CINNABAR } from '@/modules/map_view/engine/palette';
 import { yearToT } from '@/modules/time_line/timeScale';
@@ -10,11 +10,13 @@ const W = 336;
 const H = 150;
 const PAD = { left: 40, right: 12, top: 18, bottom: 22 };
 
-const wan = (km2: number) => km2 / 10000;
-const fmt = (v: number) => (v === 0 ? '0' : v >= 100 ? Math.round(v).toLocaleString('zh-CN') : v.toFixed(1));
+// 纵轴单位：中文为万平方公里，英文为 million km²
+const unitOf = () => (getLang() === 'zh' ? 1e4 : 1e6);
+const wan = (km2: number) => km2 / unitOf();
+const fmt = (v: number) => (v === 0 ? '0' : v >= 100 ? Math.round(v).toLocaleString() : v >= 10 ? v.toFixed(1) : getLang() === 'zh' ? v.toFixed(1) : v.toFixed(2));
 
 function niceMax(v: number) {
-  const p = 10 ** Math.floor(Math.log10(Math.max(v, 1)));
+  const p = 10 ** Math.floor(Math.log10(Math.max(v, 1e-6)));
   return Math.ceil(v / p) * p;
 }
 
@@ -87,7 +89,7 @@ export default function AreaChart({ points, current, onPick }: Props) {
           <circle key={i} cx={px} cy={py} r={points[i].year === current ? 5.5 : 4} fill={CINNABAR} stroke="#f7f1e4" strokeWidth={2} />
         ))}
         <text x={Math.min(W - 60, peakX + 7)} y={Math.max(12, peakY - 7)} className="area-chart__peak">
-          极盛 {fmt(wan(peak.core))}
+          {t('country_peak')} {fmt(wan(peak.core))}
         </text>
         {h && hover !== null && <line x1={geo.pts[hover][0]} x2={geo.pts[hover][0]} y1={PAD.top} y2={H - PAD.bottom} className="area-chart__cross" />}
       </svg>
@@ -95,7 +97,7 @@ export default function AreaChart({ points, current, onPick }: Props) {
         <div className="area-chart__tip" style={{ left: `${(geo.pts[hover][0] / W) * 100}%` }}>
           <b>{fmt(wan(h.core))} {t('country_unit')}</b>
           <span>
-            {h.label} · {formatYear(h.year)}
+            {tx(h.label)} · {formatYear(h.year)}
           </span>
         </div>
       )}

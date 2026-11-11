@@ -1,3 +1,4 @@
+import { t, type LocaleKey } from '@/locale';
 import { useAtlas } from '@/store/useAtlas';
 import ScrollPanel from '@/modules/common/ScrollPanel';
 import CountryList from '@/modules/territory/CountryList';
@@ -11,7 +12,7 @@ export default function SidePanel() {
   const setPanelOpen = useAtlas((s) => s.setPanelOpen);
   if (mode === 'overview' || !open) return null;
   return (
-    <ScrollPanel key={mode} side="left" label={mode} onClose={() => setPanelOpen(false)}>
+    <ScrollPanel key={mode} side="left" label={t(`mode_${mode}` as LocaleKey)} onClose={() => setPanelOpen(false)}>
       {mode === 'territory' && <CountryList />}
       {mode === 'figure' && <FigureList />}
       {mode === 'events' && <EventList />}
