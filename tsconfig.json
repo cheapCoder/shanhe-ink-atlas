@@ -19,6 +19,5 @@
     "paths": { "@/*": ["src/*"] },
     "types": ["vite/client"]
   },
-  "include": ["src", "vite.config.ts"],
-  "exclude": ["src/data/figures/ancient.ts", "src/data/figures/modern.ts"]
+  "include": ["src", "vite.config.ts"]
 }

@@ -27,7 +27,7 @@ An interactive atlas of world history in the style of Chinese ink-wash painting.
 - 🌏 **Bilingual throughout** — interface, event narration, life journeys, and the names of states and rivers on the map, switchable with one click. Adding a language means adding one more set of strings.
 - 🗺️ **Five millennia of borders** — 62 time slices (54 from historical-basemaps, 8 redrawn for key years such as the Qin unification, the Treaty of Shaoxing and the Ming-Qing transition), cross-faded as time flows.
 - 📜 **219 events** — the camera flies to each site and pauses for a short narration with images and sources. The tour has three depths (Key, More, All); how long it lingers depends on how much there is to read, and it waits while your pointer is on the card.
-- 🧭 **64 lives, 1057 stops** — from Zhang Qian, Xuanzang and Zheng He to Marco Polo, Magellan and Captain Cook. Routes are drawn as curved brush strokes, and every stop tells its story in two or three sentences.
+- 🧭 **64 lives, 1129 stops** — from Zhang Qian, Xuanzang and Zheng He to Marco Polo, Magellan and Captain Cook. Routes are drawn as curved brush strokes, and every stop tells its story in two or three sentences.
 - 🏯 **15 nations and civilizations** — China, Rome, Persia, the Mongols, the Ottomans and more, highlighted in cinnabar with a territory chart. The dynasties on the timeline change with the nation you are looking at.
 - 🎵 **Music that follows the map** — no audio files: a plucked-string improvisation synthesised in the browser, whose scale and timbre shift as the camera moves between East Asia, South Asia, West Asia and Europe.
 - 🔗 **Shareable views** — the address bar records the year, mode and selection, so a copied link opens the same view.
