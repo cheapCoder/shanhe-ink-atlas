@@ -48,7 +48,8 @@ export function drawBase(ctx: Ctx2D, view: View, base: Basemap, quality: Quality
 
   // 海面留白，只在近岸以花青淡淡晕开，再勾几道水纹（半分辨率绘制后放大，降低描边与模糊的开销）
 
-  if (quality === 'full') drawSea(ctx, view, base);
+  // 近岸水纹较费时：交互中的快速画质省去；代理纹理在后台线程画一次，飞行时海岸也不会忽隐忽现
+  if (quality !== 'fast') drawSea(ctx, view, base);
 
   if (base.landTexture) ctx.drawImage(base.landTexture, 0, 0, BASE_W, BASE_H);
 
@@ -64,7 +65,7 @@ export function drawBase(ctx: Ctx2D, view: View, base: Basemap, quality: Quality
   ctx.save();
   ctx.strokeStyle = 'rgba(70, 58, 44, 0.1)';
   ctx.lineWidth = 10 / k;
-  if (quality === 'full') ctx.filter = 'blur(5px)';
+  if (quality !== 'fast') ctx.filter = 'blur(5px)';
   ctx.stroke(getSphere());
   ctx.filter = 'none';
   ctx.strokeStyle = 'rgba(52, 44, 36, 0.38)';
