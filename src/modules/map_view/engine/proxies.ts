@@ -22,6 +22,9 @@ function supported(): boolean {
 // 暂存区只留最近送达的几张：当前画面、淡出中的前一张与预取的下一张
 const READY_LIMIT = 3;
 
+// 加急请求超过这么久仍无回应，视为后台线程不可用
+const WATCHDOG_MS = 8000;
+
 export class ProxySource {
   readonly enabled = supported();
   private worker: Worker | null = null;
@@ -30,6 +33,9 @@ export class ProxySource {
   private requested = new Map<string, boolean>();
   private waiters = new Map<string, (() => void)[]>();
   private listeners = new Set<() => void>();
+  // 连续失败或迟迟不回应时停用代理纹理，地图退回逐帧重绘的旧办法，而不是让每次飞行都白等
+  private failures = 0;
+  private watchdog = 0;
 
   start(viewportWidth: number, dpr: number) {
     if (!this.enabled || this.worker) return;
@@ -40,6 +46,8 @@ export class ProxySource {
     }
     this.worker.onmessage = ({ data }: MessageEvent<ProxyResponse>) => {
       if (data.type === 'proxy') {
+        this.failures = 0;
+        window.clearTimeout(this.watchdog);
         this.requested.delete(data.key);
         this.ready.get(data.key)?.close();
         this.ready.delete(data.key);
@@ -51,7 +59,7 @@ export class ProxySource {
         }
         this.settle(data.key);
       } else if (data.type === 'failed') {
-        if (data.key === null) this.stop();
+        if (data.key === null || ++this.failures >= 2) this.stop();
         else {
           this.requested.delete(data.key);
           this.settle(data.key);
@@ -82,6 +90,10 @@ export class ProxySource {
     if (pending !== undefined && (pending || !urgent)) return;
     this.requested.set(key, urgent);
     this.post({ type: 'render', key, year: meta.year, url: snapshotUrl(meta), urgent, highlight });
+    if (urgent) {
+      window.clearTimeout(this.watchdog);
+      this.watchdog = window.setTimeout(() => this.requested.has(key) && this.stop(), WATCHDOG_MS);
+    }
   }
 
   // 取走位图（所有权转给调用方）
@@ -117,6 +129,7 @@ export class ProxySource {
   }
 
   private stop() {
+    window.clearTimeout(this.watchdog);
     this.worker?.terminate();
     this.worker = null;
     this.requested.clear();
