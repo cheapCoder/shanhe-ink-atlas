@@ -41,7 +41,7 @@ An interactive atlas of world history in the style of Chinese ink-wash painting.
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/figure.webp" alt="Journeys mode"><p align="center">Journeys · Alexander's campaign</p></td>
-    <td width="50%"><img src="docs/screenshots/overview.webp" alt="Overview mode"><p align="center">Overview · the guided tour</p></td>
+    <td width="50%"><img src="docs/screenshots/overview.webp" alt="Overview mode"><p align="center">Overview · 1453, the fall of Constantinople</p></td>
   </tr>
 </table>
 

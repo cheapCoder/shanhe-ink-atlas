@@ -15,7 +15,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)](https://vite.dev)
 [![D3](https://img.shields.io/badge/d3--geo-Canvas-f9a03c?logo=d3dotjs&logoColor=white)](https://d3js.org)
 
-<img src="docs/screenshots/overview.webp" alt="山河墨史：1279 年的世界" width="100%">
+<img src="docs/screenshots/overview.webp" alt="山河墨史：1453 年，君士坦丁堡陷落" width="100%">
 
 </div>
 
@@ -41,7 +41,7 @@
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/figure.webp" alt="人物模式"><p align="center">人物 · 亚历山大东征</p></td>
-    <td width="50%"><img src="docs/screenshots/english.webp" alt="英文界面"><p align="center">English · 郑和七下西洋</p></td>
+    <td width="50%"><img src="docs/screenshots/english.webp" alt="英文界面"><p align="center">English · 郑和下西洋</p></td>
   </tr>
 </table>
 
