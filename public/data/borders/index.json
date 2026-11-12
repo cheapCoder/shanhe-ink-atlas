@@ -98,7 +98,6 @@
    "synthetic": true,
    "base": -300,
    "note": "公元前 221 年秦灭六国。秦朝疆域近似取西汉初年汉、南越、闽越范围之并（秦亡后南越、闽越方才自立），其余地区沿用公元前 300 年数据。",
-   "noteEn": "In 221 BC Qin conquered the six states. The territory of the Qin dynasty is approximated by the union of the extents of Han, Nanyue and Minyue in the early Western Han (Nanyue and Minyue became independent only after the fall of Qin); other regions follow the 300 BC data.",
    "source": "https://zh.wikipedia.org/wiki/%E7%A7%A6%E6%9C%9D"
   },
   {
@@ -192,7 +191,6 @@
    "synthetic": true,
    "base": 1100,
    "note": "1127 年靖康之变后宋室南渡，1142 年绍兴和议确定宋金以淮河—大散关为界；西辽已于 1124—1132 年间立国。东亚范围沿用校勘后的 1200 年，其余地区沿用 1100 年。",
-   "noteEn": "After the Jingkang Incident of 1127 the Song court moved south, and the 1142 Treaty of Shaoxing fixed the border between the Song and the Jin (Jurchen) along the line of the Huai River and Dasan Pass; the Western Liao (Kara Khitai) had been founded between 1124 and 1132. East Asia follows the corrected 1200 data, and other regions follow the 1100 data.",
    "source": "https://zh.wikipedia.org/wiki/%E7%BB%8D%E5%85%B4%E5%92%8C%E8%AE%AE"
   },
   {
@@ -208,7 +206,6 @@
    "synthetic": true,
    "base": 1200,
    "note": "1206 年铁木真在斡难河源称成吉思汗，建立大蒙古国；疆域沿用 1200 年蒙古诸部范围。",
-   "noteEn": "In 1206 Temujin took the title Genghis Khan at the source of the Onon River and founded the Mongol Empire; the territory follows the 1200 extent of the Mongol tribes.",
    "source": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E8%92%99%E5%8F%A4%E5%9B%BD"
   },
   {
@@ -218,7 +215,6 @@
    "synthetic": true,
    "base": 1206,
    "note": "大蒙古国先后灭西辽（1218）、花剌子模（1221）、西夏（1227），1234 年联宋灭金。范围取 1206 年各政权多边形之并。",
-   "noteEn": "The Mongol Empire destroyed in turn the Western Liao (1218), the Khwarazmian Empire (1221) and the Western Xia (1227), and in 1234, in alliance with the Song, destroyed the Jin (Jurchen). The extent is the union of the 1206 polygons of these polities.",
    "source": "https://zh.wikipedia.org/wiki/%E8%92%99%E9%87%91%E6%88%98%E4%BA%89"
   },
   {
@@ -240,7 +236,6 @@
    "synthetic": true,
    "base": 1300,
    "note": "1368 年明军攻占大都，元廷北迁。明朝范围近似取 1400 年（明初至 1387 年方陆续统一四川、云南、辽东）；朝鲜半岛此时仍为高丽。",
-   "noteEn": "In 1368 Ming forces captured Dadu and the Yuan court withdrew to the north. The extent of the Ming is approximated by that of 1400 (it was not until 1387 that the early Ming had brought Sichuan, Yunnan and Liaodong under its rule one after another); the Korean Peninsula was still Goryeo at this time.",
    "source": "https://zh.wikipedia.org/wiki/%E6%98%8E%E6%9C%9D"
   },
   {
@@ -280,7 +275,6 @@
    "synthetic": true,
    "base": 1600,
    "note": "1644 年李自成攻入北京、明崇祯帝自缢，清军随即入关；东亚范围沿用 1650 年（清与南明并立），其余地区沿用 1600 年。",
-   "noteEn": "In 1644 Li Zicheng took Beijing and the Chongzhen Emperor of the Ming hanged himself, and Qing forces then entered through Shanhai Pass; East Asia follows the 1650 data (with the Qing and the Southern Ming existing side by side), and other regions follow the 1600 data.",
    "source": "https://zh.wikipedia.org/wiki/%E7%94%B2%E7%94%B3%E4%B9%8B%E5%8F%98"
   },
   {
@@ -344,7 +338,6 @@
    "synthetic": true,
    "base": 1900,
    "note": "1912 年 1 月 1 日中华民国成立，2 月 12 日清帝退位；日本已于 1910 年吞并朝鲜。东亚范围沿用 1914 年，其余地区沿用 1900 年。",
-   "noteEn": "The Republic of China was founded on 1 January 1912 and the Qing emperor abdicated on 12 February; Japan had annexed Korea in 1910. East Asia follows the 1914 data, and other regions follow the 1900 data.",
    "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E6%B0%91%E5%9B%BD_(1912%E5%B9%B4%E2%80%941949%E5%B9%B4)"
   },
   {
@@ -384,7 +377,6 @@
    "synthetic": true,
    "base": 1945,
    "note": "1949 年 10 月 1 日中华人民共和国成立；朝鲜半岛已于 1948 年分立两国。东亚范围沿用 1960 年，其余地区沿用 1945 年。",
-   "noteEn": "The People's Republic of China was founded on 1 October 1949; the Korean Peninsula had been divided into two states in 1948. East Asia follows the 1960 data, and other regions follow the 1945 data.",
    "source": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD%E5%BC%80%E5%9B%BD%E5%A4%A7%E5%85%B8"
   },
   {

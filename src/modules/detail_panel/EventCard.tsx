@@ -1,21 +1,23 @@
-import { getLang, t, tx } from '@/locale';
+import { t } from '@/locale';
 import type { HistoryEvent } from '@/types';
 import { useAtlas } from '@/store/useAtlas';
 import { EVENTS } from '@/data/events';
 import { FIGURE_BY_ID } from '@/data/figures';
 import { eventMedia, figureMedia, imageUrl, thumbUrl } from '@/data/media';
-import { formatDated, formatRange } from '@/utils/year';
+import { formatDate, formatRange, formatYear } from '@/utils/year';
 import { CATEGORY_BY_ID } from '@/modules/common/categories';
 import { presentEvent } from '@/modules/playback/usePlayback';
 import InkSprite from '@/modules/ink_sprites/InkSprite';
-import ImageCredit from './ImageCredit';
 import SourceLinks from './SourceLinks';
 import TourHold from './TourHold';
 import './detailPanel.css';
 
+const ORDERED = [...EVENTS].sort((a, b) => a.year - b.year);
+
 function dateLine(e: HistoryEvent) {
-  const when = e.endYear ? formatRange(e.year, e.endYear) : formatDated(e.year, e.date);
-  return `${e.approx ? t('year_approx') : ''}${when}`;
+  const when = e.endYear ? formatRange(e.year, e.endYear) : formatYear(e.year);
+  const day = e.date && !e.endYear ? formatDate(e.date) : '';
+  return `${e.approx ? t('year_approx') : ''}${when}${day}`;
 }
 
 // 大事详情：动画题图、纪年地点、配图、讲解、相关人物与参考资料
@@ -25,10 +27,9 @@ export default function EventCard({ event }: { event: HistoryEvent }) {
   const media = eventMedia(event.id);
   const img = imageUrl(media);
   const cat = CATEGORY_BY_ID.get(event.category);
-  const i = EVENTS.indexOf(event);
-  const prev = EVENTS[i - 1];
-  const next = EVENTS[i + 1];
-  const other = getLang() === 'zh' ? event.title.en : event.title.zh;
+  const i = ORDERED.findIndex((e) => e.id === event.id);
+  const prev = ORDERED[i - 1];
+  const next = ORDERED[i + 1];
 
   return (
     <article className="event-card">
@@ -36,14 +37,10 @@ export default function EventCard({ event }: { event: HistoryEvent }) {
         <InkSprite kind={event.sprite} size={150} />
       </div>
       <header className="event-card__head">
-        {cat && (
-          <span className="event-card__cat seal" title={t(cat.key)}>
-            {t(cat.glyph)}
-          </span>
-        )}
+        {cat && <span className="event-card__cat seal">{t(cat.glyph)}</span>}
         <div>
-          <h2 className="panel-title">{tx(event.title)}</h2>
-          <p className="panel-subtitle">{other}</p>
+          <h2 className="panel-title">{event.title}</h2>
+          <p className="panel-subtitle">{event.titleEn}</p>
         </div>
       </header>
       <p className="panel-meta">
@@ -51,20 +48,30 @@ export default function EventCard({ event }: { event: HistoryEvent }) {
           {t('panel_time')} <b>{dateLine(event)}</b>
         </span>
         <span>
-          {t('panel_place')} <b>{tx(event.place)}</b>
+          {t('panel_place')} <b>{event.place}</b>
         </span>
         {cat && <span>{t(cat.key)}</span>}
       </p>
       {img && (
         <figure className="panel-figure">
-          <img src={img} alt={tx(event.title)} loading="lazy" width={media?.width} height={media?.height} />
-          <ImageCredit media={media} />
+          <img src={img} alt={event.title} loading="lazy" width={media?.width} height={media?.height} />
+          <figcaption>
+            {t('panel_image')}：{media?.credit || t('panel_anonymous')} · {media?.license}
+            {media?.filePage && (
+              <>
+                {' · '}
+                <a href={media.filePage} target="_blank" rel="noreferrer">
+                  Wikimedia Commons
+                </a>
+              </>
+            )}
+          </figcaption>
         </figure>
       )}
-      <p className="panel-text">{tx(event.summary)}</p>
+      <p className="panel-text">{event.summary}</p>
       <TourHold />
 
-      {event.figures && event.figures.some((id) => FIGURE_BY_ID.has(id)) && (
+      {event.figures && event.figures.length > 0 && (
         <>
           <h3 className="panel-section">{t('panel_figures')}</h3>
           <div className="event-card__figures">
@@ -82,7 +89,7 @@ export default function EventCard({ event }: { event: HistoryEvent }) {
                   }}
                 >
                   {thumb ? <img src={thumb} alt="" /> : <i />}
-                  {tx(f.name)}
+                  {f.name}
                 </button>
               );
             })}
@@ -91,14 +98,14 @@ export default function EventCard({ event }: { event: HistoryEvent }) {
       )}
 
       <h3 className="panel-section">{t('panel_sources')}</h3>
-      <SourceLinks wiki={event.wiki} media={media} />
+      <SourceLinks media={media} />
 
       <nav className="event-card__nav">
         <button className="ink-button ink-button--ghost" disabled={!prev} onClick={() => prev && presentEvent(prev, false)}>
-          ‹ {prev ? tx(prev.title) : ''}
+          ‹ {prev ? prev.title : ''}
         </button>
         <button className="ink-button ink-button--ghost" disabled={!next} onClick={() => next && presentEvent(next, false)}>
-          {next ? tx(next.title) : ''} ›
+          {next ? next.title : ''} ›
         </button>
       </nav>
     </article>

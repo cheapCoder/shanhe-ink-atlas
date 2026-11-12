@@ -203,7 +203,7 @@ async function applyFixes(year, feats) {
     }
     const target = fix.from || fix.target || fix.source_name || fix.land;
     if (!ok) warn(`${year} ${fix.op} 未命中：${target}`);
-    else applied.push({ year, op: fix.op, target, result: fix.to || fix.into || [fix.a, fix.b].filter(Boolean).join(' / ') || fix.name, note: fix.note, noteEn: fix.noteEn, source: fix.source });
+    else applied.push({ year, op: fix.op, target, result: fix.to || fix.into || [fix.a, fix.b].filter(Boolean).join(' / ') || fix.name, note: fix.note, source: fix.source });
   }
   for (const yn of yearNames.filter((x) => x.years.includes(year))) rename(feats, yn.from, yn.to);
   return feats;
@@ -281,7 +281,7 @@ for (const year of years) index.push(await writeSnapshot(year, await loadCorrect
 for (const def of synthetic) {
   const feats = await buildSynthetic(def);
   correctedCache.set(def.year, feats);
-  index.push(await writeSnapshot(def.year, feats, { synthetic: true, base: def.base, note: def.note, noteEn: def.noteEn, source: def.source }));
+  index.push(await writeSnapshot(def.year, feats, { synthetic: true, base: def.base, note: def.note, source: def.source }));
 }
 index.sort((a, b) => a.year - b.year);
 
@@ -297,7 +297,7 @@ fs.writeFileSync(path.join(outDir, 'index.json'), JSON.stringify({
 fs.writeFileSync(path.join(outDir, 'areas.json'), JSON.stringify(areaSeries));
 fs.writeFileSync(path.join(outDir, 'corrections.json'), JSON.stringify([
   ...applied,
-  ...synthetic.map((d) => ({ year: d.year, op: 'synthetic', target: `基于 ${d.base} 年`, result: '合成切片', note: d.note, noteEn: d.noteEn, source: d.source })),
+  ...synthetic.map((d) => ({ year: d.year, op: 'synthetic', target: `基于 ${d.base} 年`, result: '合成切片', note: d.note, source: d.source })),
 ], null, 1));
 const total = fs.readdirSync(outDir).reduce((s, f) => s + fs.statSync(path.join(outDir, f)).size, 0);
 console.log(`完成：${index.length} 个切片，校勘 ${applied.length} 条，合计 ${(total / 1024 / 1024).toFixed(1)} MB`);

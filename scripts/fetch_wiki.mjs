@@ -1,11 +1,10 @@
 // 素材抓取：维基百科摘要（规范链接、Wikidata 编号、主图）→ Commons 许可信息 → 本地 WebP
 // 只采用 Wikimedia Commons 上的自由许可图片；结果写入 src/data/generated/media.json
-// 覆盖三类条目：大事、人物，以及行迹站点的 wiki 条目（topics，以英文条目名为键，多位人物到过同一处时共用一张图）
 // 用法：node scripts/fetch_wiki.mjs [--force]
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { EVENTS } from '../src/data/events/index.ts';
+import { EVENTS } from '../src/data/events.ts';
 import { FIGURES } from '../src/data/figures/index.ts';
 import { IMAGE_OVERRIDES } from './media_overrides.mjs';
 
@@ -14,18 +13,10 @@ const UA = 'ShanheMoshi/1.0 (educational offline history atlas build script)';
 const OUT_JSON = 'src/data/generated/media.json';
 const IMG_DIR = 'public/images';
 const MAX_W = 760;
-// 站点配图显示得小，存小一些
-const TOPIC_W = 560;
 const FREE = /(public domain|^pd|cc0|cc[- ]by|cc[- ]by-sa|gfdl|attribution|no restrictions|free art)/i;
 
 fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
-const previous = fs.existsSync(OUT_JSON) ? JSON.parse(fs.readFileSync(OUT_JSON, 'utf8')) : { events: {}, figures: {}, topics: {} };
-
-// 站点条目：按英文条目名去重；文件名取条目名的小写连字符形式
-const slug = (title) => title.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
-const topicByTitle = new Map();
-for (const f of FIGURES) for (const p of f.route) if (p.wiki?.en && !topicByTitle.has(p.wiki.en)) topicByTitle.set(p.wiki.en, { id: p.wiki.en, file: slug(p.wiki.en), wiki: p.wiki });
-const TOPICS = [...topicByTitle.values()];
+const previous = fs.existsSync(OUT_JSON) ? JSON.parse(fs.readFileSync(OUT_JSON, 'utf8')) : { events: {}, figures: {} };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -91,8 +82,8 @@ function fileFromUrl(raw) {
 
 const stripHtml = (s = '') => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
-async function commonsInfo(fileName, width = MAX_W) {
-  const api = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url|size|extmetadata&iiurlwidth=${width}&titles=${encodeURIComponent(`File:${fileName}`)}`;
+async function commonsInfo(fileName) {
+  const api = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url|size|extmetadata&iiurlwidth=${MAX_W}&titles=${encodeURIComponent(`File:${fileName}`)}`;
   const data = await getJson(api);
   const page = Object.values(data?.query?.pages ?? {})[0];
   const info = page?.imageinfo?.[0];
@@ -116,10 +107,7 @@ async function zhViaLanglinks(enTitle) {
   return page?.langlinks?.[0]?.['*'] ?? null;
 }
 
-// kind：events / figures / topics；topics 存到 images/places，只留一张较小的图
 async function processEntry(kind, item) {
-  const topic = kind === 'topics';
-  const width = topic ? TOPIC_W : MAX_W;
   const prev = previous[kind]?.[item.id];
   let [zh, en] = await Promise.all([summary('zh', item.wiki.zh), summary('en', item.wiki.en)]);
   if (!zh && en) {
@@ -144,25 +132,22 @@ async function processEntry(kind, item) {
     .filter(Boolean);
   for (const file of candidates) {
     if (file.repo !== 'commons') continue;
-    const info = await commonsInfo(file.name, width);
+    const info = await commonsInfo(file.name);
     if (!info || !info.free) continue;
-    const rel = topic ? `images/places/${item.file}.webp` : `images/${kind}/${item.id}.webp`;
+    const rel = `images/${kind}/${item.id}.webp`;
     const abs = path.join('public', rel);
     if (FORCE || !fs.existsSync(abs) || prev?.sourceFile !== file.name) {
       const buf = await getBuffer(info.thumb);
       fs.mkdirSync(path.dirname(abs), { recursive: true });
-      await sharp(buf, { density: 144 }).flatten({ background: '#f4ecdb' }).resize({ width, withoutEnlargement: true }).webp({ quality: topic ? 74 : 80 }).toFile(abs);
+      await sharp(buf, { density: 144 }).flatten({ background: '#f4ecdb' }).resize({ width: MAX_W, withoutEnlargement: true }).webp({ quality: 80 }).toFile(abs);
+    }
+    const thumbRel = rel.replace('.webp', '.thumb.webp');
+    const thumbAbs = path.join('public', thumbRel);
+    if (FORCE || !fs.existsSync(thumbAbs) || prev?.sourceFile !== file.name) {
+      await sharp(abs).resize({ width: 128, height: 128, fit: 'cover', position: 'attention' }).webp({ quality: 72 }).toFile(thumbAbs);
     }
     const meta = await sharp(abs).metadata();
-    Object.assign(media, { image: rel, width: meta.width, height: meta.height, credit: info.credit, license: info.license, filePage: info.filePage, sourceFile: file.name });
-    if (!topic) {
-      const thumbRel = rel.replace('.webp', '.thumb.webp');
-      const thumbAbs = path.join('public', thumbRel);
-      if (FORCE || !fs.existsSync(thumbAbs) || prev?.sourceFile !== file.name) {
-        await sharp(abs).resize({ width: 128, height: 128, fit: 'cover', position: 'attention' }).webp({ quality: 72 }).toFile(thumbAbs);
-      }
-      media.thumb = thumbRel;
-    }
+    Object.assign(media, { image: rel, thumb: thumbRel, width: meta.width, height: meta.height, credit: info.credit, license: info.license, filePage: info.filePage, sourceFile: file.name });
     break;
   }
   return media;
@@ -193,7 +178,6 @@ async function runAll(kind, items, concurrency = 2) {
 
 const ev = await runAll('events', EVENTS);
 const fg = await runAll('figures', FIGURES);
-const tp = await runAll('topics', TOPICS);
-fs.writeFileSync(OUT_JSON, JSON.stringify({ generatedAt: new Date().toISOString(), events: ev.out, figures: fg.out, topics: tp.out }, null, 1));
-console.log(`\n写入 ${OUT_JSON}：大事 ${EVENTS.length}、人物 ${FIGURES.length}、站点条目 ${TOPICS.length}`);
-for (const p of [...ev.problems, ...fg.problems, ...tp.problems]) console.log('  ⚠', p);
+fs.writeFileSync(OUT_JSON, JSON.stringify({ generatedAt: new Date().toISOString(), events: ev.out, figures: fg.out }, null, 1));
+console.log(`\n写入 ${OUT_JSON}`);
+for (const p of [...ev.problems, ...fg.problems]) console.log('  ⚠', p);

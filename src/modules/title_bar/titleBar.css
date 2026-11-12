@@ -1,18 +1,4 @@
 /* 题签、纪年与模式切换 */
-
-/* 画面顶端一道纸色的晕边：压住其下的地图标注，题签、纪年与模式标签才清楚 */
-.app::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 96px;
-  z-index: 12;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(244, 236, 219, 0.94) 0%, rgba(244, 236, 219, 0.78) 45%, rgba(244, 236, 219, 0));
-}
-
 .title-seal {
   position: absolute;
   top: 22px;
@@ -169,108 +155,11 @@
   transform: scaleX(1);
 }
 
-.mode-tabs__tools {
-  display: flex;
-  gap: 7px;
-  margin-left: 8px;
-}
-
-/* 小印：配乐、语言、数据说明 */
-.tool-seal {
+.mode-tabs__notes {
   width: 30px;
   height: 30px;
-  font-size: 15px;
-  line-height: 1;
-  transition: transform 0.2s var(--ease-ink), background 0.25s;
-}
-
-.tool-seal:hover {
-  transform: scale(1.08) rotate(-3deg);
-}
-
-.tool-seal.is-off {
-  position: relative;
-  background: var(--ink-4);
-  box-shadow: inset 0 0 0 1.5px rgba(248, 239, 226, 0.55);
-}
-
-.tool-seal.is-off::after {
-  content: '';
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  top: 50%;
-  height: 1.5px;
-  background: #f8efe2;
-  transform: rotate(-45deg);
-}
-
-/* 纪年所依的国家：可点开自选 */
-.chrono {
-  position: relative;
-  color: var(--cinnabar-deep);
-  pointer-events: auto;
-}
-
-.chrono__button {
-  letter-spacing: inherit;
-  color: inherit;
-  text-shadow: inherit;
-  border-bottom: 1px dashed rgba(140, 42, 30, 0.45);
-}
-
-.chrono__button i {
-  margin-left: 3px;
-  font-style: normal;
-  font-size: 10px;
-}
-
-.chrono__button:hover {
-  color: var(--cinnabar);
-}
-
-.chrono__menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  z-index: 40;
-  display: grid;
-  grid-template-columns: repeat(3, max-content);
-  gap: 2px 4px;
-  margin: 0;
-  padding: 8px;
-  list-style: none;
-  transform: translateX(-50%);
-  text-shadow: none;
-  letter-spacing: 0.04em;
-  background: rgba(251, 247, 238, 0.98);
-  border: 1px solid rgba(70, 58, 44, 0.25);
-  border-radius: 2px;
-  box-shadow: 0 10px 24px rgba(60, 42, 20, 0.2);
-}
-
-.chrono__menu button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  width: 100%;
-  padding: 5px 10px;
-  font-size: 13px;
-  white-space: nowrap;
-  color: var(--ink-1);
-  border-radius: 2px;
-}
-
-.chrono__menu button i {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-}
-
-.chrono__menu button:hover,
-.chrono__menu button.is-active {
-  background: var(--cinnabar-soft);
-  color: var(--cinnabar-deep);
+  margin-left: 8px;
+  font-size: 16px;
 }
 
 @media (max-width: 760px) {
@@ -288,7 +177,7 @@
   }
 
   .year-banner {
-    top: 76px;
+    top: 64px;
   }
 
   .year-banner__num {
@@ -301,39 +190,14 @@
     letter-spacing: 0.06em;
   }
 
-  /* 窄屏：模式标签占一行，三枚小印折到下一行靠右 */
   .mode-tabs {
-    top: 8px;
-    right: 8px;
-    left: 56px;
+    top: 10px;
+    right: 10px;
     gap: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    row-gap: 4px;
-  }
-
-  .mode-tabs__tools {
-    flex-basis: 100%;
-    justify-content: flex-end;
   }
 
   .mode-tabs__tab {
     padding: 4px 7px 8px;
     font-size: 18px;
-  }
-
-  .mode-tabs__tools {
-    gap: 4px;
-    margin-left: 4px;
-  }
-
-  .tool-seal {
-    width: 25px;
-    height: 25px;
-    font-size: 13px;
-  }
-
-  .chrono__menu {
-    grid-template-columns: repeat(2, max-content);
   }
 }

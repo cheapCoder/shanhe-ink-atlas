@@ -1,7 +1,6 @@
 // 淡彩笔触纹理：可平铺的多八度值噪声叠加横向笔痕，按颜料预生成透明度起伏的平铺图案
 import { seededRandom } from './paper';
 import { hexToRgb } from './palette';
-import { makeCanvas, type AnyCanvas, type Ctx2D } from './surface';
 
 export const WASH_SIZE = 256;
 const SIZE = WASH_SIZE;
@@ -53,16 +52,18 @@ function noiseField(): Float32Array {
   return out;
 }
 
-const tiles = new Map<string, AnyCanvas>();
+const tiles = new Map<string, HTMLCanvasElement>();
 
 // 某颜料的平铺纹理：透明度在 base 附近起伏，颜料聚集处略深
-export function washTile(hex: string, base: number): AnyCanvas {
+export function washTile(hex: string, base: number): HTMLCanvasElement {
   const key = `${hex}|${base}`;
   const hit = tiles.get(key);
   if (hit) return hit;
   const f = noiseField();
-  const c = makeCanvas(SIZE, SIZE);
-  const ctx = c.getContext('2d') as Ctx2D;
+  const c = document.createElement('canvas');
+  c.width = SIZE;
+  c.height = SIZE;
+  const ctx = c.getContext('2d')!;
   const img = ctx.createImageData(SIZE, SIZE);
   const [r, g, b] = hexToRgb(hex);
   for (let i = 0; i < SIZE * SIZE; i++) {

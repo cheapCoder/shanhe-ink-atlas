@@ -5,50 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="山河墨史：水墨风格的世界历史疆域变迁、大事纪年与人物行迹交互地图" />
     <meta name="theme-color" content="#f1e9d8" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="山河墨史 · Shanhe Ink Atlas" />
-    <meta property="og:description" content="An ink-wash atlas of world history: 5,000 years of shifting borders, turning points and great journeys. 以水墨之笔，绘五千年山河更迭、大事兴替与人物行迹。" />
-    <meta property="og:image" content="https://raw.githubusercontent.com/cheapCoder/shanhe-ink-atlas/main/docs/screenshots/overview.webp" />
-    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>山河墨史 · Shanhe Ink Atlas</title>
-    <style>
-      /* 脚本加载完成前先显示的占位画面，应用挂载后被替换 */
-      .boot {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 18px;
-        background: #f4ecdb;
-        color: #2b2925;
-        font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', 'Songti SC', serif;
-      }
-      .boot b {
-        font-size: 56px;
-        font-weight: 400;
-        letter-spacing: 0.2em;
-        text-indent: 0.2em;
-      }
-      .boot span {
-        font-size: 14px;
-        letter-spacing: 0.3em;
-        color: #78736a;
-        animation: boot-breathe 1.6s ease-in-out infinite alternate;
-      }
-      @keyframes boot-breathe {
-        to {
-          opacity: 0.35;
-        }
-      }
-    </style>
+    <title>山河墨史 · 世界历史疆域与大事舆图</title>
   </head>
   <body>
-    <div id="root">
-      <div class="boot"><b>山河墨史</b><span>研墨中 · Grinding ink</span></div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

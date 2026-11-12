@@ -6,7 +6,6 @@ import '@fontsource/noto-serif-sc/600.css';
 import '@fontsource/cormorant-garamond/500.css';
 import '@fontsource/cormorant-garamond/500-italic.css';
 import '@/styles/global.css';
-import '@/styles/locale-en.css';
 import App from './App';
 import SpriteGallery from '@/modules/ink_sprites/SpriteGallery';
 

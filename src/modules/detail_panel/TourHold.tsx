@@ -2,17 +2,15 @@ import { t } from '@/locale';
 import { useAtlas } from '@/store/useAtlas';
 import './detailPanel.css';
 
-// 导览停驻时的朱砂进度线与“继续前行”，可提前结束停驻；读者把鼠标移入卡片时进度停住
+// 导览停驻时的朱砂进度线与“继续前行”，可提前结束停驻
 export default function TourHold() {
-  const holdUntil = useAtlas((s) => s.holdUntil !== null);
-  const span = useAtlas((s) => s.holdSpan);
-  const paused = useAtlas((s) => s.holdPaused);
+  const holdUntil = useAtlas((s) => s.holdUntil);
   const playing = useAtlas((s) => s.playing);
-  if (!playing || !holdUntil) return null;
+  if (!playing || holdUntil === null) return null;
+  const remain = Math.max(0, holdUntil - performance.now());
   return (
-    <div className={`tour-hold${paused ? ' is-paused' : ''}`}>
-      <span key={span} className="tour-hold__bar" style={{ animationDuration: `${Math.max(1, span)}ms` }} />
-      {paused && <span className="tour-hold__note">{t('tour_paused')}</span>}
+    <div className="tour-hold">
+      <span key={holdUntil} className="tour-hold__bar" style={{ animationDuration: `${remain}ms` }} />
       <button className="ink-button ink-button--ghost" onClick={() => useAtlas.getState().setHold(performance.now())}>
         {t('panel_continue')} ›
       </button>

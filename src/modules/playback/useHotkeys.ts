@@ -7,6 +7,8 @@ import { getMapEngine } from '@/modules/map_view/mapBus';
 import { lineagePeriods } from '@/modules/territory/lineage';
 import { frameLeg, presentEvent } from './usePlayback';
 
+const ORDERED = [...EVENTS].sort((a, b) => a.year - b.year);
+
 // 按模式前后切换：大事、人物行迹站点或疆域时期
 function step(dir: 1 | -1) {
   const s = useAtlas.getState();
@@ -26,8 +28,8 @@ function step(dir: 1 | -1) {
     s.setYear(periods[i]);
     return;
   }
-  const cur = s.eventId ? EVENTS.findIndex((e) => e.id === s.eventId) : -1;
-  const next = cur >= 0 ? EVENTS[cur + dir] : dir > 0 ? EVENTS.find((e) => e.year > s.year) : [...EVENTS].reverse().find((e) => e.year < s.year);
+  const cur = s.eventId ? ORDERED.findIndex((e) => e.id === s.eventId) : -1;
+  const next = cur >= 0 ? ORDERED[cur + dir] : dir > 0 ? ORDERED.find((e) => e.year > s.year) : [...ORDERED].reverse().find((e) => e.year < s.year);
   if (next) presentEvent(next, false);
 }
 

@@ -1,12 +1,14 @@
-import { t, tx } from '@/locale';
+import { t } from '@/locale';
 import { useAtlas } from '@/store/useAtlas';
-import { EVENT_BY_ID } from '@/data/events';
+import { EVENTS } from '@/data/events';
 import { FIGURE_BY_ID } from '@/data/figures';
 import { LINEAGE_BY_ID } from '@/data/lineages';
 import ScrollPanel from '@/modules/common/ScrollPanel';
 import CountryCard from '@/modules/territory/CountryCard';
 import EventCard from './EventCard';
 import FigureCard from './FigureCard';
+
+const EVENT_BY_ID = new Map(EVENTS.map((e) => [e.id, e]));
 
 // 右侧挂轴：按模式展示大事、人物或疆域详情
 export default function DetailPanel() {
@@ -22,21 +24,21 @@ export default function DetailPanel() {
 
   if (figure) {
     return (
-      <ScrollPanel key={figure.id} side="right" label={tx(figure.name)} onClose={() => openFigure(null)} holdWhileReading>
+      <ScrollPanel key={figure.id} side="right" label={figure.name} onClose={() => openFigure(null)}>
         <FigureCard figure={figure} />
       </ScrollPanel>
     );
   }
   if (lineage) {
     return (
-      <ScrollPanel key={lineage.id} side="right" label={tx(lineage.name)} onClose={() => openLineage(null)}>
+      <ScrollPanel key={lineage.id} side="right" label={lineage.name} onClose={() => openLineage(null)}>
         <CountryCard lineage={lineage} />
       </ScrollPanel>
     );
   }
   if (event) {
     return (
-      <ScrollPanel key={event.id} side="right" label={tx(event.title)} onClose={() => openEvent(null)} holdWhileReading>
+      <ScrollPanel key={event.id} side="right" label={event.title} onClose={() => openEvent(null)}>
         <EventCard event={event} />
       </ScrollPanel>
     );

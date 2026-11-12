@@ -59,6 +59,6 @@ export function fitView(width: number, height: number, padTop = 70, padBottom = 
   return { k, x: (width - BASE_W * k) / 2, y: padTop + (availH - BASE_H * k) / 2 };
 }
 
-export function applyView(ctx: Pick<CanvasRenderingContext2D, 'setTransform'>, view: View) {
+export function applyView(ctx: CanvasRenderingContext2D, view: View) {
   ctx.setTransform(view.k * view.dpr, 0, 0, view.k * view.dpr, view.x * view.dpr, view.y * view.dpr);
 }

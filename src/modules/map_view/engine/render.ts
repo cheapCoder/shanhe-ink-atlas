@@ -1,30 +1,13 @@
-// 各图层的绘制函数：所有路径都在基准平面坐标中，线宽等屏幕尺寸需除以 k。
-// 这些函数同时用于主线程的清晰图层与后台线程的整幅世界代理纹理，因此只依赖通用的二维上下文
+// 各图层的绘制函数：所有路径都在基准平面坐标中，线宽等屏幕尺寸需除以 k
 import { geoGraticule10 } from 'd3-geo';
-import { BASE_H, BASE_W, applyView, intersects, spherePath, toPath2D, viewBox, type Box, type View } from './projection';
+import { BASE_H, BASE_W, applyView, intersects, spherePath, toPath2D, viewBox, type View } from './projection';
 import type { Basemap, ChinaSea } from './basemap';
+import type { Polity, Snapshot } from './snapshots';
 import { CINNABAR, INK, PIGMENTS, WATER_INK, deepen, rgba } from './palette';
 import { WASH_SIZE, WASH_TILE_BASE, washTile } from './wash';
-import { ctxOf, makeCanvas, type AnyCanvas, type Ctx2D } from './surface';
+import { LABEL_FONT } from './labels';
 
-// full：静止时的清晰画质；fast：没有代理纹理时交互中的应急画质；proxy：后台线程绘制整幅世界代理纹理
-export type Quality = 'full' | 'fast' | 'proxy';
-
-// 绘制所需的政权与切片信息（主线程的 Snapshot 与后台线程的简化结构都满足）
-export interface PolityShape {
-  index: number;
-  name: string;
-  area: number;
-  bbox: Box;
-  color: number;
-  path: Path2D;
-}
-
-export interface SnapshotShape {
-  year: number;
-  polities: PolityShape[];
-  borders: { path: Path2D; box: Box }[];
-}
+export type Quality = 'full' | 'fast';
 
 let sphere: Path2D | null = null;
 let graticule: Path2D | null = null;
@@ -32,7 +15,7 @@ let graticule: Path2D | null = null;
 const getSphere = () => (sphere ??= spherePath());
 const getGraticule = () => (graticule ??= toPath2D(geoGraticule10()));
 
-export function clear(ctx: Ctx2D) {
+export function clear(ctx: CanvasRenderingContext2D) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
@@ -41,15 +24,14 @@ export function clear(ctx: Ctx2D) {
 const CULTURE_RE = /(hunter|gatherer|tribes|peoples|nomad|culture|farmers|pastoral|forag|chiefdom|cultures|neolithic|aboriginal|amerindian|homo |neanderthal|bantu|khoisan|semites|dravidians|austronesians|papuans|inuit|sámi|saami|samis)/i;
 export const isCulture = (name: string) => CULTURE_RE.test(name);
 
-export function drawBase(ctx: Ctx2D, view: View, base: Basemap, quality: Quality) {
+export function drawBase(ctx: CanvasRenderingContext2D, view: View, base: Basemap, quality: Quality) {
   const k = view.k;
   clear(ctx);
   applyView(ctx, view);
 
   // 海面留白，只在近岸以花青淡淡晕开，再勾几道水纹（半分辨率绘制后放大，降低描边与模糊的开销）
 
-  // 近岸水纹较费时：交互中的快速画质省去；代理纹理在后台线程画一次，飞行时海岸也不会忽隐忽现
-  if (quality !== 'fast') drawSea(ctx, view, base);
+  if (quality === 'full') drawSea(ctx, view, base);
 
   if (base.landTexture) ctx.drawImage(base.landTexture, 0, 0, BASE_W, BASE_H);
 
@@ -65,7 +47,7 @@ export function drawBase(ctx: Ctx2D, view: View, base: Basemap, quality: Quality
   ctx.save();
   ctx.strokeStyle = 'rgba(70, 58, 44, 0.1)';
   ctx.lineWidth = 10 / k;
-  if (quality !== 'fast') ctx.filter = 'blur(5px)';
+  if (quality === 'full') ctx.filter = 'blur(5px)';
   ctx.stroke(getSphere());
   ctx.filter = 'none';
   ctx.strokeStyle = 'rgba(52, 44, 36, 0.38)';
@@ -75,18 +57,22 @@ export function drawBase(ctx: Ctx2D, view: View, base: Basemap, quality: Quality
 }
 
 // 近岸晕染与水纹：由外向内逐圈“宽描边再挖空”，得到距海岸等距的细线，最后去掉陆地内侧
-let seaCanvas: AnyCanvas | null = null;
+let seaCanvas: HTMLCanvasElement | null = null;
 const SEA_SCALE = 0.5;
 
 // 宽描边与模糊会抹平海岸细节，中心线可容许 1 个海面画布像素的简化误差
 const SEA_ERROR_PX = 1;
 
-function drawSea(ctx: Ctx2D, view: View, base: Basemap) {
+function drawSea(ctx: CanvasRenderingContext2D, view: View, base: Basemap) {
+  seaCanvas ??= document.createElement('canvas');
+  const off = seaCanvas;
   const w = Math.ceil(ctx.canvas.width * SEA_SCALE);
   const h = Math.ceil(ctx.canvas.height * SEA_SCALE);
-  if (!seaCanvas || seaCanvas.width !== w || seaCanvas.height !== h) seaCanvas = makeCanvas(w, h);
-  const off = seaCanvas;
-  const o = ctxOf(off);
+  if (off.width !== w || off.height !== h) {
+    off.width = w;
+    off.height = h;
+  }
+  const o = off.getContext('2d')!;
   o.setTransform(1, 0, 0, 1, 0, 0);
   o.clearRect(0, 0, w, h);
   const s = view.dpr * SEA_SCALE;
@@ -124,12 +110,12 @@ function drawSea(ctx: Ctx2D, view: View, base: Basemap) {
   ctx.restore();
 }
 
-const strokeEach = (ctx: Ctx2D, paths: Path2D[]) => paths.forEach((p) => ctx.stroke(p));
+const strokeEach = (ctx: CanvasRenderingContext2D, paths: Path2D[]) => paths.forEach((p) => ctx.stroke(p));
 
 const patterns = new Map<string, CanvasPattern>();
 
 // 设色用的淡彩纹理图案，纹理坐标落在基准平面上，随地图一同缩放平移
-function washPattern(ctx: Ctx2D, hex: string, alpha: number): CanvasPattern | string {
+function washPattern(ctx: CanvasRenderingContext2D, hex: string, alpha: number): CanvasPattern | string {
   const a = Math.round(alpha * 50) / 50;
   const key = `${hex}|${a}`;
   let p = patterns.get(key);
@@ -142,122 +128,125 @@ function washPattern(ctx: Ctx2D, hex: string, alpha: number): CanvasPattern | st
   return p;
 }
 
-const washOf = (ctx: Ctx2D, hex: string, alpha: number, quality: Quality) => (quality === 'fast' ? rgba(hex, alpha) : washPattern(ctx, hex, alpha));
-
-// 晕边：在多边形内侧叠几道由宽到窄的描边，模拟颜料在纸上向边缘聚集
-function edgeWash(ctx: Ctx2D, path: Path2D, hex: string, k: number) {
-  ctx.save();
-  ctx.clip(path);
-  ctx.strokeStyle = rgba(hex, 0.07);
-  ctx.lineWidth = 9 / k;
-  ctx.stroke(path);
-  ctx.strokeStyle = rgba(hex, 0.1);
-  ctx.lineWidth = 3.5 / k;
-  ctx.stroke(path);
-  ctx.restore();
+export interface PolityStyle {
+  colors: number[];
+  highlight: Map<number, 1 | 2> | null;
+  highlightColor: string;
 }
 
-// 只保留陆地部分：画完后按陆地遮罩一次性抠掉海面。若先 clip 再画，上千次填充与描边每次都要与复杂裁剪区求交，开销高出数倍
-function keepLand(ctx: Ctx2D, view: View, base: Basemap) {
-  ctx.globalCompositeOperation = 'destination-in';
-  ctx.fillStyle = '#000';
-  ctx.fill(base.land.in(view, 'fill'));
-  ctx.globalCompositeOperation = 'source-over';
-}
-
-// 各政权的本色与国界。国家谱系的高亮不在这里处理：高亮另成一层盖在上面，
-// 其余政权的“退淡”由合成时降低本层的不透明度实现，换一个国家看时本层无需重绘
-export function drawPolities(ctx: Ctx2D, view: View, base: Basemap, snap: SnapshotShape, quality: Quality) {
+export function drawPolities(ctx: CanvasRenderingContext2D, view: View, base: Basemap, snap: Snapshot, style: PolityStyle, quality: Quality) {
   const k = view.k;
   clear(ctx);
   applyView(ctx, view);
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
+  const dim = style.highlight !== null;
   const minScreen = 1.5 / k;
   const box = viewBox(view, 16);
   const visible = snap.polities.filter((p) => intersects(box, p.bbox));
   for (const p of visible) {
     if (p.bbox[2] - p.bbox[0] < minScreen && p.bbox[3] - p.bbox[1] < minScreen) continue;
-    ctx.fillStyle = washOf(ctx, PIGMENTS[p.color] ?? PIGMENTS[0], isCulture(p.name) ? 0.13 : 0.3, quality);
+    const level = style.highlight?.get(p.index) ?? 0;
+    const hex = level ? style.highlightColor : PIGMENTS[style.colors[p.index] ?? 0];
+    const culture = isCulture(p.name);
+    let alpha = culture ? 0.13 : 0.3;
+    if (dim) alpha = level === 1 ? 0.4 : level === 2 ? 0.2 : alpha * 0.32;
+    ctx.fillStyle = quality === 'full' ? washPattern(ctx, hex, alpha) : rgba(hex, alpha);
     ctx.fill(p.path);
   }
   ctx.globalCompositeOperation = 'source-over';
+
+  // 晕边：在多边形内侧叠几道由宽到窄的描边，模拟颜料在纸上向边缘聚集
 
   if (quality === 'full') {
     const big = visible
       .filter((p) => (p.bbox[2] - p.bbox[0]) * k >= 14 && !isCulture(p.name))
       .sort((a, b) => b.area - a.area)
       .slice(0, 140);
-    for (const p of big) edgeWash(ctx, p.path, deepen(PIGMENTS[p.color] ?? PIGMENTS[0], 0.3), k);
+    for (const p of big) {
+      const level = style.highlight?.get(p.index) ?? 0;
+      if (dim && !level) continue;
+      const hex = deepen(level ? style.highlightColor : PIGMENTS[style.colors[p.index] ?? 0], 0.3);
+      ctx.save();
+      ctx.clip(p.path);
+      ctx.strokeStyle = rgba(hex, 0.07);
+      ctx.lineWidth = 9 / k;
+      ctx.stroke(p.path);
+      ctx.strokeStyle = rgba(hex, 0.1);
+      ctx.lineWidth = 3.5 / k;
+      ctx.stroke(p.path);
+      ctx.restore();
+    }
   }
 
   const borders = snap.borders.filter((b) => intersects(box, b.box)).map((b) => b.path);
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = rgba(INK, 0.32);
+  ctx.strokeStyle = rgba(INK, dim ? 0.18 : 0.32);
   ctx.lineWidth = 2.2 / k;
   strokeEach(ctx, borders);
-  ctx.strokeStyle = rgba(INK, 0.55);
+  ctx.strokeStyle = rgba(INK, dim ? 0.3 : 0.55);
   ctx.lineWidth = 0.7 / k;
   strokeEach(ctx, borders);
 
-  keepLand(ctx, view, base);
+  if (style.highlight) {
+    for (const [i, level] of style.highlight) {
+      ctx.strokeStyle = rgba(deepen(style.highlightColor, 0.25), level === 1 ? 0.85 : 0.55);
+      ctx.lineWidth = (level === 1 ? 1.6 : 1) / k;
+      ctx.setLineDash(level === 1 ? [] : [4 / k, 3 / k]);
+      ctx.stroke(snap.polities[i].path);
+    }
+    ctx.setLineDash([]);
+  }
+
+  // 只保留陆地部分：画完后按陆地遮罩一次性抠掉海面。若先 clip 再画，上千次填充与描边每次都要与复杂裁剪区求交，GPU 开销高出数倍
+
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.fillStyle = '#000';
+  ctx.fill(base.land.in(view, 'fill'));
   ctx.restore();
-  if (base.chinaSea && snap.year >= CHINA_SEA_SINCE) drawChinaSea(ctx, view, base.chinaSea);
+  if (base.chinaSea && snap.meta.year >= CHINA_SEA_SINCE) drawChinaSea(ctx, view, base.chinaSea, dim ? 0.5 : 1);
 }
 
-// 国家谱系的高亮层：本体朱砂实线，并立或附属淡染虚线
-export function drawHighlight(ctx: Ctx2D, view: View, base: Basemap, snap: SnapshotShape, levels: Map<number, 1 | 2>, color: string, quality: Quality) {
-  const k = view.k;
-  clear(ctx);
-  if (!levels.size) return;
-  applyView(ctx, view);
-  ctx.save();
-  const box = viewBox(view, 16);
-  const edge = deepen(color, 0.3);
-  const line = deepen(color, 0.25);
-  const lit = [...levels].map(([i, level]) => ({ p: snap.polities[i], level })).filter(({ p }) => p && intersects(box, p.bbox));
-  for (const { p, level } of lit) {
-    ctx.fillStyle = washOf(ctx, color, level === 1 ? 0.42 : 0.2, quality);
-    ctx.fill(p.path);
-  }
-  if (quality === 'full') for (const { p } of lit) edgeWash(ctx, p.path, edge, k);
-  ctx.lineJoin = 'round';
-  for (const { p, level } of lit) {
-    ctx.strokeStyle = rgba(line, level === 1 ? 0.85 : 0.55);
-    ctx.lineWidth = (level === 1 ? 1.6 : 1) / k;
-    ctx.setLineDash(level === 1 ? [] : [4 / k, 3 / k]);
-    ctx.stroke(p.path);
-  }
-  ctx.setLineDash([]);
-  keepLand(ctx, view, base);
-  ctx.restore();
-}
+// 南海断续线与南海诸岛：中华人民共和国成立后的切片显示；断续线同国界线墨色，岛礁以墨点示意，放大后标注地名
+const CHINA_SEA_SINCE = 1949;
 
-// 南海断续线与南海诸岛：中华人民共和国成立后的切片显示；断续线同国界线墨色，岛礁以墨点示意（地名见标注层）
-export const CHINA_SEA_SINCE = 1949;
-
-function drawChinaSea(ctx: Ctx2D, view: View, sea: ChinaSea) {
+function drawChinaSea(ctx: CanvasRenderingContext2D, view: View, sea: ChinaSea, alpha: number) {
   const k = view.k;
   ctx.save();
   ctx.lineCap = 'round';
-  ctx.strokeStyle = rgba(INK, 0.32);
+  ctx.strokeStyle = rgba(INK, 0.32 * alpha);
   ctx.lineWidth = 2.2 / k;
   ctx.stroke(sea.dashes);
-  ctx.strokeStyle = rgba(INK, 0.7);
+  ctx.strokeStyle = rgba(INK, 0.7 * alpha);
   ctx.lineWidth = 0.9 / k;
   ctx.stroke(sea.dashes);
   const r = Math.min(1.4, 0.5 + k * 0.2) / k;
-  ctx.fillStyle = rgba(INK, 0.6);
+  ctx.fillStyle = rgba(INK, 0.6 * alpha);
   ctx.beginPath();
   for (const [x, y] of sea.islands) {
     ctx.moveTo(x + r, y);
     ctx.arc(x, y, r, 0, Math.PI * 2);
   }
   ctx.fill();
+  ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.min(15, 9 + k).toFixed(1)}px ${LABEL_FONT}`;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = `rgba(243, 236, 222, ${0.8 * alpha})`;
+  ctx.fillStyle = rgba(INK, 0.72 * alpha);
+  for (const l of sea.labels) {
+    if (k < l.minK) continue;
+    const x = l.at[0] * k + view.x;
+    const y = l.at[1] * k + view.y;
+    ctx.strokeText(l.name, x, y);
+    ctx.fillText(l.name, x, y);
+  }
   ctx.restore();
 }
 
-export function drawWater(ctx: Ctx2D, view: View, base: Basemap) {
+export function drawWater(ctx: CanvasRenderingContext2D, view: View, base: Basemap) {
   const k = view.k;
   clear(ctx);
   applyView(ctx, view);
@@ -287,17 +276,17 @@ export function drawWater(ctx: Ctx2D, view: View, base: Basemap) {
   strokeEach(ctx, base.land.pieces(view));
 }
 
-export function drawHover(ctx: Ctx2D, view: View, path: Path2D | null, color = INK) {
-  if (!path) return;
+export function drawHover(ctx: CanvasRenderingContext2D, view: View, p: Polity | null, color = INK) {
+  if (!p) return;
   applyView(ctx, view);
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.strokeStyle = rgba(color === INK ? '#000000' : color, 0.16);
   ctx.lineWidth = 6 / view.k;
-  ctx.stroke(path);
+  ctx.stroke(p.path);
   ctx.strokeStyle = rgba(color, 0.85);
   ctx.lineWidth = 1.4 / view.k;
-  ctx.stroke(path);
+  ctx.stroke(p.path);
   ctx.restore();
 }
 

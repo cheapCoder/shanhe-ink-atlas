@@ -14,8 +14,6 @@
   width: 0;
   height: 0;
   transition: opacity 0.4s;
-  /* 镜头移动时印记逐帧平移：单独成层后只需合成器搬动，不必连同印章滤镜重画 */
-  will-change: transform;
 }
 
 .event-marker__seal {
@@ -113,7 +111,6 @@
   top: 0;
   width: 0;
   height: 0;
-  will-change: transform;
 }
 
 .route-head > span {
@@ -190,59 +187,4 @@
 .map-controls button:hover {
   color: var(--paper-light);
   background: var(--ink-1);
-}
-
-/* 行迹站点题签：停在站点上时在行进精灵旁写明年份与所为何事 */
-.route-head__caption {
-  position: absolute;
-  left: 34px;
-  bottom: 26px;
-  margin: 0;
-  max-width: 260px;
-  width: max-content;
-  padding: 5px 10px 5px 8px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-0);
-  background: rgba(250, 245, 233, 0.94);
-  border-left: 3px solid var(--cinnabar);
-  box-shadow: 0 0 0 1px rgba(70, 58, 44, 0.2), 0 4px 10px rgba(60, 42, 20, 0.16);
-  animation: caption-in 0.5s var(--ease-ink) both;
-}
-
-.route-head__caption b {
-  margin-right: 7px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--cinnabar-deep);
-}
-
-@keyframes caption-in {
-  from {
-    opacity: 0;
-    transform: translateX(-6px);
-  }
-}
-
-.map-controls button.is-done {
-  color: var(--paper-light);
-  background: var(--cinnabar);
-}
-
-.map-controls button:last-of-type {
-  font-family: var(--font-brush);
-  font-size: 16px;
-}
-
-.map-controls__toast {
-  position: absolute;
-  right: 44px;
-  bottom: 4px;
-  padding: 4px 10px;
-  font-size: 12.5px;
-  white-space: nowrap;
-  color: var(--paper-light);
-  background: var(--ink-1);
-  border-radius: 2px;
-  animation: caption-in 0.3s var(--ease-ink) both;
 }

@@ -1,5 +1,4 @@
-// 界面文案（简体中文）。key 规则：下划线命名、首词为模块名、最多三个词。
-// 新增 key 时须同时补上 en.ts（类型检查会提示缺漏）
+// 界面文案（简体中文）。key 规则：下划线命名、首词为模块名、最多三个词
 export const zh = {
   app_title: '山河墨史',
   app_subtitle: '世界历史疆域与大事舆图',
@@ -7,20 +6,8 @@ export const zh = {
   app_enter: '展卷',
   app_loading: '研墨中',
   app_seal: '千秋',
-  app_stats: '疆域切片 {s} 幅 · 大事 {e} 则 · 人物 {f} 位 · 行迹 {w} 站',
+  app_stats: '疆域切片 {s} 幅 · 大事 {e} 则 · 人物 {f} 位 · 校勘 {c} 条',
   app_hint: '点击“展卷”开始自动导览，可随时暂停、拖动时间轴或切换模式',
-  app_doc_title: '山河墨史 · 世界历史疆域与大事舆图',
-  app_doc_desc: '山河墨史：水墨风格的世界历史疆域变迁、大事纪年与人物行迹交互地图',
-
-  lang_switch: 'Switch to English',
-  lang_glyph: 'EN',
-  sound_title: '背景音乐',
-  sound_on: '配乐已开，点击关闭',
-  sound_off: '配乐已关，点击开启',
-  sound_glyph: '乐',
-  share_copy: '复制当前画面的链接',
-  share_copied: '链接已复制',
-  share_glyph: '链',
 
   mode_overview: '纵览',
   mode_territory: '疆域',
@@ -38,6 +25,7 @@ export const zh = {
   year_snapshot: '疆域据',
   year_synthetic: '校补',
   year_approx: '约',
+  year_china: '中国',
 
   timeline_play: '播放',
   timeline_pause: '暂停',
@@ -46,19 +34,9 @@ export const zh = {
   timeline_normal: '中',
   timeline_fast: '疾',
   timeline_tour: '导览',
-  timeline_tour_hint: '遇大事自动飞往发生地、停驻讲解',
+  timeline_tour_hint: '遇大事自动停驻讲解',
   timeline_prev: '上一大事',
   timeline_next: '下一大事',
-  tour_depth: '导览详略',
-  tour_depth_1: '精',
-  tour_depth_2: '详',
-  tour_depth_3: '全',
-  tour_hint_1: '精要：只在改变格局的大事停驻（{n} 则，全程约 {m} 分钟）',
-  tour_hint_2: '详览：重要大事都停驻（{n} 则，全程约 {m} 分钟）',
-  tour_hint_3: '全览：每则大事都停驻（{n} 则，全程约 {m} 分钟）',
-  tour_paused: '阅读中，已为你停住',
-  chrono_pick: '时间轴显示哪一国的纪年',
-  chrono_auto: '随所看的国家切换',
 
   panel_close: '收起',
   panel_sources: '参考资料',
@@ -72,8 +50,6 @@ export const zh = {
   panel_locate: '定位',
   panel_hint_figure: '请在左侧选择一位历史人物，循其足迹行遍山河。',
   panel_hint_country: '请在左侧选择一个国家或文明，观其疆域历代变迁。',
-  panel_wiki_zh: '维基百科（中文）',
-  panel_wiki_en: 'Wikipedia（英文）',
 
   figure_route: '生平行迹',
   figure_play: '循迹而行',
@@ -82,22 +58,6 @@ export const zh = {
   figure_list: '历史人物',
   figure_stage: '当前',
   figure_all: '全部',
-  figure_stops: '{n} 站',
-  figure_step: '第 {i} / {n} 站',
-  figure_prev: '上一站',
-  figure_next: '下一站',
-  figure_event: '相关大事',
-  figure_more: '延伸阅读',
-  figure_search: '搜索人物',
-
-  region_china: '中国',
-  region_east_asia: '东亚',
-  region_south_asia: '南亚',
-  region_central_asia: '中亚',
-  region_west_asia: '西亚',
-  region_europe: '欧洲',
-  region_africa: '非洲',
-  region_americas: '美洲',
 
   country_title: '疆域变迁',
   country_list: '国家与文明',
@@ -115,7 +75,6 @@ export const zh = {
   events_count: '则大事',
   events_search: '搜索事件、人物或地点',
   events_empty: '没有匹配的条目',
-  events_rank: '只看要事',
 
   category_war: '战争',
   category_politics: '政事',
@@ -147,7 +106,6 @@ export const zh = {
   sprite_seal_text: '受命',
 
   data_title: '数据说明',
-  data_glyph: '注',
   data_borders: '疆域底图',
   data_basemap: '地形与水系',
   data_content: '事件与人物',

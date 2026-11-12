@@ -6,6 +6,7 @@
   z-index: 25;
   display: flex;
   flex-direction: column;
+  filter: drop-shadow(0 12px 22px rgba(60, 42, 20, 0.2)) drop-shadow(0 2px 4px rgba(60, 42, 20, 0.15));
   animation: scroll-unroll 0.7s var(--ease-ink) both;
 }
 
@@ -19,14 +20,13 @@
   width: 300px;
 }
 
-/* 裁剪范围向外留出投影的位置 */
 @keyframes scroll-unroll {
   from {
-    clip-path: inset(-30px -40px calc(100% - 22px) -40px);
+    clip-path: inset(0 0 calc(100% - 22px) 0);
     opacity: 0.4;
   }
   to {
-    clip-path: inset(-30px -40px -50px -40px);
+    clip-path: inset(0 0 0 0);
     opacity: 1;
   }
 }
@@ -37,9 +37,8 @@
   margin: 0 -9px;
   border-radius: 7px;
   background: linear-gradient(to bottom, #6b4a2e 0%, #3e2918 45%, #2a1b10 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.25), 0 8px 14px rgba(60, 42, 20, 0.22), 0 2px 3px rgba(60, 42, 20, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.25);
   position: relative;
-  z-index: 1;
 }
 
 .scroll-panel__rod::before,
@@ -69,8 +68,6 @@
   background: #d8c6a2;
   background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 50%, transparent 50%);
   background-size: 6px 6px;
-  /* 投影用 box-shadow 而非 filter：滤镜会让面板在地图每帧变化时反复重新合成，拖慢镜头飞行 */
-  box-shadow: 0 12px 22px rgba(60, 42, 20, 0.2), 0 2px 4px rgba(60, 42, 20, 0.15);
 }
 
 .scroll-panel__paper {

@@ -82,100 +82,10 @@
   color: var(--ink-4);
 }
 
-.figure-card__bar {
-  margin-bottom: 6px;
-}
-
-.figure-card__count {
-  order: 2;
-  font-size: 13px;
-  font-style: italic;
-  color: var(--ink-3);
-}
-
-.figure-card__bar::after {
-  order: 1;
-}
-
-/* 行迹的播放与前后站切换 */
-.figure-card__controls {
-  display: grid;
-  grid-template-columns: 34px 1fr 34px;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.figure-card__controls .ink-button {
-  height: 32px;
-  padding: 0;
-  font-size: 16px;
-}
-
-.figure-card__controls .ink-button:disabled {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-/* 当前站点的讲解 */
-.station {
-  margin: 2px 0 8px 2px;
-  padding: 2px 4px 6px 8px;
-  border-left: 2px solid rgba(178, 58, 43, 0.35);
-  animation: station-in 0.45s var(--ease-ink) both;
-}
-
-@keyframes station-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-
-.station__text {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.85;
-  text-align: justify;
-  color: var(--ink-1);
-}
-
-.station__figure {
-  margin-top: 10px;
-  padding: 6px;
-}
-
-.station__figure img {
-  height: auto;
-  max-height: 230px;
-}
-
-.station__links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin: 10px 0 0;
-  font-size: 12.5px;
-}
-
-.station__links a {
-  color: var(--indigo);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(62, 92, 118, 0.3);
-}
-
-.station__event {
-  font-size: 12.5px;
-  text-align: left;
-}
-
-.station__seal {
-  flex: none;
-  font-style: normal;
-  font-size: 13px;
-  color: #f8efe2;
-  background: var(--cinnabar) !important;
-  border-radius: 3px !important;
+.figure-card__play {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 15px;
 }
 
 .figure-card__route {
@@ -197,7 +107,6 @@
 
 .figure-card__route li {
   position: relative;
-  scroll-margin-top: 58px;
 }
 
 .figure-card__route li::before {
@@ -280,16 +189,6 @@
   background: var(--cinnabar);
   transform-origin: left center;
   animation: hold-drain linear forwards;
-}
-
-.tour-hold.is-paused .tour-hold__bar {
-  animation-play-state: paused;
-}
-
-.tour-hold__note {
-  font-size: 12px;
-  color: var(--cinnabar-deep);
-  white-space: nowrap;
 }
 
 @keyframes hold-drain {

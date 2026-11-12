@@ -169,12 +169,3 @@
     letter-spacing: 0.06em;
   }
 }
-
-/* 开篇右上角：配乐与语言 */
-.intro__tools {
-  position: absolute;
-  top: 22px;
-  right: 26px;
-  display: flex;
-  gap: 8px;
-}

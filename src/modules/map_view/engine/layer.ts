@@ -21,16 +21,6 @@ export class Layer {
     this.view = null;
   }
 
-  // 是否已有可用的内容（可能属于稍早的视图）
-  get drawn(): boolean {
-    return this.view !== null;
-  }
-
-  // 是否已按该视图与画质画好
-  fresh(v: View, quality: Quality): boolean {
-    return !this.needsRender(v, false, quality) && this.quality === quality;
-  }
-
   needsRender(v: View, interacting: boolean, quality: Quality): boolean {
     const c = this.view;
     if (!this.valid || !c) return true;
@@ -70,7 +60,7 @@ export class Layer {
 }
 
 // 缓存图层经相对变换后未覆盖视口的比例
-export function uncovered(c: View, v: View): number {
+function uncovered(c: View, v: View): number {
   const r = v.k / c.k;
   const left = v.x - c.x * r;
   const top = v.y - c.y * r;
@@ -90,11 +80,4 @@ export function composeLayer(ctx: CanvasRenderingContext2D, layer: Layer, v: Vie
   ctx.drawImage(layer.canvas, 0, 0);
   ctx.globalAlpha = 1;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-}
-
-// 缓存视图与当前视图是否足够接近：缩放比在 [lo, hi] 之内，且露出的空白不超过 gap
-export function near(c: View | null, v: View, lo: number, hi: number, gap: number): boolean {
-  if (!c || c.width !== v.width || c.height !== v.height) return false;
-  const r = v.k / c.k;
-  return r >= lo && r <= hi && uncovered(c, v) <= gap;
 }
